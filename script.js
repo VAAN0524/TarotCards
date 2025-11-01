@@ -464,20 +464,45 @@ window.addEventListener('resize', debouncedResize);
 
 // 初始化占卜系统
 function initializeDivination() {
-    // 占卜入口按钮
-    document.getElementById('startDivination').addEventListener('click', startDivination);
+    try {
+        // 占卜入口按钮
+        const startBtn = document.getElementById('startDivination');
+        if (startBtn) {
+            startBtn.addEventListener('click', startDivination);
+        }
 
-    // 问题类型选择
-    document.querySelectorAll('.question-type').forEach(type => {
-        type.addEventListener('click', selectQuestionType);
-    });
+        // 问题类型选择 - 添加详细错误处理
+        const questionTypes = document.querySelectorAll('.question-type');
+        console.log(`找到 ${questionTypes.length} 个问题类型选择器`);
 
-    // 导航按钮
-    document.getElementById('backToMain').addEventListener('click', backToMain);
-    document.getElementById('backToQuestionType').addEventListener('click', backToQuestionType);
-    document.getElementById('startInterpretation').addEventListener('click', startInterpretation);
-    document.getElementById('newReading').addEventListener('click', newReading);
-    document.getElementById('backHome').addEventListener('click', backHome);
+        questionTypes.forEach((type, index) => {
+            console.log(`绑定问题类型 ${index}:`, type.getAttribute('data-type'));
+            type.addEventListener('click', function(event) {
+                console.log('点击问题类型:', event.currentTarget.getAttribute('data-type'));
+                selectQuestionType(event);
+            });
+        });
+
+        // 导航按钮
+        const backToMainBtn = document.getElementById('backToMain');
+        if (backToMainBtn) backToMainBtn.addEventListener('click', backToMain);
+
+        const backToQuestionTypeBtn = document.getElementById('backToQuestionType');
+        if (backToQuestionTypeBtn) backToQuestionTypeBtn.addEventListener('click', backToQuestionType);
+
+        const startInterpretationBtn = document.getElementById('startInterpretation');
+        if (startInterpretationBtn) startInterpretationBtn.addEventListener('click', startInterpretation);
+
+        const newReadingBtn = document.getElementById('newReading');
+        if (newReadingBtn) newReadingBtn.addEventListener('click', newReading);
+
+        const backHomeBtn = document.getElementById('backHome');
+        if (backHomeBtn) backHomeBtn.addEventListener('click', backHome);
+
+        console.log('占卜系统初始化完成');
+    } catch (error) {
+        console.error('占卜系统初始化失败:', error);
+    }
 }
 
 // 开始占卜
@@ -525,20 +550,36 @@ function selectQuestionType(event) {
 
 // 准备卡牌抽取
 function prepareCardDraw() {
-    // 重置抽取状态
-    AppState.selectedCards = [];
-    updateSelectedCount();
+    try {
+        console.log('开始准备卡牌抽取界面...');
 
-    // 使用全部22张塔罗牌，确保不重复
-    AppState.availableCardsForDivination = shuffleArray([...tarotCards]);
+        // 重置抽取状态
+        AppState.selectedCards = [];
+        updateSelectedCount();
 
-    console.log(`准备${AppState.availableCardsForDivination.length}张不重复的塔罗牌供抽取`);
+        // 使用全部22张塔罗牌，确保不重复
+        AppState.availableCardsForDivination = shuffleArray([...tarotCards]);
 
-    // 显示横向滚动的卡牌
-    createScrollCards();
+        console.log(`准备${AppState.availableCardsForDivination.length}张不重复的塔罗牌供抽取`, AppState.availableCardsForDivination);
 
-    // 更新问题提示
-    updateQuestionPrompt();
+        // 确保容器存在
+        const container = document.getElementById('cardFanContainer');
+        if (!container) {
+            console.error('cardFanContainer容器不存在');
+            return;
+        }
+
+        // 显示横向滚动的卡牌
+        createScrollCards();
+
+        // 更新问题提示
+        updateQuestionPrompt();
+
+        console.log('卡牌抽取界面准备完成');
+
+    } catch (error) {
+        console.error('准备卡牌抽取失败:', error);
+    }
 }
 
 // 更新问题提示
@@ -557,66 +598,100 @@ function updateQuestionPrompt() {
 
 // 创建无缝循环滚动的卡牌
 function createScrollCards() {
-    const container = document.getElementById('cardFanContainer');
-    container.innerHTML = '';
+    try {
+        const container = document.getElementById('cardFanContainer');
+        if (!container) {
+            console.error('找不到cardFanContainer容器');
+            return;
+        }
 
-    const cards = AppState.availableCardsForDivination;
-    console.log(`创建无缝循环滚动卡牌: ${cards.length}张`);
+        container.innerHTML = '';
 
-    // 创建滚动容器
-    const scrollWrapper = document.createElement('div');
-    scrollWrapper.className = 'scroll-wrapper';
+        const cards = AppState.availableCardsForDivination;
+        console.log(`创建无缝循环滚动卡牌: ${cards.length}张`, cards);
 
-    // 创建卡牌轨道 - 复制两份实现无缝循环
-    const track = document.createElement('div');
-    track.className = 'card-track';
+        if (!cards || cards.length === 0) {
+            console.error('没有可用的卡牌数据');
+            return;
+        }
 
-    // 第一组卡牌
-    cards.forEach((card, index) => {
-        const cardElement = createScrollCard(card, index);
-        track.appendChild(cardElement);
-    });
+        // 创建滚动容器
+        const scrollWrapper = document.createElement('div');
+        scrollWrapper.className = 'scroll-wrapper';
 
-    // 第二组卡牌（用于无缝循环）
-    cards.forEach((card, index) => {
-        const cardElement = createScrollCard(card, index + cards.length);
-        track.appendChild(cardElement);
-    });
+        // 创建卡牌轨道 - 复制两份实现无缝循环
+        const track = document.createElement('div');
+        track.className = 'card-track';
 
-    scrollWrapper.appendChild(track);
-    container.appendChild(scrollWrapper);
+        // 第一组卡牌
+        cards.forEach((card, index) => {
+            console.log(`创建第一组卡牌 ${index}:`, card.name);
+            const cardElement = createScrollCard(card, index);
+            track.appendChild(cardElement);
+        });
 
-    console.log(`创建了${cards.length * 2}张无缝循环滚动卡牌`);
+        // 第二组卡牌（用于无缝循环）
+        cards.forEach((card, index) => {
+            console.log(`创建第二组卡牌 ${index}:`, card.name);
+            const cardElement = createScrollCard(card, index + cards.length);
+            track.appendChild(cardElement);
+        });
+
+        scrollWrapper.appendChild(track);
+        container.appendChild(scrollWrapper);
+
+        console.log(`创建了${cards.length * 2}张无缝循环滚动卡牌`);
+
+        // 强制触发重排以确保动画开始
+        setTimeout(() => {
+            const trackElement = container.querySelector('.card-track');
+            if (trackElement) {
+                trackElement.style.animation = 'autoScroll 30s linear infinite';
+            }
+        }, 100);
+
+    } catch (error) {
+        console.error('创建滚动卡牌失败:', error);
+    }
 }
 
 // 创建单个滚动卡牌元素
 function createScrollCard(card, index) {
-    const cardElement = document.createElement('div');
-    cardElement.className = 'scroll-card';
-    cardElement.setAttribute('data-card-id', card.id);
-    cardElement.setAttribute('data-index', index % cards.length);
-    cardElement.setAttribute('data-original-index', index % cards.length);
+    try {
+        console.log(`创建滚动卡牌: ${card.name} (索引: ${index})`);
 
-    // 创建卡牌内容（只显示卡背）
-    cardElement.innerHTML = `
-        <div class="card-face card-back">
-            <img src="images/塔罗牌背面.png" alt="塔罗牌背面" loading="eager">
-        </div>
-    `;
+        const cardElement = document.createElement('div');
+        cardElement.className = 'scroll-card';
+        cardElement.setAttribute('data-card-id', card.id);
 
-    // 添加点击事件
-    cardElement.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectScrollCard(cardElement, card, index % cards.length);
-    });
+        // 使用AppState中的卡牌数组长度计算索引
+        const cardsLength = AppState.availableCardsForDivination.length;
+        const originalIndex = index % cardsLength;
 
-    // 添加进入动画
-    setTimeout(() => {
-        cardElement.style.opacity = '1';
-        cardElement.style.transform = 'translateY(0)';
-    }, index * 30);
+        cardElement.setAttribute('data-index', originalIndex);
+        cardElement.setAttribute('data-original-index', originalIndex);
 
-    return cardElement;
+        // 创建卡牌内容（只显示卡背）
+        cardElement.innerHTML = `
+            <div class="card-face card-back">
+                <img src="images/塔罗牌背面.png" alt="塔罗牌背面" loading="eager">
+            </div>
+        `;
+
+        // 添加点击事件
+        cardElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log(`点击滚动卡牌: ${card.name}`);
+            selectScrollCard(cardElement, card, originalIndex);
+        });
+
+        // 卡牌已默认显示，无需额外的opacity动画
+
+        return cardElement;
+    } catch (error) {
+        console.error(`创建滚动卡牌失败 (${card.name}):`, error);
+        return document.createElement('div'); // 返回空元素避免崩溃
+    }
 }
 
 // 选择滚动卡牌

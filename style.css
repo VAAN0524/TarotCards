@@ -572,8 +572,8 @@ h1 {
     height: 180px;
     cursor: pointer;
     transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1; /* 修改：默认显示，避免移动端看不到 */
+    transform: translateY(0); /* 修改：默认位置 */
 
     /* 3D支持 */
     -webkit-transform-style: preserve-3d;
