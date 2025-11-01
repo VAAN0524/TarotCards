@@ -180,10 +180,36 @@ const tarotCards = [
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('页面DOM加载完成，开始初始化...');
+
+    // 基础初始化
     initializeTarotCards();
     addAutoRotate();
-    initializeDivination();
-    setupLazyLoading(); // 启用图片懒加载优化
+
+    // 延迟初始化占卜系统，确保所有元素都准备好
+    setTimeout(() => {
+        console.log('延迟初始化占卜系统...');
+        initializeDivination();
+        setupLazyLoading(); // 启用图片懒加载优化
+    }, 200);
+
+    // 添加全局测试函数
+    window.testDivination = function() {
+        console.log('测试占卜系统...');
+        try {
+            const startBtn = document.getElementById('startDivination');
+            if (startBtn) {
+                console.log('找到开始按钮，手动触发点击事件');
+                startBtn.click();
+            } else {
+                console.error('仍然找不到开始按钮');
+            }
+        } catch (error) {
+            console.error('测试占卜系统失败:', error);
+        }
+    };
+
+    console.log('基础初始化完成，占卜系统将在200ms后初始化');
 });
 
 // 全局变量
@@ -464,88 +490,158 @@ window.addEventListener('resize', debouncedResize);
 
 // 初始化占卜系统
 function initializeDivination() {
-    try {
-        // 占卜入口按钮
-        const startBtn = document.getElementById('startDivination');
-        if (startBtn) {
-            startBtn.addEventListener('click', startDivination);
-        }
+    console.log('开始初始化占卜系统...');
 
-        // 问题类型选择 - 添加详细错误处理
-        const questionTypes = document.querySelectorAll('.question-type');
-        console.log(`找到 ${questionTypes.length} 个问题类型选择器`);
+    // 延迟初始化，确保DOM完全准备好
+    setTimeout(() => {
+        try {
+            // 占卜入口按钮
+            const startBtn = document.getElementById('startDivination');
+            if (startBtn) {
+                console.log('找到开始占卜按钮');
+                startBtn.addEventListener('click', function(e) {
+                    console.log('点击开始占卜按钮');
+                    e.preventDefault();
+                    startDivination();
+                });
+            } else {
+                console.error('找不到开始占卜按钮');
+            }
 
-        questionTypes.forEach((type, index) => {
-            console.log(`绑定问题类型 ${index}:`, type.getAttribute('data-type'));
-            type.addEventListener('click', function(event) {
-                console.log('点击问题类型:', event.currentTarget.getAttribute('data-type'));
-                selectQuestionType(event);
+            // 问题类型选择 - 添加详细错误处理
+            const questionTypes = document.querySelectorAll('.question-type');
+            console.log(`找到 ${questionTypes.length} 个问题类型选择器`);
+
+            if (questionTypes.length === 0) {
+                console.error('没有找到任何问题类型选择器');
+            } else {
+                questionTypes.forEach((type, index) => {
+                    const typeValue = type.getAttribute('data-type');
+                    console.log(`绑定问题类型 ${index}: ${typeValue}`);
+
+                    type.addEventListener('click', function(event) {
+                        console.log('点击问题类型:', typeValue);
+                        event.preventDefault();
+                        selectQuestionType(event);
+                    });
+                });
+            }
+
+            // 导航按钮
+            const buttons = [
+                { id: 'backToMain', func: backToMain },
+                { id: 'backToQuestionType', func: backToQuestionType },
+                { id: 'startInterpretation', func: startInterpretation },
+                { id: 'newReading', func: newReading },
+                { id: 'backHome', func: backHome }
+            ];
+
+            buttons.forEach(btn => {
+                const element = document.getElementById(btn.id);
+                if (element) {
+                    console.log(`绑定按钮: ${btn.id}`);
+                    element.addEventListener('click', function(e) {
+                        console.log(`点击按钮: ${btn.id}`);
+                        e.preventDefault();
+                        btn.func();
+                    });
+                } else {
+                    console.warn(`找不到按钮: ${btn.id}`);
+                }
             });
-        });
 
-        // 导航按钮
-        const backToMainBtn = document.getElementById('backToMain');
-        if (backToMainBtn) backToMainBtn.addEventListener('click', backToMain);
-
-        const backToQuestionTypeBtn = document.getElementById('backToQuestionType');
-        if (backToQuestionTypeBtn) backToQuestionTypeBtn.addEventListener('click', backToQuestionType);
-
-        const startInterpretationBtn = document.getElementById('startInterpretation');
-        if (startInterpretationBtn) startInterpretationBtn.addEventListener('click', startInterpretation);
-
-        const newReadingBtn = document.getElementById('newReading');
-        if (newReadingBtn) newReadingBtn.addEventListener('click', newReading);
-
-        const backHomeBtn = document.getElementById('backHome');
-        if (backHomeBtn) backHomeBtn.addEventListener('click', backHome);
-
-        console.log('占卜系统初始化完成');
-    } catch (error) {
-        console.error('占卜系统初始化失败:', error);
-    }
+            console.log('占卜系统初始化完成');
+        } catch (error) {
+            console.error('占卜系统初始化失败:', error);
+        }
+    }, 100); // 100ms延迟确保DOM完全准备好
 }
 
 // 开始占卜
 function startDivination() {
-    AppState.isDivinationMode = true;
-    AppState.selectedCards = [];
-    AppState.selectedQuestionType = '';
+    console.log('开始占卜...');
+    try {
+        AppState.isDivinationMode = true;
+        AppState.selectedCards = [];
+        AppState.selectedQuestionType = '';
 
-    // 停止主页面的卡牌动画
-    stopMainPageAnimation();
+        console.log('停止主页面动画...');
+        // 停止主页面的卡牌动画
+        stopMainPageAnimation();
 
-    // 显示占卜界面
-    document.getElementById('divinationContainer').classList.add('active');
-    showScreen('questionTypeScreen');
+        console.log('显示占卜界面...');
+        const container = document.getElementById('divinationContainer');
+        if (container) {
+            container.classList.add('active');
+            console.log('占卜容器已激活');
+        } else {
+            console.error('找不到占卜容器');
+            return;
+        }
+
+        console.log('切换到问题类型选择界面...');
+        showScreen('questionTypeScreen');
+
+    } catch (error) {
+        console.error('开始占卜失败:', error);
+    }
 }
 
 // 显示指定界面
 function showScreen(screenId) {
-    document.querySelectorAll('.divination-screen').forEach(screen => {
-        screen.classList.add('hidden');
-    });
-    document.getElementById(screenId).classList.remove('hidden');
+    console.log(`切换到界面: ${screenId}`);
+    try {
+        const screens = document.querySelectorAll('.divination-screen');
+        console.log(`找到 ${screens.length} 个占卜界面`);
+
+        // 隐藏所有界面
+        screens.forEach(screen => {
+            screen.classList.add('hidden');
+        });
+
+        // 显示目标界面
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.remove('hidden');
+            console.log(`成功显示界面: ${screenId}`);
+        } else {
+            console.error(`找不到目标界面: ${screenId}`);
+        }
+    } catch (error) {
+        console.error(`显示界面失败 (${screenId}):`, error);
+    }
 }
 
 // 选择问题类型
 function selectQuestionType(event) {
-    const typeElement = event.currentTarget;
-    const type = typeElement.getAttribute('data-type');
+    console.log('选择问题类型...');
+    try {
+        const typeElement = event.currentTarget;
+        const type = typeElement.getAttribute('data-type');
 
-    // 移除之前的选中状态
-    document.querySelectorAll('.question-type').forEach(t => {
-        t.classList.remove('selected');
-    });
+        console.log(`选择的问题类型: ${type}`);
 
-    // 添加选中状态
-    typeElement.classList.add('selected');
-    AppState.selectedQuestionType = type;
+        // 移除之前的选中状态
+        document.querySelectorAll('.question-type').forEach(t => {
+            t.classList.remove('selected');
+        });
 
-    // 延迟后进入卡牌抽取界面
-    setTimeout(() => {
-        prepareCardDraw();
-        showScreen('cardDrawScreen');
-    }, 500);
+        // 添加选中状态
+        typeElement.classList.add('selected');
+        AppState.selectedQuestionType = type;
+
+        console.log(`已选择问题类型: ${type}，准备进入卡牌抽取界面...`);
+
+        // 延迟后进入卡牌抽取界面
+        setTimeout(() => {
+            console.log('开始准备卡牌抽取...');
+            prepareCardDraw();
+            showScreen('cardDrawScreen');
+        }, 500);
+
+    } catch (error) {
+        console.error('选择问题类型失败:', error);
+    }
 }
 
 // 准备卡牌抽取
