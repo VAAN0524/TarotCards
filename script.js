@@ -593,65 +593,330 @@ function showSimpleCardDraw() {
     }
 }
 
-// 创建专业的22张塔罗牌横向滚动系统
+// 创建优化的塔罗牌滚动系统
 function createSimpleCards() {
     try {
-        console.log('创建22张塔罗牌横向滚动系统');
+        console.log('创建优化的塔罗牌滚动系统');
         const container = document.getElementById('cardFanContainer');
         if (!container) {
             console.error('找不到卡牌容器');
             return;
         }
 
+        // 清空容器
         container.innerHTML = '';
+        container.style.display = 'block';
+        container.style.visibility = 'visible';
 
-        // 使用全部22张塔罗牌
-        const cards = [...tarotCards];
-        console.log(`准备创建${cards.length}张塔罗牌滚动系统`);
+        // 使用前10张塔罗牌减少加载量
+        const cards = tarotCards.slice(0, 10);
+        console.log(`准备创建${cards.length}张优化塔罗牌（前10张）`);
 
-        // 创建滚动容器结构
-        const scrollWrapper = document.createElement('div');
-        scrollWrapper.className = 'tarot-scroll-wrapper';
-        scrollWrapper.style.cssText = `
+        // 创建简单的滚动容器
+        const scrollContainer = document.createElement('div');
+        scrollContainer.style.cssText = `
             width: 100%;
-            height: 220px;
-            position: relative;
-            overflow: hidden;
+            height: 200px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            background: linear-gradient(135deg, rgba(45, 27, 61, 0.3), rgba(26, 26, 46, 0.3));
+            border-radius: 15px;
+            padding: 20px 10px;
             margin: 20px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         `;
 
-        // 创建轨道容器
-        const track = document.createElement('div');
-        track.className = 'tarot-scroll-track';
-        track.style.cssText = `
-            display: flex;
-            height: 100%;
-            animation: tarotScroll 25s linear infinite;
-            will-change: transform;
+        // 隐藏滚动条
+        const style = document.createElement('style');
+        style.textContent = `
+            #cardFanContainer::-webkit-scrollbar {
+                display: none;
+            }
+            .optimized-tarot-card {
+                display: inline-block;
+                width: 100px;
+                height: 150px;
+                margin: 0 8px;
+                vertical-align: top;
+                white-space: normal;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+            .optimized-tarot-card:hover {
+                transform: translateY(-10px) scale(1.05);
+            }
+            .optimized-tarot-card.selected {
+                transform: translateY(-15px) scale(1.1);
+                box-shadow: 0 16px 48px rgba(212, 175, 55, 0.4);
+            }
+            @media (max-width: 768px) {
+                .optimized-tarot-card {
+                    width: 80px;
+                    height: 120px;
+                    margin: 0 6px;
+                }
+            }
+            @media (max-width: 480px) {
+                .optimized-tarot-card {
+                    width: 60px;
+                    height: 90px;
+                    margin: 0 4px;
+                }
+            }
         `;
+        document.head.appendChild(style);
 
-        // 第一组卡牌（22张）
+        // 创建优化的卡牌
         cards.forEach((card, index) => {
-            const cardElement = createTarotScrollCard(card, index);
-            track.appendChild(cardElement);
+            const cardElement = createOptimizedTarotCard(card, index);
+            scrollContainer.appendChild(cardElement);
         });
 
-        // 第二组卡牌（用于无缝循环）
-        cards.forEach((card, index) => {
-            const cardElement = createTarotScrollCard(card, index + cards.length);
-            track.appendChild(cardElement);
-        });
+        container.appendChild(scrollContainer);
 
-        scrollWrapper.appendChild(track);
-        container.appendChild(scrollWrapper);
+        // 添加简单的自动滚动
+        setTimeout(() => {
+            startAutoScroll(scrollContainer);
+        }, 1000);
 
-        // 添加CSS动画
-        addTarotScrollAnimation();
-
-        console.log(`成功创建${cards.length * 2}张塔罗牌无缝滚动系统`);
+        console.log(`成功创建${cards.length}张优化塔罗牌`);
 
     } catch (error) {
-        console.error('创建塔罗牌滚动系统失败:', error);
+        console.error('创建塔罗牌系统失败:', error);
+        // 降级方案：创建最简单的卡牌
+        createFallbackCards();
+    }
+}
+
+// 创建优化的单个塔罗牌
+function createOptimizedTarotCard(card, index) {
+    const cardElement = document.createElement('div');
+    cardElement.className = 'optimized-tarot-card';
+    cardElement.setAttribute('data-card-id', card.id);
+    cardElement.setAttribute('data-index', index);
+
+    // 使用CSS背景图而不是img标签，更快的加载
+    cardElement.style.cssText += `
+        background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
+        border: 2px solid #d4af37;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    `;
+
+    // 卡背显示（使用小尺寸的placeholder）
+    cardElement.innerHTML = `
+        <div style="
+            width: 60px;
+            height: 80px;
+            background: url('images/塔罗牌背面.png') center/contain no-repeat;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            margin-bottom: 8px;
+        "></div>
+        <div style="
+            background: rgba(0, 0, 0, 0.7);
+            color: #d4af37;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            max-width: 90%;
+        ">${card.name}</div>
+    `;
+
+    // 点击事件
+    cardElement.onclick = function() {
+        handleOptimizedCardSelection(card, cardElement);
+    };
+
+    return cardElement;
+}
+
+// 处理优化卡牌选择
+function handleOptimizedCardSelection(card, cardElement) {
+    try {
+        console.log(`选择卡牌: ${card.name}`);
+
+        // 检查是否已选择3张
+        if (AppState.selectedCards.length >= 3) {
+            console.log('已选择3张卡牌');
+            return;
+        }
+
+        // 检查是否已选择此卡
+        if (cardElement.classList.contains('selected')) {
+            console.log('此卡已选择');
+            return;
+        }
+
+        // 随机正位逆位
+        const isReversed = Math.random() < 0.30;
+
+        console.log(`${card.name} - ${isReversed ? '逆位' : '正位'}`);
+
+        // 添加选中状态
+        cardElement.classList.add('selected');
+
+        // 显示卡牌正面（延迟加载图片）
+        showCardFront(cardElement, card, isReversed);
+
+        // 添加到选择列表
+        AppState.selectedCards.push({
+            ...card,
+            isReversed: isReversed,
+            element: cardElement
+        });
+
+        // 更新计数
+        updateSelectedCountDisplay();
+
+        // 如果选择3张，开始解读
+        if (AppState.selectedCards.length === 3) {
+            setTimeout(() => {
+                startSimpleInterpretation();
+            }, 2000);
+        }
+
+    } catch (error) {
+        console.error('处理卡牌选择失败:', error);
+    }
+}
+
+// 显示卡牌正面
+function showCardFront(cardElement, card, isReversed) {
+    try {
+        // 添加翻转动画
+        cardElement.style.transition = 'transform 0.6s ease';
+        cardElement.style.transform = 'rotateY(180deg)';
+
+        setTimeout(() => {
+            cardElement.innerHTML = `
+                <div style="
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(135deg, #1a1a2e, #2d1b3d);
+                    border: 2px solid #d4af37;
+                    border-radius: 8px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    transform: ${isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
+                ">
+                    <div style="
+                        width: 50px;
+                        height: 70px;
+                        background: url('images/${card.file}') center/contain no-repeat;
+                        margin-bottom: 6px;
+                        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+                    "></div>
+                    <div style="
+                        background: rgba(0, 0, 0, 0.8);
+                        color: #d4af37;
+                        padding: 3px 6px;
+                        border-radius: 3px;
+                        font-size: 8px;
+                        font-weight: bold;
+                        text-align: center;
+                        width: 80%;
+                    ">${card.name}</div>
+                </div>
+            `;
+        }, 300);
+
+    } catch (error) {
+        console.error('显示卡牌正面失败:', error);
+    }
+}
+
+// 简单自动滚动
+function startAutoScroll(container) {
+    try {
+        let scrollPosition = 0;
+        const scrollSpeed = 1;
+        const maxScroll = container.scrollWidth - container.clientWidth;
+
+        const scroll = () => {
+            if (!container.matches(':hover')) {
+                scrollPosition += scrollSpeed;
+                if (scrollPosition >= maxScroll) {
+                    scrollPosition = 0;
+                }
+                container.scrollLeft = scrollPosition;
+            }
+            requestAnimationFrame(scroll);
+        };
+
+        scroll();
+    } catch (error) {
+        console.error('自动滚动失败:', error);
+    }
+}
+
+// 降级方案：最简单的卡牌
+function createFallbackCards() {
+    try {
+        console.log('使用降级方案创建简单卡牌');
+        const container = document.getElementById('cardFanContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        const simpleCards = [
+            { id: 0, name: '愚人' },
+            { id: 1, name: '魔术师' },
+            { id: 2, name: '女祭司' },
+            { id: 3, name: '皇后' },
+            { id: 4, name: '皇帝' }
+        ];
+
+        const cardsContainer = document.createElement('div');
+        cardsContainer.style.cssText = `
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap;
+        `;
+
+        simpleCards.forEach(card => {
+            const cardDiv = document.createElement('div');
+            cardDiv.style.cssText = `
+                width: 100px;
+                height: 150px;
+                background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
+                border: 2px solid #d4af37;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: #d4af37;
+                font-weight: bold;
+                font-size: 12px;
+                text-align: center;
+                transition: all 0.3s ease;
+            `;
+            cardDiv.textContent = card.name;
+            cardDiv.onclick = () => handleOptimizedCardSelection(card, cardDiv);
+
+            cardsContainer.appendChild(cardDiv);
+        });
+
+        container.appendChild(cardsContainer);
+        console.log('降级方案卡牌创建完成');
+
+    } catch (error) {
+        console.error('降级方案失败:', error);
     }
 }
 
