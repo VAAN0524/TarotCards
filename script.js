@@ -593,10 +593,10 @@ function showSimpleCardDraw() {
     }
 }
 
-// 创建简单的卡牌
+// 创建专业的22张塔罗牌横向滚动系统
 function createSimpleCards() {
     try {
-        console.log('创建简单卡牌');
+        console.log('创建22张塔罗牌横向滚动系统');
         const container = document.getElementById('cardFanContainer');
         if (!container) {
             console.error('找不到卡牌容器');
@@ -605,45 +605,527 @@ function createSimpleCards() {
 
         container.innerHTML = '';
 
-        // 创建6张简单的卡牌用于测试
-        const simpleCards = [
-            { id: 0, name: '愚人', file: '0. 愚人 (The Fool).png' },
-            { id: 1, name: '魔术师', file: '1. 魔术师 (The Magician) .png' },
-            { id: 2, name: '女祭司', file: '2. 女祭司 (The High Priestess).png' },
-            { id: 3, name: '皇后', file: '3. 皇后 (The Empress).png' },
-            { id: 4, name: '皇帝', file: '4. 皇帝 (The Emperor).png' },
-            { id: 5, name: '教皇', file: '5. 教皇 (The Hierophant).png' }
-        ];
+        // 使用全部22张塔罗牌
+        const cards = [...tarotCards];
+        console.log(`准备创建${cards.length}张塔罗牌滚动系统`);
 
-        simpleCards.forEach((card, index) => {
-            const cardElement = document.createElement('div');
-            cardElement.style.cssText = `
-                display: inline-block;
-                width: 120px;
-                height: 180px;
-                margin: 10px;
-                background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
-                border: 2px solid #d4af37;
-                border-radius: 10px;
-                cursor: pointer;
-                text-align: center;
-                line-height: 180px;
-                color: #d4af37;
-                font-size: 14px;
-                transition: all 0.3s ease;
-            `;
-            cardElement.textContent = card.name;
-            cardElement.onclick = function() {
-                alert(`你选择了 ${card.name}`);
-            };
+        // 创建滚动容器结构
+        const scrollWrapper = document.createElement('div');
+        scrollWrapper.className = 'tarot-scroll-wrapper';
+        scrollWrapper.style.cssText = `
+            width: 100%;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        `;
 
-            container.appendChild(cardElement);
+        // 创建轨道容器
+        const track = document.createElement('div');
+        track.className = 'tarot-scroll-track';
+        track.style.cssText = `
+            display: flex;
+            height: 100%;
+            animation: tarotScroll 25s linear infinite;
+            will-change: transform;
+        `;
+
+        // 第一组卡牌（22张）
+        cards.forEach((card, index) => {
+            const cardElement = createTarotScrollCard(card, index);
+            track.appendChild(cardElement);
         });
 
-        console.log('创建了6张简单测试卡牌');
+        // 第二组卡牌（用于无缝循环）
+        cards.forEach((card, index) => {
+            const cardElement = createTarotScrollCard(card, index + cards.length);
+            track.appendChild(cardElement);
+        });
+
+        scrollWrapper.appendChild(track);
+        container.appendChild(scrollWrapper);
+
+        // 添加CSS动画
+        addTarotScrollAnimation();
+
+        console.log(`成功创建${cards.length * 2}张塔罗牌无缝滚动系统`);
 
     } catch (error) {
-        console.error('创建简单卡牌失败:', error);
+        console.error('创建塔罗牌滚动系统失败:', error);
+    }
+}
+
+// 创建单个滚动塔罗牌
+function createTarotScrollCard(card, index) {
+    const cardElement = document.createElement('div');
+    cardElement.className = 'tarot-scroll-card';
+    cardElement.setAttribute('data-card-id', card.id);
+    cardElement.setAttribute('data-index', index % 22);
+    cardElement.setAttribute('data-original-index', index % 22);
+
+    cardElement.style.cssText = `
+        flex-shrink: 0;
+        width: 120px;
+        height: 180px;
+        margin: 0 10px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+    `;
+
+    // 创建卡牌内容（显示卡背）
+    cardElement.innerHTML = `
+        <div class="tarot-card-face" style="
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2d1b3d 0%, #1a1a2e 50%, #2d1b3d 100%);
+            border: 2px solid #d4af37;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        ">
+            <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('images/塔罗牌背面.png') center/contain no-repeat;
+                border-radius: 10px;
+            "></div>
+            <div style="
+                position: absolute;
+                bottom: 8px;
+                right: 8px;
+                background: rgba(0, 0, 0, 0.7);
+                color: #d4af37;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: bold;
+            ">${card.name}</div>
+        </div>
+    `;
+
+    // 添加点击事件
+    cardElement.onclick = function() {
+        handleTarotCardSelection(card, cardElement);
+    };
+
+    // 添加悬停效果
+    cardElement.onmouseenter = function() {
+        this.style.transform = 'translateY(-8px) scale(1.05)';
+        this.style.zIndex = '10';
+    };
+
+    cardElement.onmouseleave = function() {
+        if (!this.classList.contains('selected')) {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.zIndex = '1';
+        }
+    };
+
+    return cardElement;
+}
+
+// 添加塔罗牌滚动动画
+function addTarotScrollAnimation() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes tarotScroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-50% - 20px));
+            }
+        }
+
+        .tarot-scroll-wrapper:hover .tarot-scroll-track {
+            animation-play-state: paused;
+        }
+
+        .tarot-scroll-card.selected {
+            transform: translateY(-12px) scale(1.1) !important;
+            z-index: 100 !important;
+            box-shadow: 0 16px 48px rgba(212, 175, 55, 0.4) !important;
+        }
+
+        .tarot-scroll-card.selected .tarot-card-face {
+            border-color: #fff !important;
+            box-shadow: 0 0 24px rgba(212, 175, 55, 0.8) !important;
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .tarot-scroll-card {
+                width: 90px !important;
+                height: 135px !important;
+                margin: 0 8px !important;
+            }
+
+            .tarot-scroll-wrapper {
+                height: 180px !important;
+            }
+
+            @keyframes tarotScroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-50% - 16px)); }
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tarot-scroll-card {
+                width: 70px !important;
+                height: 105px !important;
+                margin: 0 6px !important;
+            }
+
+            .tarot-scroll-wrapper {
+                height: 140px !important;
+            }
+
+            @keyframes tarotScroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-50% - 12px)); }
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// 处理塔罗牌选择
+function handleTarotCardSelection(card, cardElement) {
+    try {
+        console.log(`选择塔罗牌: ${card.name}`);
+
+        // 如果已选择3张，不允许再选择
+        if (AppState.selectedCards.length >= 3) {
+            console.log('已选择3张卡牌，无法继续选择');
+            return;
+        }
+
+        // 如果这张卡已选择，不允许重复选择
+        if (cardElement.classList.contains('selected')) {
+            console.log('这张卡已经选择过了');
+            return;
+        }
+
+        // 随机决定正位还是逆位（30%逆位，70%正位）
+        const isReversed = Math.random() < 0.30;
+        const orientation = isReversed ? 'reversed' : 'upright';
+
+        console.log(`${card.name} - ${isReversed ? '逆位' : '正位'} (第${AppState.selectedCards.length + 1}张)`);
+
+        // 添加选中状态
+        cardElement.classList.add('selected');
+
+        // 翻转卡牌显示正面
+        flipTarotCard(cardElement, card, isReversed);
+
+        // 添加到已选择列表
+        AppState.selectedCards.push({
+            ...card,
+            isReversed: isReversed,
+            orientation: orientation,
+            element: cardElement
+        });
+
+        // 更新选择计数
+        updateSelectedCountDisplay();
+
+        // 如果选择了3张，自动开始解读
+        if (AppState.selectedCards.length === 3) {
+            console.log('已选择3张卡牌，3秒后自动开始解读...');
+            setTimeout(() => {
+                startSimpleInterpretation();
+            }, 3000);
+        }
+
+    } catch (error) {
+        console.error('处理塔罗牌选择失败:', error);
+    }
+}
+
+// 翻转塔罗牌显示正面
+function flipTarotCard(cardElement, card, isReversed) {
+    try {
+        console.log(`翻转卡牌: ${card.name}`);
+
+        // 添加翻转动画
+        cardElement.style.transition = 'transform 0.8s cubic-bezier(0.4, 0.1, 0.2, 1)';
+        cardElement.style.transform = 'rotateY(180deg)';
+
+        setTimeout(() => {
+            cardElement.innerHTML = `
+                <div class="tarot-card-face" style="
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 50%, #1a1a2e 100%);
+                    border: 2px solid #d4af37;
+                    border-radius: 12px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                    position: relative;
+                    overflow: hidden;
+                    transform: ${isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
+                    transition: transform 0.8s ease;
+                ">
+                    <div style="
+                        width: 80%;
+                        height: 70%;
+                        background: url('images/${card.file}') center/contain no-repeat;
+                        border-radius: 8px;
+                        margin-bottom: 8px;
+                    "></div>
+                    <div style="
+                        background: rgba(0, 0, 0, 0.8);
+                        color: #d4af37;
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: bold;
+                        text-align: center;
+                        width: 90%;
+                        transform: ${isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
+                    ">${card.name}</div>
+                </div>
+            `;
+        }, 400);
+
+    } catch (error) {
+        console.error('翻转塔罗牌失败:', error);
+    }
+}
+
+// 更新选择计数显示
+function updateSelectedCountDisplay() {
+    try {
+        const countElement = document.getElementById('selectedCount');
+        if (countElement) {
+            countElement.textContent = AppState.selectedCards.length;
+        }
+
+        // 显示或隐藏开始解读按钮
+        const startBtn = document.getElementById('startInterpretation');
+        if (startBtn) {
+            if (AppState.selectedCards.length === 3) {
+                startBtn.style.display = 'inline-block';
+                startBtn.classList.remove('hidden');
+            } else {
+                startBtn.style.display = 'none';
+            }
+        }
+
+    } catch (error) {
+        console.error('更新选择计数失败:', error);
+    }
+}
+
+// 开始简单解读
+function startSimpleInterpretation() {
+    try {
+        console.log('开始塔罗牌解读...');
+
+        // 隐藏卡牌抽取界面
+        document.getElementById('cardDrawScreen').style.display = 'none';
+
+        // 显示结果界面
+        const resultScreen = document.getElementById('resultScreen');
+        if (resultScreen) {
+            resultScreen.style.display = 'block';
+            resultScreen.classList.remove('hidden');
+        }
+
+        // 生成解读内容
+        generateSimpleInterpretation();
+
+    } catch (error) {
+        console.error('开始解读失败:', error);
+    }
+}
+
+// 生成简单解读
+function generateSimpleInterpretation() {
+    try {
+        const questionNames = {
+            love: '爱情占卜',
+            career: '事业发展',
+            relationship: '人际关系',
+            growth: '个人成长',
+            fortune: '日常运势'
+        };
+
+        const question = questionNames[AppState.selectedQuestionType] || '塔罗占卜';
+
+        // 生成卡牌信息
+        const cardDetails = AppState.selectedCards.map(card => {
+            const orientation = card.isReversed ? '逆位' : '正位';
+            const meaning = card.isReversed ? card.reversed : card.upright;
+            return `${card.name}(${orientation})`;
+        }).join('、');
+
+        // 计算正逆位比例
+        const reversedCount = AppState.selectedCards.filter(card => card.isReversed).length;
+        const uprightCount = AppState.selectedCards.length - reversedCount;
+
+        // 生成解读内容
+        let interpretation = `
+            <div style="text-align: center; padding: 20px;">
+                <h2 style="color: #d4af37; margin-bottom: 20px;">${question}结果</h2>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #d4af37; margin-bottom: 15px;">你选择的卡牌：</h3>
+                    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                        ${AppState.selectedCards.map(card => `
+                            <div style="text-align: center;">
+                                <div style="
+                                    width: 80px;
+                                    height: 120px;
+                                    background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
+                                    border: 2px solid #d4af37;
+                                    border-radius: 8px;
+                                    margin: 0 auto 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    transform: ${card.isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
+                                ">
+                                    <div style="
+                                        width: 60px;
+                                        height: 80px;
+                                        background: url('images/${card.file}') center/contain no-repeat;
+                                        border-radius: 4px;
+                                    "></div>
+                                </div>
+                                <div style="color: #d4af37; font-size: 12px; font-weight: bold;">${card.name}</div>
+                                <div style="color: #999; font-size: 10px;">${card.isReversed ? '逆位' : '正位'}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="color: #d4af37; margin-bottom: 15px;">占卜解读：</h3>
+                    <p style="line-height: 1.6; color: #fff; margin-bottom: 15px;">
+                        你抽取的卡牌是${cardDetails}。
+                    </p>
+                    <p style="line-height: 1.6; color: #fff; margin-bottom: 15px;">
+                        ${reversedCount === 0 ? '所有卡牌都是正位，预示着事情将顺利发展，能量流动通畅。' :
+                          reversedCount === AppState.selectedCards.length ? '所有卡牌都是逆位，暗示着需要特别注意内在的阻碍和挑战。' :
+                          `正位(${uprightCount}张)和逆位(${reversedCount}张)的组合显示事情发展既有机遇也有挑战。`}
+                    </p>
+                    <p style="line-height: 1.6; color: #fff;">
+                        ${generateSpecificInterpretation(question, reversedCount)}
+                    </p>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button onclick="newSimpleReading()" style="
+                        background: linear-gradient(135deg, #d4af37, #f4e4c1);
+                        border: none;
+                        border-radius: 8px;
+                        padding: 12px 24px;
+                        color: #1e1e2e;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin: 0 10px;
+                    ">新的占卜</button>
+
+                    <button onclick="hideDivination()" style="
+                        background: rgba(255, 255, 255, 0.1);
+                        border: 1px solid #d4af37;
+                        border-radius: 8px;
+                        padding: 12px 24px;
+                        color: #d4af37;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin: 0 10px;
+                    ">返回主页</button>
+                </div>
+            </div>
+        `;
+
+        const resultContainer = document.getElementById('interpretationContent');
+        if (resultContainer) {
+            resultContainer.innerHTML = interpretation;
+        }
+
+        // 显示问题标题
+        const resultQuestion = document.getElementById('resultQuestion');
+        if (resultQuestion) {
+            resultQuestion.textContent = `你选择了${question}`;
+        }
+
+        console.log('解读生成完成');
+
+    } catch (error) {
+        console.error('生成解读失败:', error);
+    }
+}
+
+// 生成特定解读
+function generateSpecificInterpretation(question, reversedCount) {
+    const interpretations = {
+        love: {
+            0: '这些正位卡牌显示你的感情关系充满正能量，爱情将顺利发展。建议保持开放的心态迎接美好，相信缘分的力量。',
+            1: '这些逆位卡牌提醒你需要审视感情中的问题，可能存在沟通障碍。建议坦诚面对，用心倾听对方的需求。',
+            2: '正位和逆位的组合显示感情既有美好机会也需要努力经营。关键在于平衡付出与接受，相信爱的力量。'
+        },
+        career: {
+            0: '正位卡牌预示事业发展将一帆风顺，你的努力会得到认可。建议抓住机会，大胆展现自己的才能。',
+            1: '逆位卡牌暗示职业道路可能遇到阻碍，需要重新规划方向。建议冷静分析，寻找新的突破口。',
+            2: '事业发展既有机遇也有挑战，关键在于保持学习的态度和适应变化的能力。'
+        },
+        relationship: {
+            0: '人际关系将进入和谐阶段，你的真诚会赢得他人的信任。建议保持开放沟通，建立更深的连接。',
+            1: '需要反思人际交往中的模式，可能存在误解或冲突。建议主动沟通，化解矛盾。',
+            2: '人际关系处于转型期，既需要维护现有关系，也要勇敢拓展新的社交圈。'
+        },
+        growth: {
+            0: '个人成长迎来黄金期，你的潜能将得到充分发挥。建议保持好奇心，勇敢尝试新事物。',
+            1: '需要深入内心探索，发现阻碍成长的模式。建议保持耐心，相信内在智慧的力量。',
+            2: '成长之路既有突破也有挑战，关键是保持学习的热情和对未知的开放态度。'
+        },
+        fortune: {
+            0: '运势正处于上升期，各方面都会有好消息。建议保持积极心态，把握好运。',
+            1: '运势提醒你需要更加谨慎，避免冲动决定。建议放慢节奏，积蓄能量。',
+            2: '运势整体平衡，既有好运也需要努力。关键在于保持平和的心态和积极行动。'
+        }
+    };
+
+    const key = Math.min(reversedCount, 2);
+    return interpretations[question]?.[key] || '塔罗牌指引着你的前行之路，相信内在的智慧，勇敢面对未来的挑战与机遇。';
+}
+
+// 新的占卜
+function newSimpleReading() {
+    try {
+        console.log('开始新的占卜...');
+
+        // 重置状态
+        AppState.selectedCards = [];
+        AppState.selectedQuestionType = '';
+
+        // 返回问题类型选择界面
+        document.getElementById('resultScreen').style.display = 'none';
+        document.getElementById('cardDrawScreen').style.display = 'none';
+        document.getElementById('questionTypeScreen').style.display = 'block';
+
+        // 重置选择计数
+        updateSelectedCountDisplay();
+
+    } catch (error) {
+        console.error('新的占卜失败:', error);
     }
 }
 
@@ -660,6 +1142,10 @@ function hideDivination() {
         document.querySelectorAll('.divination-screen').forEach(screen => {
             screen.style.display = 'none';
         });
+
+        // 重置状态
+        AppState.selectedCards = [];
+        AppState.selectedQuestionType = '';
 
         console.log('占卜界面已隐藏');
     } catch (error) {
