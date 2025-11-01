@@ -183,20 +183,66 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTarotCards();
     addAutoRotate();
     initializeDivination();
+    setupLazyLoading(); // 启用图片懒加载优化
 });
 
 // 全局变量
-let displayedCards = [];
-let currentRound = 1;
-const CARDS_PER_ROUND = 5;
-let cardSets = []; // 存储多套不同的卡牌
-let currentSetIndex = 0;
+// 全局状态管理
+const AppState = {
+    displayedCards: [],
+    currentRound: 1,
+    CARDS_PER_ROUND: 5,
+    cardSets: [],
+    currentSetIndex: 0,
+    selectedQuestionType: '',
+    selectedCards: [],
+    availableCardsForDivination: [],
+    isDivinationMode: false,
+    scrollTimeout: null
+};
 
-// 占卜相关变量
-let selectedQuestionType = '';
-let selectedCards = [];
-let availableCardsForDivination = [];
-let isDivinationMode = false;
+// 性能优化工具函数
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+// 内存管理：清理未使用的DOM事件监听器
+const cleanupEventListeners = () => {
+    // 清理所有卡牌事件监听器
+    document.querySelectorAll('.scroll-card').forEach(card => {
+        card.replaceWith(card.cloneNode(true));
+    });
+};
+
+// 图片懒加载优化
+const setupLazyLoading = () => {
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                        observer.unobserve(img);
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+};
 
 // 初始化塔罗牌网格
 function initializeTarotCards() {
@@ -270,14 +316,14 @@ function displayCardSet(cardSet) {
 
 // 获取当前轮次的随机卡片（优化版本）
 function getRandomCardsForRound() {
-    const availableCards = tarotCards.filter(card => !displayedCards.includes(card.id));
+    const availableCards = tarotCards.filter(card => !AppState.displayedCards.includes(card.id));
     const selectedCards = [];
 
     // 如果可用卡片不足5张，重置记忆
-    if (availableCards.length < CARDS_PER_ROUND) {
+    if (availableCards.length < AppState.CARDS_PER_ROUND) {
         console.log('已展示所有卡牌，重置记忆系统');
-        displayedCards = [];
-        currentRound = 1;
+        AppState.displayedCards = [];
+        AppState.currentRound = 1;
         return getRandomCardsForRound();
     }
 
@@ -289,13 +335,13 @@ function getRandomCardsForRound() {
     }
 
     // 选择前5张
-    for (let i = 0; i < CARDS_PER_ROUND; i++) {
+    for (let i = 0; i < AppState.CARDS_PER_ROUND; i++) {
         selectedCards.push(shuffled[i]);
-        displayedCards.push(shuffled[i].id);
+        AppState.displayedCards.push(shuffled[i].id);
     }
 
-    console.log(`生成随机组合${currentRound}:`, selectedCards.map(card => card.name));
-    currentRound++;
+    console.log(`生成随机组合${AppState.currentRound}:`, selectedCards.map(card => card.name));
+    AppState.currentRound++;
 
     return selectedCards;
 }
@@ -398,8 +444,8 @@ document.querySelectorAll('.card').forEach(card => {
 });
 
 
-// 添加窗口大小调整时的响应
-window.addEventListener('resize', function() {
+// 添加窗口大小调整时的响应（防抖处理）
+const debouncedResize = debounce(function() {
     // 重新计算布局
     const cards = document.querySelectorAll('.card');
     cards.forEach(card => {
@@ -410,7 +456,9 @@ window.addEventListener('resize', function() {
             card.style.transform = 'rotateY(0deg)';
         }
     });
-});
+}, 250);
+
+window.addEventListener('resize', debouncedResize);
 
 // ==================== 占卜功能 ====================
 
@@ -434,9 +482,9 @@ function initializeDivination() {
 
 // 开始占卜
 function startDivination() {
-    isDivinationMode = true;
-    selectedCards = [];
-    selectedQuestionType = '';
+    AppState.isDivinationMode = true;
+    AppState.selectedCards = [];
+    AppState.selectedQuestionType = '';
 
     // 停止主页面的卡牌动画
     stopMainPageAnimation();
@@ -466,7 +514,7 @@ function selectQuestionType(event) {
 
     // 添加选中状态
     typeElement.classList.add('selected');
-    selectedQuestionType = type;
+    AppState.selectedQuestionType = type;
 
     // 延迟后进入卡牌抽取界面
     setTimeout(() => {
@@ -478,13 +526,13 @@ function selectQuestionType(event) {
 // 准备卡牌抽取
 function prepareCardDraw() {
     // 重置抽取状态
-    selectedCards = [];
+    AppState.selectedCards = [];
     updateSelectedCount();
 
     // 使用全部22张塔罗牌，确保不重复
-    availableCardsForDivination = shuffleArray([...tarotCards]);
+    AppState.availableCardsForDivination = shuffleArray([...tarotCards]);
 
-    console.log(`准备${availableCardsForDivination.length}张不重复的塔罗牌供抽取`);
+    console.log(`准备${AppState.availableCardsForDivination.length}张不重复的塔罗牌供抽取`);
 
     // 显示横向滚动的卡牌
     createScrollCards();
@@ -504,7 +552,7 @@ function updateQuestionPrompt() {
         fortune: '请为你的日常运势选择3张有缘的指引卡牌'
     };
 
-    promptElement.textContent = prompts[selectedQuestionType] || '请选择3张有缘的指引卡牌';
+    promptElement.textContent = prompts[AppState.selectedQuestionType] || '请选择3张有缘的指引卡牌';
 }
 
 // 创建无缝循环滚动的卡牌
@@ -512,7 +560,7 @@ function createScrollCards() {
     const container = document.getElementById('cardFanContainer');
     container.innerHTML = '';
 
-    const cards = availableCardsForDivination;
+    const cards = AppState.availableCardsForDivination;
     console.log(`创建无缝循环滚动卡牌: ${cards.length}张`);
 
     // 创建滚动容器
@@ -576,18 +624,18 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
     if (cardElement.classList.contains('selected')) return;
 
     // 限制最多选择3张卡牌
-    if (selectedCards.length >= 3) return;
+    if (AppState.selectedCards.length >= 3) return;
 
     // 随机决定正位还是逆位（30%逆位，70%正位）
     const isReversed = Math.random() < 0.30;
     const orientation = isReversed ? 'reversed' : 'upright';
 
-    console.log(`选择卡牌: ${cardData.name} - ${isReversed ? '逆位' : '正位'} (第${selectedCards.length + 1}张)`);
+    console.log(`选择卡牌: ${cardData.name} - ${isReversed ? '逆位' : '正位'} (第${AppState.selectedCards.length + 1}张)`);
 
     // 从可用卡牌中移除已选择的卡牌，确保不重复
-    const cardIndex = availableCardsForDivination.findIndex(card => card.id === cardData.id);
+    const cardIndex = AppState.availableCardsForDivination.findIndex(card => card.id === cardData.id);
     if (cardIndex > -1) {
-        availableCardsForDivination.splice(cardIndex, 1);
+        AppState.availableCardsForDivination.splice(cardIndex, 1);
     }
 
     // 暂停滚动动画
@@ -611,7 +659,7 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
     `;
 
     // 添加到已选卡牌，包含正位逆位信息
-    selectedCards.push({
+    AppState.selectedCards.push({
         ...cardData,
         orientation: orientation,
         isReversed: isReversed,
@@ -623,7 +671,7 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
     updateSelectedCount();
 
     // 如果选择了3张卡牌，禁用其他卡牌并准备自动解读
-    if (selectedCards.length === 3) {
+    if (AppState.selectedCards.length === 3) {
         disableRemainingCards();
 
         // 2秒后自动开始解读
@@ -656,12 +704,12 @@ function disableRemainingCards() {
 
 // 更新已选择卡牌数量
 function updateSelectedCount() {
-    document.getElementById('selectedCount').textContent = selectedCards.length;
+    document.getElementById('selectedCount').textContent = AppState.selectedCards.length;
 }
 
 // 开始解读
 function startInterpretation() {
-    if (selectedCards.length !== 3) return;
+    if (AppState.selectedCards.length !== 3) return;
 
     // 生成解读内容
     const interpretation = generateInterpretation();
@@ -681,7 +729,7 @@ function generateInterpretation() {
     };
 
     // 生成卡牌详细信息
-    const cardDetails = selectedCards.map(card => {
+    const cardDetails = AppState.selectedCards.map(card => {
         const orientation = card.isReversed ? '逆位' : '正位';
         const meaning = card.isReversed ? card.reversed : card.upright;
         return `${card.name}(${orientation})`;
@@ -690,13 +738,13 @@ function generateInterpretation() {
     const baseInterpretation = `你抽取的卡牌是${cardDetails}。`;
 
     // 分析正位逆位组合
-    const reversedCount = selectedCards.filter(card => card.isReversed).length;
-    const uprightCount = selectedCards.length - reversedCount;
+    const reversedCount = AppState.selectedCards.filter(card => card.isReversed).length;
+    const uprightCount = AppState.selectedCards.length - reversedCount;
 
     let orientationAnalysis = '';
     if (reversedCount === 0) {
         orientationAnalysis = '所有卡牌都是正位，预示着事情将顺利发展，能量流动通畅。';
-    } else if (reversedCount === selectedCards.length) {
+    } else if (reversedCount === AppState.selectedCards.length) {
         orientationAnalysis = '所有卡牌都是逆位，暗示着需要特别注意内在的阻碍和挑战，建议深入反思。';
     } else {
         orientationAnalysis = `正位(${uprightCount}张)和逆位(${reversedCount}张)的组合显示事情发展既有机遇也有挑战，需要平衡处理。`;
@@ -733,14 +781,14 @@ function generateInterpretation() {
         };
 
         const key = reversedCount === 0 ? 'upright' :
-                   reversedCount === selectedCards.length ? 'reversed' : 'mixed';
+                   reversedCount === AppState.selectedCards.length ? 'reversed' : 'mixed';
 
-        return interpretations[selectedQuestionType]?.[key] || baseInterpretation + orientationAnalysis;
+        return interpretations[AppState.selectedQuestionType]?.[key] || baseInterpretation + orientationAnalysis;
     };
 
     // 生成具体的卡牌解读
     const generateCardInterpretations = () => {
-        return selectedCards.map((card, index) => {
+        return AppState.selectedCards.map((card, index) => {
             const position = index === 0 ? '第一张牌(现状)' :
                            index === 1 ? '第二张牌(挑战)' : '第三张牌(未来)';
             const orientation = card.isReversed ? '逆位' : '正位';
@@ -753,7 +801,7 @@ function generateInterpretation() {
     const calculateLoveIndex = () => {
         let score = 50; // 基础分数
 
-        selectedCards.forEach((card, index) => {
+        AppState.selectedCards.forEach((card, index) => {
             // 不同卡牌的爱情权重
             const loveWeights = {
                 0: 65,  // 愚人
@@ -801,7 +849,7 @@ function generateInterpretation() {
     const calculateEmotionIndex = () => {
         let emotionScore = 0;
 
-        selectedCards.forEach((card, index) => {
+        AppState.selectedCards.forEach((card, index) => {
             // 情绪评分（-100到+100）
             const emotionScores = {
                 0: { upright: 85, reversed: -45 },  // 愚人
@@ -881,8 +929,8 @@ function generateInterpretation() {
     const personalized = generatePersonalizedInterpretation();
 
     return {
-        question: questionNames[selectedQuestionType],
-        cards: selectedCards,
+        question: questionNames[AppState.selectedQuestionType],
+        cards: AppState.selectedCards,
         interpretation: `${baseInterpretation}${generateSpecificInterpretation()}`,
         cardDetails: generateCardInterpretations(),
         loveIndex: personalized.loveIndex,
@@ -959,8 +1007,19 @@ function showResultScreen(interpretation) {
 
 // 新的占卜
 function newReading() {
-    selectedCards = [];
-    selectedQuestionType = '';
+    // 清理之前的资源
+    cleanupEventListeners();
+
+    // 重置状态
+    AppState.selectedCards = [];
+    AppState.selectedQuestionType = '';
+
+    // 清理超时
+    if (AppState.scrollTimeout) {
+        clearTimeout(AppState.scrollTimeout);
+        AppState.scrollTimeout = null;
+    }
+
     showScreen('questionTypeScreen');
 }
 
@@ -973,13 +1032,13 @@ function backHome() {
 
 // 返回问题类型选择
 function backToQuestionType() {
-    selectedCards = [];
+    AppState.selectedCards = [];
     showScreen('questionTypeScreen');
 }
 
 // 返回主页面
 function backToMain() {
-    isDivinationMode = false;
+    AppState.isDivinationMode = false;
     document.getElementById('divinationContainer').classList.remove('active');
     startMainPageAnimation();
 }
