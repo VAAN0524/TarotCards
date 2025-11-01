@@ -2992,8 +2992,20 @@ function generateInterpretation() {
 
     // 分析整体发展趋势
     function analyzeOverallTrend(timeReadings) {
-        const reversedCount = timeReadings.filter(r => r.orientation === '逆位').length;
+        // 调试信息：检查实际数据
+        console.log('=== 趋势分析调试信息 ===');
+        console.log('timeReadings:', timeReadings);
+        console.log('实际orientation数据:');
+        timeReadings.forEach((r, i) => {
+            console.log(`第${i+1}张: ${r.card.name}, orientation: "${r.orientation}"`);
+        });
+
+        // 正确计算逆位卡牌数量（orientation包含HTML标签）
+        const reversedCount = timeReadings.filter(r => r.orientation.includes('逆位')).length;
         const questionType = AppState.selectedQuestionType;
+
+        console.log(`逆位卡牌数量: ${reversedCount}`);
+        console.log(`问题类型: ${questionType}`);
 
         let trendAnalysis = '';
 
@@ -3004,9 +3016,7 @@ function generateInterpretation() {
             trendAnalysis = '三张逆位卡牌提醒你正处于一个重要的转折点，虽然面临挑战，但这也是深刻反思和彻底改变的时机。通过正视问题，你将迎来真正的转机。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">Three reversed cards remind you that you are at an important turning point. Although facing challenges, this is also a time for deep reflection and complete change. By facing problems directly, you will welcome a true turning point.</span>';
         } else if (reversedCount === 1) {
             const reversedIndex = timeReadings.findIndex(r => r.orientation.includes('逆位'));
-            const timePositions = ['过去<br><span style="font-size:0.7em;color:rgba(212,175,55,0.8);">Past</span>',
-                         '现在<br><span style="font-size:0.7em;color:rgba(212,175,55,0.8);">Present</span>',
-                         '未来<br><span style="font-size:0.7em;color:rgba(212,175,55,0.8);">Future</span>'];
+            const timePositions = ['过去', '现在', '未来']; // 使用纯文本进行比较
             const reversedTime = timePositions[reversedIndex];
 
             if (reversedTime === '过去') {
@@ -3016,8 +3026,25 @@ function generateInterpretation() {
             } else {
                 trendAnalysis = '过去和现在的正位卡牌为你奠定了坚实的基础，虽然未来需要注意潜在挑战（未来的逆位卡牌），但你的智慧和经验将帮助你成功应对，迎来更美好的发展。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">The upright cards of the past and present have laid a solid foundation for you. Although potential challenges in the future need attention (reversed card in the future), your wisdom and experience will help you respond successfully and welcome better development.</span>';
             }
+        } else if (reversedCount === 2) {
+            // 找出两个逆位卡牌的位置
+            const reversedIndexes = timeReadings.map((r, i) => r.orientation.includes('逆位') ? i : -1).filter(i => i !== -1);
+            const timePositions = ['过去', '现在', '未来'];
+            const reversedTimes = reversedIndexes.map(i => timePositions[i]);
+            const uprightIndex = timeReadings.findIndex(r => !r.orientation.includes('逆位'));
+            const uprightTime = timePositions[uprightIndex];
+
+            if (reversedTimes.includes('现在') && reversedTimes.includes('未来')) {
+                trendAnalysis = `现在和未来的卡牌都处于逆位，提醒你需要重新审视当前的计划和未来的方向。虽然过去有良好基础，但现在需要调整策略，未来要更加谨慎。过去的正位能量是你应对当前挑战的重要支撑。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">The present and future cards are both reversed, reminding you to re-examine current plans and future directions. Although there is a good foundation from the past, adjustments are needed now and more caution is required for the future. The upright energy from the past is important support for dealing with current challenges.</span>`;
+            } else if (reversedTimes.includes('过去') && reversedTimes.includes('现在')) {
+                trendAnalysis = `过去和现在的挑战表明你可能一直在经历一些困难，但未来的正位卡牌带来希望。保持信心，光明的前景就在前方等待着你。未来的正位能量是你前进的最大动力。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">Challenges in the past and present suggest you may have been experiencing difficulties, but the upright card for the future brings hope. Maintain faith, as bright prospects await you ahead. The upright energy of the future is your greatest motivation for moving forward.</span>`;
+            } else if (reversedTimes.includes('过去') && reversedTimes.includes('未来')) {
+                trendAnalysis = `过去和未来的逆位显示需要从过去的经历中吸取教训，同时为未来的挑战做好准备。现在的正位能量是你当前最大的优势和机遇，好好把握当下。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">Reversed cards in the past and future indicate the need to learn from past experiences while preparing for future challenges. The upright energy of the present is your greatest current advantage and opportunity - seize the moment.</span>`;
+            } else {
+                trendAnalysis = `两张逆位卡牌提醒你需要关注特定领域的问题，而一张正位卡牌显示出你的优势所在。平衡处理挑战和机遇是当前的关键。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">Two reversed cards remind you to pay attention to issues in specific areas, while one upright card shows your strengths. Balancing challenges and opportunities is the current key.</span>`;
+            }
         } else {
-            trendAnalysis = '正位和逆位卡牌的组合显示出事物发展的复杂性，既有有利因素也有需要注意的地方。关键在于保持平衡，发挥优势，同时谨慎应对挑战。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">The combination of upright and reversed cards shows the complexity of development, with both favorable factors and areas needing attention. The key is to maintain balance, leverage advantages, while carefully responding to challenges.</span>';
+            trendAnalysis = '卡牌的组合显示出独特的能量配置，需要根据具体情况来分析。建议关注每张卡牌的具体含义，综合分析整体趋势。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">The combination of cards shows a unique energy configuration that needs to be analyzed according to specific circumstances. It is recommended to focus on the specific meaning of each card and analyze the overall trend comprehensively.</span>';
         }
 
         // 根据问题类型补充具体建议
@@ -3028,6 +3055,9 @@ function generateInterpretation() {
             growth: '在个人成长路上，建议保持好奇心和勇气，相信内在的智慧，勇敢探索未知的可能性。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">On the path of personal growth, maintain curiosity and courage, trust your inner wisdom, and bravely explore unknown possibilities.</span>',
             fortune: '在运势流转中，建议保持积极乐观的心态，把握机遇，同时保持谦逊和感恩之心。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">As fortune flows, maintain a positive and optimistic mindset, seize opportunities, while remaining humble and grateful.</span>'
         };
+
+        console.log(`生成的趋势分析: ${trendAnalysis.substring(0, 100)}...`);
+        console.log('=== 趋势分析结束 ===');
 
         return trendAnalysis + (specificAdvice[questionType] || '');
     }
