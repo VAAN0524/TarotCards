@@ -1101,7 +1101,7 @@ function addProfessionalScrollCSS() {
             }
 
             .tarot-track-container {
-                animation-duration: 35s !important;
+                animation-duration: 45.5s !important;
             }
 
             @keyframes seamlessScroll {
@@ -1119,7 +1119,7 @@ function addProfessionalScrollCSS() {
             }
 
             .tarot-track-container {
-                animation-duration: 25s !important;
+                animation-duration: 32.5s !important;
             }
 
             @keyframes seamlessScroll {
@@ -1136,7 +1136,7 @@ function addProfessionalScrollCSS() {
             }
 
             .tarot-track-container {
-                animation-duration: 20s !important;
+                animation-duration: 26s !important;
             }
 
             @keyframes seamlessScroll {
@@ -2119,7 +2119,7 @@ function createScrollCards() {
         setTimeout(() => {
             const trackElement = container.querySelector('.card-track');
             if (trackElement) {
-                trackElement.style.animation = 'autoScroll 30s linear infinite';
+                trackElement.style.animation = 'autoScroll 39s linear infinite';
             }
         }, 100);
 

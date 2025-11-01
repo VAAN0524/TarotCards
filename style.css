@@ -619,7 +619,7 @@ h1 {
     gap: 20px;
     height: 100%;
     align-items: center;
-    animation: autoScroll 30s linear infinite;
+    animation: autoScroll 39s linear infinite;
     will-change: transform;
 }
 
