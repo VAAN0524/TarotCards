@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
 const AppState = {
     displayedCards: [],
     currentRound: 1,
-    CARDS_PER_ROUND: 5,
+    CARDS_PER_ROUND: 3,
     cardSets: [],
     currentSetIndex: 0,
     selectedQuestionType: '',
@@ -292,7 +292,7 @@ function initializeTarotCards() {
         // 清空现有卡片
         cardsGrid.innerHTML = '';
 
-        // 生成初始的4套随机卡牌 - 使用AppState管理
+        // 生成初始的4套随机卡牌 - 使用AppState管理（每套3张）
         AppState.cardSets = [
             getRandomCardsForRound(),
             getRandomCardsForRound(),
@@ -364,7 +364,7 @@ function getRandomCardsForRound() {
     const availableCards = tarotCards.filter(card => !AppState.displayedCards.includes(card.id));
     const selectedCards = [];
 
-    // 如果可用卡片不足5张，重置记忆
+    // 如果可用卡片不足3张，重置记忆
     if (availableCards.length < AppState.CARDS_PER_ROUND) {
         console.log('已展示所有卡牌，重置记忆系统');
         AppState.displayedCards = [];
@@ -379,7 +379,7 @@ function getRandomCardsForRound() {
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
 
-    // 选择前5张
+    // 选择前3张
     for (let i = 0; i < AppState.CARDS_PER_ROUND; i++) {
         selectedCards.push(shuffled[i]);
         AppState.displayedCards.push(shuffled[i].id);
