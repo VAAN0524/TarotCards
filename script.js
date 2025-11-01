@@ -178,6 +178,14 @@ const tarotCards = [
     }
 ];
 
+// 添加窗口大小变化监听器
+window.addEventListener('resize', function() {
+    if (document.getElementById('cardFanContainer').style.display !== 'none') {
+        applyDynamicCardStyles();
+        console.log('📱 窗口大小变化，重新应用卡牌尺寸');
+    }
+});
+
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('页面DOM加载完成，开始初始化...');
@@ -606,6 +614,9 @@ function createSimpleCards() {
 
         console.log('✅ 找到容器，准备创建卡牌系统');
 
+        // 应用动态卡牌尺寸
+        applyDynamicCardStyles();
+
         // 强制显示容器
         container.innerHTML = '';
         container.style.display = 'block';
@@ -613,11 +624,10 @@ function createSimpleCards() {
         container.style.opacity = '1';
         container.style.position = 'relative';
         container.style.width = '100%';
-        container.style.height = '250px';
 
-        // 使用全部22张塔罗牌
-        const cards = [...tarotCards];
-        console.log(`📋 准备创建${cards.length}张塔罗牌`);
+        // 随机打乱22张塔罗牌
+        const cards = shuffleArray([...tarotCards]);
+        console.log(`📋 准备创建${cards.length}张随机排列的塔罗牌`);
 
         // 创建专业的滚动系统
         const scrollSystem = createProfessionalScrollSystem(cards);
@@ -1927,6 +1937,83 @@ function createScrollCards() {
     }
 }
 
+// 根据屏幕尺寸计算动态卡牌尺寸
+function calculateDynamicCardSize() {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    // 基础尺寸
+    let cardWidth, cardHeight, containerHeight;
+
+    if (screenWidth <= 480) {
+        // 移动设备
+        cardWidth = Math.min(60, screenWidth / 5);
+        cardHeight = cardWidth * 1.6;
+        containerHeight = 180;
+    } else if (screenWidth <= 768) {
+        // 平板设备
+        cardWidth = Math.min(80, screenWidth / 6);
+        cardHeight = cardWidth * 1.6;
+        containerHeight = 220;
+    } else if (screenWidth <= 1200) {
+        // 桌面设备
+        cardWidth = Math.min(100, screenWidth / 8);
+        cardHeight = cardWidth * 1.6;
+        containerHeight = 250;
+    } else {
+        // 大屏设备
+        cardWidth = Math.min(120, screenWidth / 10);
+        cardHeight = cardWidth * 1.6;
+        containerHeight = 280;
+    }
+
+    return {
+        cardWidth,
+        cardHeight,
+        containerHeight,
+        gap: screenWidth <= 480 ? 15 : 20
+    };
+}
+
+// 应用动态尺寸到CSS
+function applyDynamicCardStyles() {
+    const dimensions = calculateDynamicCardSize();
+
+    // 创建或更新动态样式
+    let dynamicStyle = document.getElementById('dynamic-card-styles');
+    if (!dynamicStyle) {
+        dynamicStyle = document.createElement('style');
+        dynamicStyle.id = 'dynamic-card-styles';
+        document.head.appendChild(dynamicStyle);
+    }
+
+    dynamicStyle.textContent = `
+        #cardFanContainer {
+            height: ${dimensions.containerHeight}px !important;
+        }
+
+        .scroll-card {
+            width: ${dimensions.cardWidth}px !important;
+            height: ${dimensions.cardHeight}px !important;
+            min-width: ${dimensions.cardWidth}px !important;
+            min-height: ${dimensions.cardHeight}px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .card-track {
+            gap: ${dimensions.gap}px !important;
+        }
+
+        .scroll-card .card-face img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+    `;
+
+    console.log(`🎯 应用动态卡牌尺寸: ${dimensions.cardWidth}x${dimensions.cardHeight}, 容器高度: ${dimensions.containerHeight}`);
+}
+
 // 创建单个滚动卡牌元素
 function createScrollCard(card, index) {
     try {
@@ -1985,25 +2072,69 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
         AppState.availableCardsForDivination.splice(cardIndex, 1);
     }
 
-    // 暂停滚动动画
-    const track = cardElement.closest('.card-track');
-    if (track) {
-        track.style.animationPlayState = 'paused';
-    }
-
-    // 添加选中效果
+    // 添加选中效果并从滚动中移除
     cardElement.classList.add('selected');
     if (isReversed) {
         cardElement.classList.add('reversed');
     }
 
-    // 立即替换卡背为卡牌正面，不显示正位逆位标注
-    const transformStyle = isReversed ? 'transform: rotate(180deg);' : '';
-    cardElement.innerHTML = `
-        <div class="card-face" style="${transformStyle}">
-            <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
-        </div>
-    `;
+    // 将卡牌从滚动轨道中移除并添加到已选择区域
+    const track = cardElement.closest('.card-track');
+    const container = document.getElementById('cardFanContainer');
+
+    if (track && container) {
+        // 创建一个特殊的"已选卡牌"容器
+        let selectedCardsArea = document.querySelector('.selected-cards-area');
+        if (!selectedCardsArea) {
+            selectedCardsArea = document.createElement('div');
+            selectedCardsArea.className = 'selected-cards-area';
+            selectedCardsArea.style.cssText = `
+                position: absolute;
+                top: -80px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 15px;
+                z-index: 100;
+            `;
+            container.appendChild(selectedCardsArea);
+        }
+
+        // 将卡牌从轨道移到已选择区域
+        cardElement.style.animation = 'none';
+        cardElement.style.position = 'relative';
+        selectedCardsArea.appendChild(cardElement);
+
+        // 立即替换卡背为卡牌正面，不显示正位逆位标注
+        const transformStyle = isReversed ? 'transform: rotate(180deg);' : '';
+        cardElement.innerHTML = `
+            <div class="card-face" style="${transformStyle}">
+                <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
+            </div>
+        `;
+
+        // 移除对应循环的第二张卡牌
+        const allCards = track.querySelectorAll('.scroll-card');
+        const duplicateCards = Array.from(allCards).filter(card =>
+            card.getAttribute('data-card-id') === cardData.id &&
+            card !== cardElement
+        );
+
+        duplicateCards.forEach(duplicate => {
+            duplicate.style.transition = 'all 0.5s ease-out';
+            duplicate.style.opacity = '0';
+            duplicate.style.transform = 'scale(0)';
+            setTimeout(() => duplicate.remove(), 500);
+        });
+
+        // 重新启动滚动动画（如果有剩余卡牌）
+        if (AppState.selectedCards.length < 3) {
+            track.style.animation = 'none';
+            setTimeout(() => {
+                track.style.animation = '';
+            }, 100);
+        }
+    }
 
     // 添加到已选卡牌，包含正位逆位信息
     AppState.selectedCards.push({
@@ -2017,10 +2148,8 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
     // 更新计数
     updateSelectedCount();
 
-    // 如果选择了3张卡牌，禁用其他卡牌并准备自动解读
+    // 如果选择了3张卡牌，准备自动解读
     if (AppState.selectedCards.length === 3) {
-        disableRemainingCards();
-
         // 2秒后自动开始解读
         setTimeout(() => {
             startInterpretation();
@@ -2029,10 +2158,8 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
         // 如果选择了1-2张卡牌，显示手动解读按钮
         document.getElementById('startInterpretation').classList.remove('hidden');
 
-        // 部分禁用其他卡牌（但保持一些可选性）
-        document.querySelectorAll('.scroll-card:not(.selected)').forEach(card => {
-            card.style.opacity = '0.6';
-        });
+        // 剩余卡牌继续正常滚动，不需要任何禁用操作
+        console.log(`🔄 已选择${AppState.selectedCards.length}张卡牌，剩余卡牌继续轮动`);
     }
 }
 
