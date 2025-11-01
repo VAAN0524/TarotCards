@@ -134,6 +134,23 @@ h1 {
     max-height: 330px;
 }
 
+/* 移动端专用：确保卡牌背面显示 */
+@media (max-width: 1200px) {
+    .card-back {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+        transform: rotateY(180deg) !important;
+        backface-visibility: hidden !important;
+    }
+
+    .card-back img {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: block !important;
+    }
+}
+
 .card.flipped {
     transform: rotateY(180deg);
     animation: none;
@@ -174,6 +191,10 @@ h1 {
     background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 50%, #1a1a2e 100%);
     color: #e0e0e0;
     transform: rotateY(180deg);
+    /* 强制显示确保移动端可见 */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
 }
 
 .card-face img {
@@ -183,20 +204,12 @@ h1 {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    border-radius: 0;
+    border-radius: 15px;
     background: transparent;
     z-index: 1;
     max-width: none !important;
     max-height: none !important;
     display: block !important;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 330'%3E%3Crect x='0' y='0' width='220' height='330' rx='15' fill='white'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 330'%3E%3Crect x='0' y='0' width='220' height='330' rx='15' fill='white'/%3E%3C/svg%3E");
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
 }
 
 
@@ -235,8 +248,7 @@ footer {
     }
 
     .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect x='0' y='0' width='200' height='300' rx='12' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect x='0' y='0' width='200' height='300' rx='12' fill='white'/%3E%3C/svg%3E");
+        border-radius: 12px;
     }
 }
 
@@ -266,8 +278,7 @@ footer {
     }
 
     .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 270'%3E%3Crect x='0' y='0' width='180' height='270' rx='10' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 270'%3E%3Crect x='0' y='0' width='180' height='270' rx='10' fill='white'/%3E%3C/svg%3E");
+        border-radius: 10px;
     }
 }
 
@@ -302,8 +313,7 @@ footer {
     }
 
     .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 240'%3E%3Crect x='0' y='0' width='160' height='240' rx='8' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 240'%3E%3Crect x='0' y='0' width='160' height='240' rx='8' fill='white'/%3E%3C/svg%3E");
+        border-radius: 8px;
     }
 }
 
@@ -338,8 +348,7 @@ footer {
     }
 
     .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 210'%3E%3Crect x='0' y='0' width='140' height='210' rx='6' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 210'%3E%3Crect x='0' y='0' width='140' height='210' rx='6' fill='white'/%3E%3C/svg%3E");
+        border-radius: 6px;
     }
 }
 
@@ -374,8 +383,7 @@ footer {
     }
 
     .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 180'%3E%3Crect x='0' y='0' width='120' height='180' rx='5' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 180'%3E%3Crect x='0' y='0' width='120' height='180' rx='5' fill='white'/%3E%3C/svg%3E");
+        border-radius: 5px;
     }
 }
 
@@ -410,8 +418,7 @@ footer {
     }
 
     .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'%3E%3Crect x='0' y='0' width='100' height='150' rx='4' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'%3E%3Crect x='0' y='0' width='100' height='150' rx='4' fill='white'/%3E%3C/svg%3E");
+        border-radius: 4px;
     }
 }
 
@@ -446,7 +453,6 @@ footer {
     }
 
     .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 85 127.5'%3E%3Crect x='0' y='0' width='85' height='127.5' rx='3' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 85 127.5'%3E%3Crect x='0' y='0' width='85' height='127.5' rx='3' fill='white'/%3E%3C/svg%3E");
+        border-radius: 3px;
     }
 }
