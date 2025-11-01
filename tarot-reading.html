@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔罗牌占卜 - 神秘指引</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reading-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .reading-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .reading-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .reading-type {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .reading-type:hover {
+            border-color: #d4af37;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .reading-type.selected {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .reading-type h3 {
+            color: #d4af37;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .reading-type p {
+            color: #b8b8b8;
+            font-size: 0.9rem;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        .start-reading-btn {
+            background: linear-gradient(45deg, #d4af37, #f4e4c1);
+            color: #1e1e2e;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .start-reading-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .start-reading-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cards-selection {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 30px 0;
+            min-height: 200px;
+        }
+
+        .selectable-card {
+            width: 120px;
+            height: 180px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .selectable-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .selectable-card.selected {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .selectable-card .card-back {
+            background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
+            border-radius: 8px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #d4af37;
+        }
+
+        .selectable-card .card-back::before {
+            content: "?";
+            font-size: 2rem;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .reading-result {
+            display: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .reading-result.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-spread {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .result-card h4 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .result-card .card-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .result-card .card-meaning {
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .overall-interpretation {
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 4px solid #d4af37;
+        }
+
+        .overall-interpretation h3 {
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+
+        .overall-interpretation p {
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 10px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        .reset-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: #d4af37;
+        }
+
+        @media (max-width: 768px) {
+            .reading-types {
+                grid-template-columns: 1fr;
+            }
+
+            .result-spread {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reading-container">
+        <header>
+            <h1>塔罗牌占卜</h1>
+            <p class="subtitle">探索内在智慧，寻找生命指引</p>
+        </header>
+
+        <div class="reading-section">
+            <h2>选择占卜类型</h2>
+            <div class="reading-types">
+                <div class="reading-type" data-type="three-card">
+                    <h3>三牌阵</h3>
+                    <p>过去-现在-未来，了解事物发展趋势</p>
+                </div>
+                <div class="reading-type" data-type="celtic-cross">
+                    <h3>凯尔特十字</h3>
+                    <p>全面分析当前状况和未来发展</p>
+                </div>
+                <div class="reading-type" data-type="decision">
+                    <h3>决策指引</h3>
+                    <p>选项分析，帮助你做出明智选择</p>
+                </div>
+                <div class="reading-type" data-type="single">
+                    <h3>单张指引</h3>
+                    <p>今日运势，获得简明指引</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="reading-section" id="questionSection" style="display: none;">
+            <h2>提出你的问题</h2>
+            <textarea
+                class="question-input"
+                id="questionInput"
+                placeholder="请描述你想要了解的问题或情况...&#10;&#10;例如：&#10;- 我的事业发展前景如何？&#10;- 我该如何处理这段关系？&#10;- 我面临的重大选择是什么？"
+            ></textarea>
+            <button class="start-reading-btn" id="startReading">开始抽牌</button>
+        </div>
+
+        <div class="reading-section" id="cardSelection" style="display: none;">
+            <h2>选择你的牌</h2>
+            <p style="text-align: center; color: #999; margin-bottom: 20px;">
+                请凭直觉选择 <span id="cardCount">0</span>/<span id="totalCards">3</span> 张牌
+            </p>
+            <div class="cards-selection" id="cardsContainer">
+                <!-- 卡牌将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="reading-result" id="readingResult">
+            <h2>占卜结果</h2>
+            <div class="result-spread" id="resultSpread">
+                <!-- 结果将通过JavaScript动态生成 -->
+            </div>
+            <div class="overall-interpretation" id="overallInterpretation">
+                <!-- 整体解读将通过JavaScript动态生成 -->
+            </div>
+            <button class="reset-btn" id="resetReading">重新占卜</button>
+        </div>
+    </div>
+
+    <script src="tarot-knowledge.js"></script>
+    <script src="tarot-reading.js"></script>
+</body>
+</html>
