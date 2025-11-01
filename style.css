@@ -929,7 +929,8 @@ h1 {
 
     .result-card {
         width: 200px;
-        padding: 20px;
+        min-width: 200px;
+        padding: 15px;
     }
 
     .result-card img {
@@ -1064,6 +1065,40 @@ footer {
 
     .subtitle {
         font-size: 1rem;
+    }
+
+    /* 结果卡牌移动端优化 */
+    .result-cards {
+        gap: 15px;
+        padding: 10px 0;
+        margin: 30px 0;
+    }
+
+    .result-card {
+        width: 160px;
+        min-width: 160px;
+        padding: 12px;
+    }
+
+    .result-card img {
+        width: 120px;
+        height: 180px;
+    }
+
+    .result-card h4 {
+        font-size: 1rem;
+    }
+
+    .result-card .english-name {
+        font-size: 0.8rem;
+    }
+
+    .result-card .orientation {
+        font-size: 0.7rem;
+    }
+
+    .result-card .meaning {
+        font-size: 0.7rem;
     }
 
     .cards-grid {
