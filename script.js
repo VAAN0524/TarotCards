@@ -546,6 +546,15 @@ function initializeDivination() {
                 };
             }
 
+            // 解读按钮绑定
+            const interpretationBtn = document.getElementById('startInterpretation');
+            if (interpretationBtn) {
+                interpretationBtn.onclick = function() {
+                    console.log('开始专业解读');
+                    startInterpretation();
+                };
+            }
+
             console.log('极简占卜系统初始化完成');
         } catch (error) {
             console.error('占卜初始化失败:', error);
@@ -821,7 +830,7 @@ function handleProfessionalCardSelection(card, cardElement) {
         if (AppState.selectedCards.length === 3) {
             console.log('✨ 已选择3张卡牌，3秒后自动开始解读...');
             setTimeout(() => {
-                startSimpleInterpretation();
+                startInterpretation();
             }, 3000);
         }
 
@@ -1110,7 +1119,7 @@ function handleOptimizedCardSelection(card, cardElement) {
         // 如果选择3张，开始解读
         if (AppState.selectedCards.length === 3) {
             setTimeout(() => {
-                startSimpleInterpretation();
+                startInterpretation();
             }, 2000);
         }
 
@@ -1437,7 +1446,7 @@ function handleTarotCardSelection(card, cardElement) {
         if (AppState.selectedCards.length === 3) {
             console.log('已选择3张卡牌，3秒后自动开始解读...');
             setTimeout(() => {
-                startSimpleInterpretation();
+                startInterpretation();
             }, 3000);
         }
 
@@ -2220,13 +2229,27 @@ function updateSelectedCount() {
 
 // 开始解读
 function startInterpretation() {
-    if (AppState.selectedCards.length !== 3) return;
+    console.log('🔮 开始专业解读...');
+    console.log('选择的卡牌数量:', AppState.selectedCards.length);
+    console.log('问题类型:', AppState.selectedQuestionType);
 
-    // 生成解读内容
-    const interpretation = generateInterpretation();
+    if (AppState.selectedCards.length !== 3) {
+        console.log('❌ 卡牌数量不足，无法开始解读');
+        return;
+    }
 
-    // 显示结果界面
-    showResultScreen(interpretation);
+    try {
+        // 生成解读内容
+        console.log('📊 生成专业解读内容...');
+        const interpretation = generateInterpretation();
+        console.log('✨ 解读生成完成');
+
+        // 显示结果界面
+        showResultScreen(interpretation);
+        console.log('🎯 解读界面显示完成');
+    } catch (error) {
+        console.error('❌ 解读生成失败:', error);
+    }
 }
 
 // 生成占卜解读 - 优化版本，包含时间维度深度解读
