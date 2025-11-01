@@ -1,27 +1,181 @@
-// 塔罗牌数据
+// 塔罗牌数据 - 包含正位逆位含义
 const tarotCards = [
-    { id: 0, name: "愚人", english: "The Fool", file: "0. 愚人 (The Fool).png", meaning: "新的开始，无限可能" },
-    { id: 1, name: "魔术师", english: "The Magician", file: "1. 魔术师 (The Magician) .png", meaning: "创造力和意志力" },
-    { id: 2, name: "女祭司", english: "The High Priestess", file: "2. 女祭司 (The High Priestess).png", meaning: "直觉和内在智慧" },
-    { id: 3, name: "皇后", english: "The Empress", file: "3. 皇后 (The Empress).png", meaning: "丰盛和创造力" },
-    { id: 4, name: "皇帝", english: "The Emperor", file: "4. 皇帝 (The Emperor).png", meaning: "权威和结构" },
-    { id: 5, name: "教皇", english: "The Hierophant", file: "5. 教皇 (The Hierophant).png", meaning: "传统和精神指导" },
-    { id: 6, name: "恋人", english: "The Lovers", file: "6. 恋人 (The Lovers).png", meaning: "选择和和谐" },
-    { id: 7, name: "战车", english: "The Chariot", file: "7. 战车 (The Chariot).png", meaning: "胜利和决心" },
-    { id: 8, name: "力量", english: "Strength", file: "8. 力量 (Strength).png", meaning: "内在力量和勇气" },
-    { id: 9, name: "隐士", english: "The Hermit", file: "9. 隐士 (The Hermit).png", meaning: "内省和寻求真理" },
-    { id: 10, name: "命运之轮", english: "Wheel of Fortune", file: "10. 命运之轮 (Wheel of Fortune).png", meaning: "变化和循环" },
-    { id: 11, name: "正义", english: "Justice", file: "11. 正义 (Justice).png", meaning: "公平和平衡" },
-    { id: 12, name: "倒吊人", english: "The Hanged Man", file: "12. 倒吊人 (The Hanged Man).png", meaning: "牺牲和新视角" },
-    { id: 13, name: "死神", english: "Death", file: "13. 死神 (Death).png", meaning: "转变和重生" },
-    { id: 14, name: "节制", english: "Temperance", file: "14. 节制 (Temperance).png", meaning: "平衡和耐心" },
-    { id: 15, name: "恶魔", english: "The Devil", file: "15. 恶魔 (The Devil).png", meaning: "束缚和诱惑" },
-    { id: 16, name: "高塔", english: "The Tower", file: "16. 高塔 (The Tower).png", meaning: "突变和启示" },
-    { id: 17, name: "星星", english: "The Star", file: "17. 星星 (The Star).png", meaning: "希望和灵感" },
-    { id: 18, name: "月亮", english: "The Moon", file: "18. 月亮 (The Moon).png", meaning: "幻觉和直觉" },
-    { id: 19, name: "太阳", english: "The Sun", file: "19. 太阳 (The Sun).png", meaning: "成功和喜悦" },
-    { id: 20, name: "审判", english: "Judgement", file: "20. 审判 (Judgement).png", meaning: "重生和觉醒" },
-    { id: 21, name: "世界", english: "The World", file: "21. 世界 (The World).png", meaning: "完成和圆满" }
+    {
+        id: 0,
+        name: "愚人",
+        english: "The Fool",
+        file: "0. 愚人 (The Fool).png",
+        upright: "新的开始，无限可能，冒险精神，天真无邪",
+        reversed: "鲁莽行事，愚蠢，冒险失败，缺乏方向感"
+    },
+    {
+        id: 1,
+        name: "魔术师",
+        english: "The Magician",
+        file: "1. 魔术师 (The Magician) .png",
+        upright: "创造力和意志力，技能娴熟，目标明确，行动力强",
+        reversed: "操控欲强，欺骗，技能不足，计划失败"
+    },
+    {
+        id: 2,
+        name: "女祭司",
+        english: "The High Priestess",
+        file: "2. 女祭司 (The High Priestess).png",
+        upright: "直觉和内在智慧，神秘，潜意识，洞察力",
+        reversed: "隐藏的真相被忽略，直觉错误，秘密暴露"
+    },
+    {
+        id: 3,
+        name: "皇后",
+        english: "The Empress",
+        file: "3. 皇后 (The Empress).png",
+        upright: "丰盛和创造力，母性，生育力，舒适和安全感",
+        reversed: "依赖过度，创造力受阻，缺乏母爱，不安全感"
+    },
+    {
+        id: 4,
+        name: "皇帝",
+        english: "The Emperor",
+        file: "4. 皇帝 (The Emperor).png",
+        upright: "权威和结构，领导力，稳定，父亲形象",
+        reversed: "专制独裁，缺乏纪律，失控，权威滥用"
+    },
+    {
+        id: 5,
+        name: "教皇",
+        english: "The Hierophant",
+        file: "5. 教皇 (The Hierophant).png",
+        upright: "传统和精神指导，信仰，制度，学习",
+        reversed: "打破常规，挑战传统，自由思想，反叛"
+    },
+    {
+        id: 6,
+        name: "恋人",
+        english: "The Lovers",
+        file: "6. 恋人 (The Lovers).png",
+        upright: "选择和和谐，爱情关系，价值观统一，伙伴关系",
+        reversed: "关系不和，错误选择，价值观冲突，分离"
+    },
+    {
+        id: 7,
+        name: "战车",
+        english: "The Chariot",
+        file: "7. 战车 (The Chariot).png",
+        upright: "胜利和决心，意志力，前进动力，自我控制",
+        reversed: "失控，缺乏方向，失败，意志力薄弱"
+    },
+    {
+        id: 8,
+        name: "力量",
+        english: "Strength",
+        file: "8. 力量 (Strength).png",
+        upright: "内在力量和勇气，耐心，同情心，自控力",
+        reversed: "软弱无力，缺乏自信，冲动，失去控制"
+    },
+    {
+        id: 9,
+        name: "隐士",
+        english: "The Hermit",
+        file: "9. 隐士 (The Hermit).png",
+        upright: "内省和寻求真理，智慧，独处，内在指引",
+        reversed: "孤立无援，退缩，孤独，迷失方向"
+    },
+    {
+        id: 10,
+        name: "命运之轮",
+        english: "Wheel of Fortune",
+        file: "10. 命运之轮 (Wheel of Fortune).png",
+        upright: "变化和循环，运气，转折点，命运",
+        reversed: "厄运，抗拒变化，坏运气，停滞不前"
+    },
+    {
+        id: 11,
+        name: "正义",
+        english: "Justice",
+        file: "11. 正义 (Justice).png",
+        upright: "公平和平衡，真理，法律，因果关系",
+        reversed: "不公正，偏见，逃避责任，失衡"
+    },
+    {
+        id: 12,
+        name: "倒吊人",
+        english: "The Hanged Man",
+        file: "12. 倒吊人 (The Hanged Man).png",
+        upright: "牺牲和新视角，顺从，放下，等待",
+        reversed: "无意义的牺牲，拖延，抗拒改变，停滞"
+    },
+    {
+        id: 13,
+        name: "死神",
+        english: "Death",
+        file: "13. 死神 (Death).png",
+        upright: "转变和重生，结束，变化，新生",
+        reversed: "抗拒改变，恐惧改变，停滞，痛苦结束"
+    },
+    {
+        id: 14,
+        name: "节制",
+        english: "Temperance",
+        file: "14. 节制 (Temperance).png",
+        upright: "平衡和耐心，调和，中庸之道，适应",
+        reversed: "失衡，极端，缺乏耐心，冲突"
+    },
+    {
+        id: 15,
+        name: "恶魔",
+        english: "The Devil",
+        file: "15. 恶魔 (The Devil).png",
+        upright: "束缚和诱惑，物质主义，欲望，沉溺",
+        reversed: "挣脱束缚，解放，摆脱诱惑，自由"
+    },
+    {
+        id: 16,
+        name: "高塔",
+        english: "The Tower",
+        file: "16. 高塔 (The Tower).png",
+        upright: "突变和启示，灾难，觉醒，真理",
+        reversed: "逃避灾难，恐惧改变，延迟觉醒，小问题"
+    },
+    {
+        id: 17,
+        name: "星星",
+        english: "The Star",
+        file: "17. 星星 (The Star).png",
+        upright: "希望和灵感，治愈，指引，乐观",
+        reversed: "失去希望，失望，缺乏信心，绝望"
+    },
+    {
+        id: 18,
+        name: "月亮",
+        english: "The Moon",
+        file: "18. 月亮 (The Moon).png",
+        upright: "幻觉和直觉，潜意识，恐惧，欺骗",
+        reversed: "恐惧克服，真相显现，焦虑缓解，清晰"
+    },
+    {
+        id: 19,
+        name: "太阳",
+        english: "The Sun",
+        file: "19. 太阳 (The Sun).png",
+        upright: "成功和喜悦，活力，清晰，乐观",
+        reversed: "暂时的成功，缺乏喜悦，悲观，清晰度不足"
+    },
+    {
+        id: 20,
+        name: "审判",
+        english: "Judgement",
+        file: "20. 审判 (Judgement).png",
+        upright: "重生和觉醒，决定，救赎，新开始",
+        reversed: "自我怀疑，逃避责任，错误决定，缺乏觉醒"
+    },
+    {
+        id: 21,
+        name: "世界",
+        english: "The World",
+        file: "21. 世界 (The World).png",
+        upright: "完成和圆满，成就，整合，旅行",
+        reversed: "未完成，缺乏闭环，延迟，不满足"
+    }
 ];
 
 // 页面加载完成后初始化
@@ -327,8 +481,10 @@ function prepareCardDraw() {
     selectedCards = [];
     updateSelectedCount();
 
-    // 使用全部22张塔罗牌
+    // 使用全部22张塔罗牌，确保不重复
     availableCardsForDivination = shuffleArray([...tarotCards]);
+
+    console.log(`准备${availableCardsForDivination.length}张不重复的塔罗牌供抽取`);
 
     // 显示扇形排列的卡牌
     createFanCards();
@@ -411,19 +567,38 @@ function createFanCards() {
 function selectCard(cardElement, cardData) {
     if (cardElement.classList.contains('selected')) return;
 
+    // 随机决定正位还是逆位（30%逆位，70%正位）
+    const isReversed = Math.random() < 0.30;
+    const orientation = isReversed ? 'reversed' : 'upright';
+
+    console.log(`选择卡牌: ${cardData.name} - ${isReversed ? '逆位' : '正位'}`);
+
+    // 从可用卡牌中移除已选择的卡牌，确保不重复
+    const cardIndex = availableCardsForDivination.findIndex(card => card.id === cardData.id);
+    if (cardIndex > -1) {
+        availableCardsForDivination.splice(cardIndex, 1);
+    }
+
     // 添加选中效果
     cardElement.classList.add('selected');
+    if (isReversed) {
+        cardElement.classList.add('reversed');
+    }
 
     // 立即替换卡背为卡牌正面
+    const transformStyle = isReversed ? 'transform: rotate(180deg);' : '';
     cardElement.innerHTML = `
-        <div class="card-face">
+        <div class="card-face" style="${transformStyle}">
             <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
+            ${isReversed ? '<div class="orientation-badge">逆位</div>' : '<div class="orientation-badge">正位</div>'}
         </div>
     `;
 
-    // 添加到已选卡牌
+    // 添加到已选卡牌，包含正位逆位信息
     selectedCards.push({
         ...cardData,
+        orientation: orientation,
+        isReversed: isReversed,
         element: cardElement
     });
 
@@ -467,24 +642,216 @@ function generateInterpretation() {
         fortune: '日常运势'
     };
 
-    // 生成综合解读
-    const cards = selectedCards.map(c => c.name).join('、');
-    const baseInterpretation = `你抽取的三张牌是${cards}。`;
+    // 生成卡牌详细信息
+    const cardDetails = selectedCards.map(card => {
+        const orientation = card.isReversed ? '逆位' : '正位';
+        const meaning = card.isReversed ? card.reversed : card.upright;
+        return `${card.name}(${orientation})`;
+    }).join('、');
 
-    // 根据不同问题类型生成解读
-    const specificInterpretations = {
-        love: `${baseInterpretation}这些卡牌暗示着你的感情生活将迎来重要的转折。第一张牌代表现状，第二张牌显示挑战，第三张牌指引未来。建议你保持开放的心态，真诚面对内心的感受。`,
-        career: `${baseInterpretation}这些卡牌表明你的事业发展正处于关键时期。它们提示你需要发挥领导才能，同时保持谦逊学习的态度。新的机会即将出现，要勇于把握。`,
-        relationship: `${baseInterpretation}这些卡牌反映着你的人际关系状况。它们建议你加强沟通，理解他人立场，同时保持自己的原则。和谐的关系建立在相互尊重的基础上。`,
-        growth: `${baseInterpretation}这些卡牌指向你内在成长的路径。它们鼓励你探索内心深处，面对真正的自己，释放潜能。这个过程需要勇气和耐心。`,
-        fortune: `${baseInterpretation}这些卡牌预示着你近期的运势走向。它们提醒你保持积极心态，抓住机遇，同时也要谨慎处理可能出现的变化。`
+    const baseInterpretation = `你抽取的卡牌是${cardDetails}。`;
+
+    // 分析正位逆位组合
+    const reversedCount = selectedCards.filter(card => card.isReversed).length;
+    const uprightCount = selectedCards.length - reversedCount;
+
+    let orientationAnalysis = '';
+    if (reversedCount === 0) {
+        orientationAnalysis = '所有卡牌都是正位，预示着事情将顺利发展，能量流动通畅。';
+    } else if (reversedCount === selectedCards.length) {
+        orientationAnalysis = '所有卡牌都是逆位，暗示着需要特别注意内在的阻碍和挑战，建议深入反思。';
+    } else {
+        orientationAnalysis = `正位(${uprightCount}张)和逆位(${reversedCount}张)的组合显示事情发展既有机遇也有挑战，需要平衡处理。`;
+    }
+
+    // 根据不同问题类型和正位逆位组合生成深度解读
+    const generateSpecificInterpretation = () => {
+        const interpretations = {
+            love: {
+                upright: '这些正位卡牌显示你的感情关系充满正能量，爱情将顺利发展，建议保持开放的心态迎接美好。' + orientationAnalysis,
+                reversed: '这些逆位卡牌提醒你需要审视感情中的问题，可能存在沟通障碍或内在阻碍，需要坦诚面对。' + orientationAnalysis,
+                mixed: '卡牌的正逆位组合显示你的感情生活既有美好机遇也有需要挑战的方面，关键在于平衡和沟通。' + orientationAnalysis
+            },
+            career: {
+                upright: '正位卡牌预示事业发展前景光明，你的努力将得到回报，建议继续保持积极态度和专注。' + orientationAnalysis,
+                reversed: '逆位卡牌提醒事业发展可能遇到阻碍，需要重新评估方向，保持耐心和灵活性。' + orientationAnalysis,
+                mixed: '事业发展的正逆位组合显示既有成功机会也有挑战需要克服，建议既要抓住机遇也要谨慎应对。' + orientationAnalysis
+            },
+            relationship: {
+                upright: '正位卡牌显示人际关系和谐发展，你与他人的关系将更加融洽，建议继续保持真诚和善意。' + orientationAnalysis,
+                reversed: '逆位卡牌提醒人际关系中可能存在误解或冲突，需要主动沟通和化解矛盾。' + orientationAnalysis,
+                mixed: '人际关系的正逆位组合显示既有和谐的时刻也有需要处理的挑战，关键在于理解和包容。' + orientationAnalysis
+            },
+            growth: {
+                upright: '正位卡牌显示个人成长道路清晰，内在智慧正在觉醒，建议相信自己的直觉和力量。' + orientationAnalysis,
+                reversed: '逆位卡牌提醒成长过程中可能遇到内在阻碍，需要勇敢面对恐惧和不确定性。' + orientationAnalysis,
+                mixed: '个人成长的正逆位组合显示既有突破的机会也有需要克服的挑战，建议保持平衡和耐心。' + orientationAnalysis
+            },
+            fortune: {
+                upright: '正位卡牌预示近期运势良好，幸运将眷顾你，建议抓住机遇积极行动。' + orientationAnalysis,
+                reversed: '逆位卡牌提醒运势可能有起伏，需要保持谨慎和耐心，避免冲动决定。' + orientationAnalysis,
+                mixed: '运势的正逆位组合显示机遇与挑战并存，建议既要把握好运时机也要做好应对准备。' + orientationAnalysis
+            }
+        };
+
+        const key = reversedCount === 0 ? 'upright' :
+                   reversedCount === selectedCards.length ? 'reversed' : 'mixed';
+
+        return interpretations[selectedQuestionType]?.[key] || baseInterpretation + orientationAnalysis;
     };
+
+    // 生成具体的卡牌解读
+    const generateCardInterpretations = () => {
+        return selectedCards.map((card, index) => {
+            const position = index === 0 ? '第一张牌(现状)' :
+                           index === 1 ? '第二张牌(挑战)' : '第三张牌(未来)';
+            const orientation = card.isReversed ? '逆位' : '正位';
+            const meaning = card.isReversed ? card.reversed : card.upright;
+            return `${position}：${card.name}(${orientation}) - ${meaning}`;
+        }).join('；');
+    };
+
+    // 计算爱情指数（0-100分）
+    const calculateLoveIndex = () => {
+        let score = 50; // 基础分数
+
+        selectedCards.forEach((card, index) => {
+            // 不同卡牌的爱情权重
+            const loveWeights = {
+                0: 65,  // 愚人
+                1: 70,  // 魔术师
+                2: 75,  // 女祭司
+                3: 90,  // 皇后
+                4: 60,  // 皇帝
+                5: 55,  // 教皇
+                6: 95,  // 恋人
+                7: 70,  // 战车
+                8: 80,  // 力量
+                9: 45,  // 隐士
+                10: 60, // 命运之轮
+                11: 75, // 正义
+                12: 40, // 倒吊人
+                13: 35, // 死神
+                14: 85, // 节制
+                15: 30, // 恶魔
+                16: 25, // 高塔
+                17: 88, // 星星
+                18: 50, // 月亮
+                19: 92, // 太阳
+                20: 70, // 审判
+                21: 85  // 世界
+            };
+
+            const cardScore = loveWeights[card.id] || 50;
+
+            // 正位加分，逆位减分
+            if (!card.isReversed) {
+                score += (cardScore - 50) * 0.4; // 正位40%权重
+            } else {
+                score -= (cardScore - 50) * 0.6; // 逆位60%权重
+            }
+
+            // 位置权重：现状30%，挑战40%，未来30%
+            const positionWeight = index === 0 ? 0.3 : index === 1 ? 0.4 : 0.3;
+            score += (cardScore - 50) * positionWeight * 0.3;
+        });
+
+        return Math.max(0, Math.min(100, Math.round(score)));
+    };
+
+    // 计算情绪指数（-100到+100，负数为负面情绪）
+    const calculateEmotionIndex = () => {
+        let emotionScore = 0;
+
+        selectedCards.forEach((card, index) => {
+            // 情绪评分（-100到+100）
+            const emotionScores = {
+                0: { upright: 85, reversed: -45 },  // 愚人
+                1: { upright: 75, reversed: -55 },  // 魔术师
+                2: { upright: 60, reversed: -65 },  // 女祭司
+                3: { upright: 90, reversed: -20 },  // 皇后
+                4: { upright: 70, reversed: -50 },  // 皇帝
+                5: { upright: 55, reversed: -60 },  // 教皇
+                6: { upright: 95, reversed: -70 },  // 恋人
+                7: { upright: 80, reversed: -40 },  // 战车
+                8: { upright: 85, reversed: -55 },  // 力量
+                9: { upright: 30, reversed: -80 },  // 隐士
+                10: { upright: 50, reversed: -75 }, // 命运之轮
+                11: { upright: 65, reversed: -65 }, // 正义
+                12: { upright: 20, reversed: -85 }, // 倒吊人
+                13: { upright: -10, reversed: -90 }, // 死神
+                14: { upright: 75, reversed: -50 }, // 节制
+                15: { upright: -20, reversed: -95 }, // 恶魔
+                16: { upright: -30, reversed: -98 }, // 高塔
+                17: { upright: 88, reversed: -35 }, // 星星
+                18: { upright: 25, reversed: -75 }, // 月亮
+                19: { upright: 95, reversed: -25 }, // 太阳
+                20: { upright: 70, reversed: -45 }, // 审判
+                21: { upright: 92, reversed: -15 }  // 世界
+            };
+
+            const cardEmotion = emotionScores[card.id] || { upright: 50, reversed: -50 };
+            const score = card.isReversed ? cardEmotion.reversed : cardEmotion.upright;
+
+            // 位置权重
+            const positionWeight = index === 0 ? 0.25 : index === 1 ? 0.45 : 0.3;
+            emotionScore += score * positionWeight;
+        });
+
+        return Math.round(emotionScore);
+    };
+
+    // 生成个性化解读
+    const generatePersonalizedInterpretation = () => {
+        const loveIndex = calculateLoveIndex();
+        const emotionIndex = calculateEmotionIndex();
+
+        // 爱情指数分析
+        let loveAnalysis = '';
+        if (loveIndex >= 80) {
+            loveAnalysis = '你的爱情指数极高（' + loveIndex + '分），预示着感情关系将迎来黄金时期。';
+        } else if (loveIndex >= 60) {
+            loveAnalysis = '你的爱情指数良好（' + loveIndex + '分），感情基础稳固，有机会进一步发展。';
+        } else if (loveIndex >= 40) {
+            loveAnalysis = '你的爱情指数中等（' + loveIndex + '分），需要更多的沟通和理解来改善关系。';
+        } else {
+            loveAnalysis = '你的爱情指数较低（' + loveIndex + '分），建议重新审视感情中的问题，可能需要做出改变。';
+        }
+
+        // 情绪指数分析
+        let emotionAnalysis = '';
+        if (emotionIndex >= 60) {
+            emotionAnalysis = '你的情绪状态非常积极（+' + emotionIndex + '），内心充满正能量和希望。';
+        } else if (emotionIndex >= 20) {
+            emotionAnalysis = '你的情绪状态偏向积极（+' + emotionIndex + '），虽然有些小波动但整体良好。';
+        } else if (emotionIndex >= -20) {
+            emotionAnalysis = '你的情绪状态相对中性（' + emotionIndex + '），需要在积极和消极之间找到平衡。';
+        } else if (emotionIndex >= -60) {
+            emotionAnalysis = '你的情绪状态偏消极（' + emotionIndex + '），建议多关注自己的内心需求。';
+        } else {
+            emotionAnalysis = '你的情绪状态较为消极（' + emotionIndex + '），需要特别注意心理健康和情绪调节。';
+        }
+
+        return {
+            loveIndex: loveIndex,
+            emotionIndex: emotionIndex,
+            loveAnalysis: loveAnalysis,
+            emotionAnalysis: emotionAnalysis
+        };
+    };
+
+    const personalized = generatePersonalizedInterpretation();
 
     return {
         question: questionNames[selectedQuestionType],
         cards: selectedCards,
-        interpretation: specificInterpretations[selectedQuestionType] || baseInterpretation,
-        guidance: '相信自己的直觉，这些指引将帮助你找到前行的方向。记住，命运掌握在自己手中。'
+        interpretation: `${baseInterpretation}${generateSpecificInterpretation()}`,
+        cardDetails: generateCardInterpretations(),
+        loveIndex: personalized.loveIndex,
+        emotionIndex: personalized.emotionIndex,
+        loveAnalysis: personalized.loveAnalysis,
+        emotionAnalysis: personalized.emotionAnalysis,
+        guidance: `塔罗牌的指引在于提醒我们内在的智慧和选择的力量。${reversedCount > 0 ? '逆位卡牌特别提醒我们要注意内在的阻碍和需要改变的地方。' : '正位卡牌鼓励我们保持积极的态度继续前行。'}记住，你的选择和行动将最终决定命运的走向。`
     };
 }
 
@@ -493,7 +860,7 @@ function showResultScreen(interpretation) {
     // 设置问题标题
     document.getElementById('resultQuestion').textContent = interpretation.question;
 
-    // 显示抽取的三张卡牌
+    // 显示抽取的卡牌
     const resultCardsContainer = document.getElementById('resultCards');
     resultCardsContainer.innerHTML = '';
 
@@ -501,10 +868,11 @@ function showResultScreen(interpretation) {
         const cardElement = document.createElement('div');
         cardElement.className = 'result-card';
         cardElement.innerHTML = `
-            <img src="images/${card.file}" alt="${card.name}">
+            <img src="images/${card.file}" alt="${card.name}" style="${card.isReversed ? 'transform: rotate(180deg);' : ''}">
             <h4>${card.name}</h4>
             <div class="english-name">${card.english}</div>
-            <div class="meaning">${card.meaning}</div>
+            <div class="orientation">${card.isReversed ? '逆位' : '正位'}</div>
+            <div class="meaning">${card.isReversed ? card.reversed : card.upright}</div>
         `;
         resultCardsContainer.appendChild(cardElement);
 
@@ -515,11 +883,35 @@ function showResultScreen(interpretation) {
         }, index * 200);
     });
 
+    // 显示指数分析
+    const indicesHtml = `
+        <div class="indices-analysis">
+            <div class="index-card">
+                <h4>💕 爱情指数</h4>
+                <div class="index-score">${interpretation.loveIndex}分</div>
+                <div class="index-bar">
+                    <div class="index-fill" style="width: ${interpretation.loveIndex}%"></div>
+                </div>
+                <p>${interpretation.loveAnalysis}</p>
+            </div>
+            <div class="index-card">
+                <h4>😊 情绪指数</h4>
+                <div class="index-score">${interpretation.emotionIndex > 0 ? '+' : ''}${interpretation.emotionIndex}</div>
+                <div class="index-bar">
+                    <div class="index-fill ${interpretation.emotionIndex < 0 ? 'negative' : 'positive'}" style="width: ${Math.abs(interpretation.emotionIndex)}%"></div>
+                </div>
+                <p>${interpretation.emotionAnalysis}</p>
+            </div>
+        </div>
+    `;
+
     // 显示解读内容
     const interpretationContent = document.getElementById('interpretationContent');
     interpretationContent.innerHTML = `
         <h3>塔罗指引</h3>
+        ${indicesHtml}
         <div class="interpretation-text">${interpretation.interpretation}</div>
+        <div class="card-details">${interpretation.cardDetails}</div>
         <div class="guidance">${interpretation.guidance}</div>
     `;
 
