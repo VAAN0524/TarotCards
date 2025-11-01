@@ -395,16 +395,30 @@ function getRandomCardsForRound() {
 // 添加自动旋转效果
 function addAutoRotate() {
     // 4秒后（第一次到背面位置）开始更换，然后每8秒更换一次
+    // 增加小延时确保动画完全到达背面位置
     setTimeout(() => {
         switchToNextCardSet();
-        setInterval(switchToNextCardSet, 8000);
-    }, 4000);
+        // 使用精确的8秒间隔，与CSS动画完全同步
+        setInterval(() => {
+            // 增加小延时确保卡牌完全转到背面
+            setTimeout(switchToNextCardSet, 100);
+        }, 8000);
+    }, 4100); // 稍微延迟确保第一次也在背面位置
 }
 
 // 切换到下一套卡牌（在背面位置立即更换）
 function switchToNextCardSet() {
     try {
-        console.log('卡牌到达背面位置，立即切换新卡牌...');
+        console.log('卡牌到达背面位置，准备切换新卡牌...');
+
+        // 获取所有卡牌元素
+        const cards = document.querySelectorAll('.card');
+
+        // 临时停止所有卡牌的动画，锁定在背面位置
+        cards.forEach(card => {
+            card.style.animationPlayState = 'paused';
+            card.style.transform = 'rotateY(180deg)';
+        });
 
         // 切换到下一套卡牌 - 使用AppState管理
         AppState.currentSetIndex = (AppState.currentSetIndex + 1) % AppState.cardSets.length;
@@ -413,11 +427,18 @@ function switchToNextCardSet() {
         updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
         console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}: 已切换到新卡牌组`);
 
-    // 预生成更多卡牌组，确保有足够的随机组合
-    if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复
-        AppState.cardSets.push(getRandomCardsForRound());
-        console.log(`生成新的随机组合，当前共${AppState.cardSets.length}组`);
-    }
+        // 短暂延迟后恢复动画
+        setTimeout(() => {
+            cards.forEach(card => {
+                card.style.animationPlayState = 'running';
+            });
+        }, 50);
+
+        // 预生成更多卡牌组，确保有足够的随机组合
+        if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复
+            AppState.cardSets.push(getRandomCardsForRound());
+            console.log(`生成新的随机组合，当前共${AppState.cardSets.length}组`);
+        }
     } catch (error) {
         console.error('切换卡牌集失败:', error);
     }
@@ -427,6 +448,8 @@ function switchToNextCardSet() {
 function updateCardImages(newCards) {
     const cardsGrid = document.getElementById('cardsGrid');
     const existingCards = cardsGrid.querySelectorAll('.card');
+    let loadedCount = 0;
+    const totalCards = newCards.length;
 
     // 使用requestAnimationFrame优化性能
     requestAnimationFrame(() => {
@@ -438,8 +461,21 @@ function updateCardImages(newCards) {
                     // 使用新图片避免缓存问题
                     const newSrc = `images/${newCard.file}`;
                     if (frontImg.src !== newSrc) {
+                        // 监听图片加载完成
+                        frontImg.onload = () => {
+                            loadedCount++;
+                            console.log(`卡牌图片加载完成 ${loadedCount}/${totalCards}: ${newCard.name}`);
+                        };
+
+                        frontImg.onerror = () => {
+                            loadedCount++; // 即使失败也计数
+                            console.error(`卡牌图片加载失败: ${newSrc}`);
+                        };
+
                         frontImg.src = newSrc;
                         frontImg.alt = newCard.name;
+                    } else {
+                        loadedCount++; // 如果图片没变，直接计数
                     }
                 }
             }
