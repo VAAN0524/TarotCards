@@ -591,6 +591,33 @@ function initializeDivination() {
                 };
             }
 
+            // 开始新的占卜按钮绑定
+            const newReadingBtn = document.getElementById('newReading');
+            if (newReadingBtn) {
+                newReadingBtn.onclick = function() {
+                    console.log('开始新的占卜');
+                    newReading();
+                };
+            }
+
+            // 返回主页按钮绑定
+            const backHomeBtn = document.getElementById('backHome');
+            if (backHomeBtn) {
+                backHomeBtn.onclick = function() {
+                    console.log('返回主页');
+                    backHome();
+                };
+            }
+
+            // 返回问题类型选择按钮绑定
+            const backToQuestionTypeBtn = document.getElementById('backToQuestionType');
+            if (backToQuestionTypeBtn) {
+                backToQuestionTypeBtn.onclick = function() {
+                    console.log('返回问题类型选择');
+                    backToQuestionType();
+                };
+            }
+
             console.log('极简占卜系统初始化完成');
         } catch (error) {
             console.error('占卜初始化失败:', error);
@@ -3159,7 +3186,7 @@ function newReading() {
 
 // 返回主页
 function backHome() {
-    isDivinationMode = false;
+    AppState.isDivinationMode = false;
     document.getElementById('divinationContainer').classList.remove('active');
     startMainPageAnimation();
 }
