@@ -729,20 +729,20 @@ function createProfessionalTarotCard(card, index) {
         backface-visibility: hidden;
     `;
 
-    // 创建卡背（不显示名称）
+    // 创建卡背（不显示名称）- 移除金色边框，借鉴首页设计
     cardElement.innerHTML = `
         <div class="card-back-face" style="
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #2d1b3d 0%, #1a1a2e 50%, #2d1b3d 100%);
-            border: 3px solid #d4af37;
+            background: transparent;
+            border: none;
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: none;
         ">
             <div class="card-pattern" style="
                 position: absolute;
@@ -853,8 +853,8 @@ function flipProfessionalCard(cardElement, card, isReversed) {
                 <div class="card-front-face" style="
                     width: 100%;
                     height: 100%;
-                    background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 50%, #1a1a2e 100%);
-                    border: 3px solid #d4af37;
+                    background: transparent;
+                    border: none;
                     border-radius: 15px;
                     display: flex;
                     flex-direction: column;
@@ -862,7 +862,7 @@ function flipProfessionalCard(cardElement, card, isReversed) {
                     justify-content: center;
                     position: relative;
                     overflow: hidden;
-                    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
+                    box-shadow: none;
                     transform: ${isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
                 ">
                     <div class="card-image" style="
@@ -920,21 +920,39 @@ function addProfessionalScrollCSS() {
         .professional-tarot-card.selected {
             transform: translateY(-20px) scale(1.15) !important;
             z-index: 100 !important;
-            box-shadow: 0 25px 60px rgba(212, 175, 55, 0.5) !important;
+            box-shadow: none !important;
         }
 
         .professional-tarot-card.selected .card-front-face,
         .professional-tarot-card.selected .card-back-face {
-            border-color: #ffffff !important;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.8) !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 桌面端响应式 - 进一步增大卡牌尺寸 */
+        @media (min-width: 1201px) {
+            .professional-tarot-card {
+                width: 320px !important;
+                height: 512px !important;
+                margin: 0 40px !important;
+            }
+
+            .tarot-track-container {
+                animation-duration: 35s !important;
+            }
+
+            @keyframes seamlessScroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(calc(-50% - 80px)); }
+            }
         }
 
         /* 移动端响应式 - 增大卡牌尺寸 */
         @media (max-width: 768px) {
             .professional-tarot-card {
-                width: 140px !important;
-                height: 224px !important;
-                margin: 0 20px !important;
+                width: 160px !important;
+                height: 256px !important;
+                margin: 0 25px !important;
             }
 
             .tarot-track-container {
@@ -943,15 +961,15 @@ function addProfessionalScrollCSS() {
 
             @keyframes seamlessScroll {
                 0% { transform: translateX(0); }
-                100% { transform: translateX(calc(-50% - 40px)); }
+                100% { transform: translateX(calc(-50% - 50px)); }
             }
         }
 
         @media (max-width: 480px) {
             .professional-tarot-card {
-                width: 110px !important;
-                height: 176px !important;
-                margin: 0 15px !important;
+                width: 120px !important;
+                height: 192px !important;
+                margin: 0 18px !important;
             }
 
             .tarot-track-container {
@@ -960,7 +978,7 @@ function addProfessionalScrollCSS() {
 
             @keyframes seamlessScroll {
                 0% { transform: translateX(0); }
-                100% { transform: translateX(calc(-50% - 30px)); }
+                100% { transform: translateX(calc(-50% - 36px)); }
             }
         }
     `;
@@ -1591,22 +1609,22 @@ function generateSimpleInterpretation() {
                         ${AppState.selectedCards.map(card => `
                             <div style="text-align: center;">
                                 <div style="
-                                    width: 140px;
-                                    height: 210px;
-                                    background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
-                                    border: 2px solid #d4af37;
+                                    width: 180px;
+                                    height: 270px;
+                                    background: transparent;
+                                    border: none;
                                     border-radius: 12px;
-                                    margin: 0 auto 12px;
+                                    margin: 0 auto 15px;
                                     display: flex;
                                     align-items: center;
                                     justify-content: center;
                                     transform: ${card.isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
                                 ">
                                     <div style="
-                                        width: 110px;
-                                        height: 165px;
+                                        width: 150px;
+                                        height: 225px;
                                         background: url('images/${card.file}') center/contain no-repeat;
-                                        border-radius: 8px;
+                                        border-radius: 10px;
                                     "></div>
                                 </div>
                                 <div style="color: #d4af37; font-size: 14px; font-weight: bold;">${card.name}</div>
@@ -1968,15 +1986,15 @@ function calculateDynamicCardSize() {
         cardHeight = cardWidth * 1.6;
         containerHeight = 420;
     } else if (screenWidth <= 1200) {
-        // 桌面设备 - 增大100%，大幅提升视觉效果
-        cardWidth = Math.min(220, screenWidth / 4);
+        // 桌面设备 - 增大150%，大幅提升视觉效果
+        cardWidth = Math.min(280, screenWidth / 3.2);
         cardHeight = cardWidth * 1.6;
-        containerHeight = 500;
+        containerHeight = 600;
     } else {
-        // 大屏设备 - 增大80%，充分利用大屏空间
-        cardWidth = Math.min(260, screenWidth / 4.5);
+        // 大屏设备 - 增大120%，充分利用大屏空间
+        cardWidth = Math.min(340, screenWidth / 3.8);
         cardHeight = cardWidth * 1.6;
-        containerHeight = 550;
+        containerHeight = 700;
     }
 
     return {
@@ -2074,9 +2092,9 @@ function createScrollCard(card, index) {
         cardElement.setAttribute('data-index', originalIndex);
         cardElement.setAttribute('data-original-index', originalIndex);
 
-        // 创建卡牌内容（只显示卡背）
+        // 创建卡牌内容（只显示卡背）- 移除边框样式
         cardElement.innerHTML = `
-            <div class="card-face card-back">
+            <div class="card-face card-back" style="border: none; box-shadow: none; background: transparent;">
                 <img src="images/塔罗牌背面.png" alt="塔罗牌背面" loading="eager">
             </div>
         `;
@@ -2151,10 +2169,10 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
         cardElement.style.position = 'relative';
         selectedCardsArea.appendChild(cardElement);
 
-        // 立即替换卡背为卡牌正面，不显示正位逆位标注
+        // 立即替换卡背为卡牌正面，不显示正位逆位标注 - 移除边框样式
         const transformStyle = isReversed ? 'transform: rotate(180deg);' : '';
         cardElement.innerHTML = `
-            <div class="card-face" style="${transformStyle}">
+            <div class="card-face" style="${transformStyle} border: none; box-shadow: none; background: transparent;">
                 <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
             </div>
         `;
