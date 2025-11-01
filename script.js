@@ -2226,7 +2226,7 @@ function startInterpretation() {
     showResultScreen(interpretation);
 }
 
-// 生成占卜解读
+// 生成占卜解读 - 优化版本，包含时间维度深度解读
 function generateInterpretation() {
     const questionNames = {
         love: '爱情占卜',
@@ -2236,232 +2236,236 @@ function generateInterpretation() {
         fortune: '日常运势'
     };
 
-    // 生成卡牌详细信息
-    const cardDetails = AppState.selectedCards.map(card => {
-        const orientation = card.isReversed ? '逆位' : '正位';
-        const meaning = card.isReversed ? card.reversed : card.upright;
-        return `${card.name}(${orientation})`;
-    }).join('、');
-
-    const baseInterpretation = `你抽取的卡牌是${cardDetails}。`;
-
-    // 分析正位逆位组合
-    const reversedCount = AppState.selectedCards.filter(card => card.isReversed).length;
-    const uprightCount = AppState.selectedCards.length - reversedCount;
-
-    let orientationAnalysis = '';
-    if (reversedCount === 0) {
-        orientationAnalysis = '所有卡牌都是正位，预示着事情将顺利发展，能量流动通畅。';
-    } else if (reversedCount === AppState.selectedCards.length) {
-        orientationAnalysis = '所有卡牌都是逆位，暗示着需要特别注意内在的阻碍和挑战，建议深入反思。';
-    } else {
-        orientationAnalysis = `正位(${uprightCount}张)和逆位(${reversedCount}张)的组合显示事情发展既有机遇也有挑战，需要平衡处理。`;
-    }
-
-    // 根据不同问题类型和正位逆位组合生成深度解读
-    const generateSpecificInterpretation = () => {
-        const interpretations = {
-            love: {
-                upright: '这些正位卡牌显示你的感情关系充满正能量，爱情将顺利发展，建议保持开放的心态迎接美好。' + orientationAnalysis,
-                reversed: '这些逆位卡牌提醒你需要审视感情中的问题，可能存在沟通障碍或内在阻碍，需要坦诚面对。' + orientationAnalysis,
-                mixed: '卡牌的正逆位组合显示你的感情生活既有美好机遇也有需要挑战的方面，关键在于平衡和沟通。' + orientationAnalysis
-            },
-            career: {
-                upright: '正位卡牌预示事业发展前景光明，你的努力将得到回报，建议继续保持积极态度和专注。' + orientationAnalysis,
-                reversed: '逆位卡牌提醒事业发展可能遇到阻碍，需要重新评估方向，保持耐心和灵活性。' + orientationAnalysis,
-                mixed: '事业发展的正逆位组合显示既有成功机会也有挑战需要克服，建议既要抓住机遇也要谨慎应对。' + orientationAnalysis
-            },
-            relationship: {
-                upright: '正位卡牌显示人际关系和谐发展，你与他人的关系将更加融洽，建议继续保持真诚和善意。' + orientationAnalysis,
-                reversed: '逆位卡牌提醒人际关系中可能存在误解或冲突，需要主动沟通和化解矛盾。' + orientationAnalysis,
-                mixed: '人际关系的正逆位组合显示既有和谐的时刻也有需要处理的挑战，关键在于理解和包容。' + orientationAnalysis
-            },
-            growth: {
-                upright: '正位卡牌显示个人成长道路清晰，内在智慧正在觉醒，建议相信自己的直觉和力量。' + orientationAnalysis,
-                reversed: '逆位卡牌提醒成长过程中可能遇到内在阻碍，需要勇敢面对恐惧和不确定性。' + orientationAnalysis,
-                mixed: '个人成长的正逆位组合显示既有突破的机会也有需要克服的挑战，建议保持平衡和耐心。' + orientationAnalysis
-            },
-            fortune: {
-                upright: '正位卡牌预示近期运势良好，幸运将眷顾你，建议抓住机遇积极行动。' + orientationAnalysis,
-                reversed: '逆位卡牌提醒运势可能有起伏，需要保持谨慎和耐心，避免冲动决定。' + orientationAnalysis,
-                mixed: '运势的正逆位组合显示机遇与挑战并存，建议既要把握好运时机也要做好应对准备。' + orientationAnalysis
-            }
-        };
-
-        const key = reversedCount === 0 ? 'upright' :
-                   reversedCount === AppState.selectedCards.length ? 'reversed' : 'mixed';
-
-        return interpretations[AppState.selectedQuestionType]?.[key] || baseInterpretation + orientationAnalysis;
-    };
-
-    // 生成具体的卡牌解读
-    const generateCardInterpretations = () => {
+    // 生成时间维度的深度解读
+    const generateTimeBasedInterpretation = () => {
+        const positions = ['过去', '现在', '未来'];
         return AppState.selectedCards.map((card, index) => {
-            const position = index === 0 ? '第一张牌(现状)' :
-                           index === 1 ? '第二张牌(挑战)' : '第三张牌(未来)';
             const orientation = card.isReversed ? '逆位' : '正位';
             const meaning = card.isReversed ? card.reversed : card.upright;
-            return `${position}：${card.name}(${orientation}) - ${meaning}`;
-        }).join('；');
+            const timePosition = positions[index];
+
+            return {
+                position: timePosition,
+                card: card,
+                orientation: orientation,
+                meaning: meaning,
+                detailedInterpretation: generateDetailedCardInterpretation(card, index, timePosition)
+            };
+        });
     };
 
-    // 计算顺利指数（0-100分）
-    const calculateLoveIndex = () => {
-        let score = 50; // 基础分数
+    // 生成每张牌在特定时间位置的详细解读
+    function generateDetailedCardInterpretation(card, index, timePosition) {
+        const orientation = card.isReversed ? '逆位' : '正位';
+        const questionType = AppState.selectedQuestionType;
+
+        // 时间位置的解读模板
+        const timeInterpretations = {
+            '过去': {
+                love: {
+                    upright: `过去的感情经历中，${card.name}正位代表着你曾经拥有${card.upright}。这些经历为现在的感情奠定了基础，让你学会了如何去爱与被爱。`,
+                    reversed: `过去的感情经历中，${card.name}逆位显示出${card.reversed}。这些经历可能造成了某些创伤或阻碍，但现在正是疗愈和成长的机会。`
+                },
+                career: {
+                    upright: `在职业发展道路上，${card.name}正位表明你过去经历了${card.upright}。这些经历塑造了你的专业能力和职业态度。`,
+                    reversed: `回顾职业历程，${card.name}逆位显示出你曾经面临${card.reversed}的挑战，这些经历现在成为了宝贵的教训。`
+                },
+                relationship: {
+                    upright: `在人际关系的历史中，${card.name}正位显示出你曾经体验过${card.upright}的美好时光，这些经历建立了你的社交基础。`,
+                    reversed: `过去的人际关系中，${card.name}逆位表明你经历过${card.reversed}的困扰，这些经历让你更懂得人际关系的珍贵。`
+                },
+                growth: {
+                    upright: `在个人成长的道路上，${card.name}正位代表着你曾经展现出${card.upright}的品质，这些特质至今仍在影响着你的成长轨迹。`,
+                    reversed: `回顾成长历程，${card.name}逆位显示出你曾经面临${card.reversed}的挑战，这些困难让你变得更加坚强和智慧。`
+                },
+                fortune: {
+                    upright: `在运势的流转中，${card.name}正位表明你过去经历了${card.upright}的幸运时期，这些美好回忆给予你继续前行的力量。`,
+                    reversed: `过去的运势中，${card.name}逆位显示出你曾遭遇${card.reversed}的起伏，这些经历让你学会在逆境中保持坚韧。`
+                }
+            },
+            '现在': {
+                love: {
+                    upright: `当前的感情状况中，${card.name}正位显示出${card.upright}的能量正在你周围流动。这是把握当下，创造美好感情的关键时刻。`,
+                    reversed: `在现在的感情中，${card.name}逆位提醒你正在经历${card.reversed}的状况。需要特别注意沟通方式或内心的真实需求。`
+                },
+                career: {
+                    upright: `在当前的职场环境中，${card.name}正位表明你正处于${card.upright}的有利位置，要充分利用这个时机展现才能。`,
+                    reversed: `目前的事业状态中，${card.name}逆位显示出${card.reversed}的挑战，需要重新评估策略或寻求新的解决方案。`
+                },
+                relationship: {
+                    upright: `在当下的人际关系中，${card.name}正位代表着${card.upright}的和谐氛围，这是深化关系的好时机。`,
+                    reversed: `当前的人际交往中，${card.name}逆位提醒你注意${card.reversed}的问题，需要主动沟通化解误解。`
+                },
+                growth: {
+                    upright: `在个人成长的现阶段，${card.name}正位显示出你正在体验${card.upright}的成长过程，要保持这种积极的发展势头。`,
+                    reversed: `目前的成长状态中，${card.name}逆位表明你面临着${card.reversed}的阻碍，需要勇敢面对并寻求突破。`
+                },
+                fortune: {
+                    upright: `在当前的运势中，${card.name}正位预示着${card.upright}的好运正在你的生活中显现，要抓住这些机会。`,
+                    reversed: `现在的运势显示出${card.name}逆位的影响，提醒你${card.reversed}，需要保持谨慎和耐心。`
+                }
+            },
+            '未来': {
+                love: {
+                    upright: `在未来的感情发展中，${card.name}正位预示着${card.upright}的美好前景。保持积极的心态，爱情将按照最有利于你的方式展开。`,
+                    reversed: `未来的感情走向中，${card.name}逆位提醒你要注意${card.reversed}的可能性，提前做好准备，避免不必要的困扰。`
+                },
+                career: {
+                    upright: `在事业发展前景中，${card.name}正位预示着${card.upright}的光明未来，你的努力将获得丰厚的回报。`,
+                    reversed: `未来职业发展中，${card.name}逆位提醒你要预防${card.reversed}的挑战，保持灵活性和适应能力。`
+                },
+                relationship: {
+                    upright: `在未来的人际关系发展上，${card.name}正位预示着${card.upright}的和谐关系，你的真诚将收获深厚的友谊。`,
+                    reversed: `未来人际关系中，${card.name}逆位提醒你要注意${card.reversed}的潜在问题，提前建立更好的沟通机制。`
+                },
+                growth: {
+                    upright: `在个人成长的未来道路上，${card.name}正位预示着你将体验${card.upright}的美好成长，潜能将得到充分展现。`,
+                    reversed: `未来成长过程中，${card.name}逆位提醒你可能会面临${card.reversed}的考验，这些经历将让你变得更加成熟。`
+                },
+                fortune: {
+                    upright: `在未来的运势流转中，${card.name}正位预示着${card.upright}的好运即将到来，要保持开放的心态迎接机遇。`,
+                    reversed: `未来运势显示出${card.name}逆位的影响，提醒你${card.reversed}，要做好应对变化的准备。`
+                }
+            }
+        };
+
+        return timeInterpretations[timePosition]?.[questionType]?.[orientation] ||
+               `${timePosition}的${card.name}(${orientation})显示着${card.isReversed ? card.reversed : card.upright}。`;
+    }
+
+    // 生成综合故事线解读
+    const generateStorylineInterpretation = () => {
+        const timeReadings = generateTimeBasedInterpretation();
+        const questionType = AppState.selectedQuestionType;
+
+        // 分析整体发展趋势
+        const overallTrend = analyzeOverallTrend(timeReadings);
+
+        // 生成连贯的故事线
+        const storyline = `
+            <div class="storyline-interpretation">
+                <h4>📖 命运故事线</h4>
+                <div class="timeline-reading">
+                    ${timeReadings.map((reading, index) => `
+                        <div class="time-period">
+                            <h5>🕐 ${reading.position}：${reading.card.name}(${reading.orientation})</h5>
+                            <p>${reading.detailedInterpretation}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="overall-trend">
+                    <h5>🎯 整体发展趋势</h5>
+                    <p>${overallTrend}</p>
+                </div>
+            </div>
+        `;
+
+        return storyline;
+    };
+
+    // 分析整体发展趋势
+    function analyzeOverallTrend(timeReadings) {
+        const reversedCount = timeReadings.filter(r => r.orientation === '逆位').length;
+        const questionType = AppState.selectedQuestionType;
+
+        let trendAnalysis = '';
+
+        // 根据正位逆位组合分析趋势
+        if (reversedCount === 0) {
+            trendAnalysis = '三张正位卡牌形成了一个非常积极的发展轨迹，从过去的美好基础，到现在的有利时机，再到未来的光明前景，显示出事物正在向最好的方向发展。';
+        } else if (reversedCount === 3) {
+            trendAnalysis = '三张逆位卡牌提醒你正处于一个重要的转折点，虽然面临挑战，但这也是深刻反思和彻底改变的时机。通过正视问题，你将迎来真正的转机。';
+        } else if (reversedCount === 1) {
+            const reversedIndex = timeReadings.findIndex(r => r.orientation === '逆位');
+            const timePositions = ['过去', '现在', '未来'];
+            const reversedTime = timePositions[reversedIndex];
+
+            if (reversedTime === '过去') {
+                trendAnalysis = '过去的逆位卡牌显示你已经克服了曾经的困难，现在的正位能量和未来的美好前景都表明你正在向正确的方向发展。';
+            } else if (reversedTime === '现在') {
+                trendAnalysis = '虽然目前面临一些挑战（现在的逆位卡牌），但过去的良好基础和未来的积极预示表明这只是暂时的困难，坚持下去就会看到曙光。';
+            } else {
+                trendAnalysis = '过去和现在的正位卡牌为你奠定了坚实的基础，虽然未来需要注意某些问题（未来的逆位卡牌），但你完全有能力预防和应对。';
+            }
+        } else {
+            trendAnalysis = '正位和逆位卡牌的组合显示出事物发展的复杂性，既有有利因素也有需要注意的地方。关键在于保持平衡，发挥优势，同时谨慎应对挑战。';
+        }
+
+        // 根据问题类型补充具体建议
+        const specificAdvice = {
+            love: '在感情关系中，建议保持真诚沟通，用理解化解分歧，相信爱的力量能够克服一切困难。',
+            career: '在事业发展上，建议保持专注和耐心，相信自己的能力，同时保持学习和适应的态度。',
+            relationship: '在人际交往中，建议保持开放和包容的心态，用善意对待他人，建立深厚而持久的友谊。',
+            growth: '在个人成长路上，建议保持好奇心和勇气，相信内在的智慧，勇敢探索未知的可能性。',
+            fortune: '在运势流转中，建议保持积极乐观的心态，把握机遇，同时保持谦逊和感恩之心。'
+        };
+
+        return trendAnalysis + specificAdvice[questionType];
+    }
+
+    // 计算时间维度的运势指数
+    const calculateFortuneIndex = () => {
+        let totalScore = 0;
 
         AppState.selectedCards.forEach((card, index) => {
-            // 不同卡牌的顺利权重
-            const loveWeights = {
-                0: 65,  // 愚人
-                1: 70,  // 魔术师
-                2: 75,  // 女祭司
-                3: 90,  // 皇后
-                4: 60,  // 皇帝
-                5: 55,  // 教皇
-                6: 95,  // 恋人
-                7: 70,  // 战车
-                8: 80,  // 力量
-                9: 45,  // 隐士
-                10: 60, // 命运之轮
-                11: 75, // 正义
-                12: 40, // 倒吊人
-                13: 35, // 死神
-                14: 85, // 节制
-                15: 30, // 恶魔
-                16: 25, // 高塔
-                17: 88, // 星星
-                18: 50, // 月亮
-                19: 92, // 太阳
-                20: 70, // 审判
-                21: 85  // 世界
+            // 基础分数根据卡牌类型
+            const baseScores = {
+                0: 65, 1: 70, 2: 75, 3: 90, 4: 70, 5: 60, 6: 95, 7: 75, 8: 85, 9: 50,
+                10: 60, 11: 75, 12: 45, 13: 40, 14: 80, 15: 35, 16: 30, 17: 90, 18: 55,
+                19: 95, 20: 75, 21: 90
             };
 
-            const cardScore = loveWeights[card.id] || 50;
+            const cardScore = baseScores[card.id] || 60;
 
             // 正位加分，逆位减分
-            if (!card.isReversed) {
-                score += (cardScore - 50) * 0.4; // 正位40%权重
-            } else {
-                score -= (cardScore - 50) * 0.6; // 逆位60%权重
-            }
+            const finalScore = card.isReversed ? cardScore - 20 : cardScore + 10;
 
-            // 位置权重：现状30%，挑战40%，未来30%
-            const positionWeight = index === 0 ? 0.3 : index === 1 ? 0.4 : 0.3;
-            score += (cardScore - 50) * positionWeight * 0.3;
+            // 时间权重：过去25%，现在40%，未来35%
+            const timeWeight = index === 0 ? 0.25 : index === 1 ? 0.4 : 0.35;
+            totalScore += finalScore * timeWeight;
         });
 
-        return Math.max(0, Math.min(100, Math.round(score)));
+        return Math.max(0, Math.min(100, Math.round(totalScore)));
     };
 
-    // 计算情绪指数（-100到+100，负数为负面情绪）
-    const calculateEmotionIndex = () => {
-        let emotionScore = 0;
-
-        AppState.selectedCards.forEach((card, index) => {
-            // 情绪评分（-100到+100）
-            const emotionScores = {
-                0: { upright: 85, reversed: -45 },  // 愚人
-                1: { upright: 75, reversed: -55 },  // 魔术师
-                2: { upright: 60, reversed: -65 },  // 女祭司
-                3: { upright: 90, reversed: -20 },  // 皇后
-                4: { upright: 70, reversed: -50 },  // 皇帝
-                5: { upright: 55, reversed: -60 },  // 教皇
-                6: { upright: 95, reversed: -70 },  // 恋人
-                7: { upright: 80, reversed: -40 },  // 战车
-                8: { upright: 85, reversed: -55 },  // 力量
-                9: { upright: 30, reversed: -80 },  // 隐士
-                10: { upright: 50, reversed: -75 }, // 命运之轮
-                11: { upright: 65, reversed: -65 }, // 正义
-                12: { upright: 20, reversed: -85 }, // 倒吊人
-                13: { upright: -10, reversed: -90 }, // 死神
-                14: { upright: 75, reversed: -50 }, // 节制
-                15: { upright: -20, reversed: -95 }, // 恶魔
-                16: { upright: -30, reversed: -98 }, // 高塔
-                17: { upright: 88, reversed: -35 }, // 星星
-                18: { upright: 25, reversed: -75 }, // 月亮
-                19: { upright: 95, reversed: -25 }, // 太阳
-                20: { upright: 70, reversed: -45 }, // 审判
-                21: { upright: 92, reversed: -15 }  // 世界
-            };
-
-            const cardEmotion = emotionScores[card.id] || { upright: 50, reversed: -50 };
-            const score = card.isReversed ? cardEmotion.reversed : cardEmotion.upright;
-
-            // 位置权重
-            const positionWeight = index === 0 ? 0.25 : index === 1 ? 0.45 : 0.3;
-            emotionScore += score * positionWeight;
-        });
-
-        return Math.round(emotionScore);
+    // 计算和谐指数
+    const calculateHarmonyIndex = () => {
+        const reversedCount = AppState.selectedCards.filter(card => card.isReversed).length;
+        const harmonyScore = 100 - (reversedCount * 25); // 每张逆位卡减25分
+        return Math.max(0, Math.min(100, harmonyScore));
     };
 
-    // 生成个性化解读
-    const generatePersonalizedInterpretation = () => {
-        const loveIndex = calculateLoveIndex();
-        const emotionIndex = calculateEmotionIndex();
-
-        // 顺利指数分析
-        let loveAnalysis = '';
-        if (loveIndex >= 80) {
-            loveAnalysis = '你的顺利指数极高（' + loveIndex + '分），预示着事情发展将非常顺利，充满机遇。';
-        } else if (loveIndex >= 60) {
-            loveAnalysis = '你的顺利指数良好（' + loveIndex + '分），基础稳固，有很好的发展前景。';
-        } else if (loveIndex >= 40) {
-            loveAnalysis = '你的顺利指数中等（' + loveIndex + '分），需要更多的努力和智慧来克服挑战。';
-        } else {
-            loveAnalysis = '你的顺利指数较低（' + loveIndex + '分），建议重新评估策略，可能需要调整方向。';
-        }
-
-        // 情绪指数分析
-        let emotionAnalysis = '';
-        if (emotionIndex >= 60) {
-            emotionAnalysis = '你的情绪状态非常积极（+' + emotionIndex + '），内心充满正能量和希望。';
-        } else if (emotionIndex >= 20) {
-            emotionAnalysis = '你的情绪状态偏向积极（+' + emotionIndex + '），虽然有些小波动但整体良好。';
-        } else if (emotionIndex >= -20) {
-            emotionAnalysis = '你的情绪状态相对中性（' + emotionIndex + '），需要在积极和消极之间找到平衡。';
-        } else if (emotionIndex >= -60) {
-            emotionAnalysis = '你的情绪状态偏消极（' + emotionIndex + '），建议多关注自己的内心需求。';
-        } else {
-            emotionAnalysis = '你的情绪状态较为消极（' + emotionIndex + '），需要特别注意心理健康和情绪调节。';
-        }
-
-        return {
-            loveIndex: loveIndex,
-            emotionIndex: emotionIndex,
-            loveAnalysis: loveAnalysis,
-            emotionAnalysis: emotionAnalysis
-        };
-    };
-
-    const personalized = generatePersonalizedInterpretation();
+    const fortuneIndex = calculateFortuneIndex();
+    const harmonyIndex = calculateHarmonyIndex();
+    const storylineInterpretation = generateStorylineInterpretation();
 
     return {
         question: questionNames[AppState.selectedQuestionType],
         cards: AppState.selectedCards,
-        interpretation: `${baseInterpretation}${generateSpecificInterpretation()}`,
-        cardDetails: generateCardInterpretations(),
-        loveIndex: personalized.loveIndex,
-        emotionIndex: personalized.emotionIndex,
-        loveAnalysis: personalized.loveAnalysis,
-        emotionAnalysis: personalized.emotionAnalysis,
-        guidance: `塔罗牌的指引在于提醒我们内在的智慧和选择的力量。${reversedCount > 0 ? '逆位卡牌特别提醒我们要注意内在的阻碍和需要改变的地方。' : '正位卡牌鼓励我们保持积极的态度继续前行。'}记住，你的选择和行动将最终决定命运的走向。`
+        storylineInterpretation: storylineInterpretation,
+        fortuneIndex: fortuneIndex,
+        harmonyIndex: harmonyIndex,
+        timeBasedAnalysis: generateTimeBasedInterpretation(),
+        overallTrend: analyzeOverallTrend(generateTimeBasedInterpretation()),
+        guidance: `塔罗牌通过时间维度为你揭示了事物发展的完整轨迹。记住，过去无法改变，但可以从中学习；现在是你行动的力量所在；未来充满了无限的可能性。相信自己的选择，勇敢地书写属于你的命运故事。`
     };
 }
 
-// 显示结果界面
+// 显示结果界面 - 优化版本，支持时间维度解读
 function showResultScreen(interpretation) {
     // 设置问题标题
     document.getElementById('resultQuestion').textContent = interpretation.question;
 
-    // 显示抽取的卡牌
+    // 显示抽取的卡牌（按时间顺序排列）
     const resultCardsContainer = document.getElementById('resultCards');
     resultCardsContainer.innerHTML = '';
 
+    const timePositions = ['过去', '现在', '未来'];
     interpretation.cards.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.className = 'result-card';
         cardElement.innerHTML = `
+            <div class="time-position">${timePositions[index]}</div>
             <img src="images/${card.file}" alt="${card.name}" style="${card.isReversed ? 'transform: rotate(180deg);' : ''}">
             <h4>${card.name}</h4>
             <div class="english-name">${card.english}</div>
@@ -2477,24 +2481,24 @@ function showResultScreen(interpretation) {
         }, index * 200);
     });
 
-    // 显示指数分析
+    // 显示时间维度的指数分析
     const indicesHtml = `
         <div class="indices-analysis">
             <div class="index-card">
-                <h4>✨ 顺利指数</h4>
-                <div class="index-score">${interpretation.loveIndex}分</div>
+                <h4>🌟 运势指数</h4>
+                <div class="index-score">${interpretation.fortuneIndex}分</div>
                 <div class="index-bar">
-                    <div class="index-fill" style="width: ${interpretation.loveIndex}%"></div>
+                    <div class="index-fill fortune-fill" style="width: ${interpretation.fortuneIndex}%"></div>
                 </div>
-                <p>${interpretation.loveAnalysis}</p>
+                <p>${generateFortuneAnalysis(interpretation.fortuneIndex)}</p>
             </div>
             <div class="index-card">
-                <h4>😊 情绪指数</h4>
-                <div class="index-score">${interpretation.emotionIndex > 0 ? '+' : ''}${interpretation.emotionIndex}</div>
+                <h4>🕊️ 和谐指数</h4>
+                <div class="index-score">${interpretation.harmonyIndex}分</div>
                 <div class="index-bar">
-                    <div class="index-fill ${interpretation.emotionIndex < 0 ? 'negative' : 'positive'}" style="width: ${Math.abs(interpretation.emotionIndex)}%"></div>
+                    <div class="index-fill harmony-fill" style="width: ${interpretation.harmonyIndex}%"></div>
                 </div>
-                <p>${interpretation.emotionAnalysis}</p>
+                <p>${generateHarmonyAnalysis(interpretation.harmonyIndex)}</p>
             </div>
         </div>
     `;
@@ -2502,15 +2506,247 @@ function showResultScreen(interpretation) {
     // 显示解读内容
     const interpretationContent = document.getElementById('interpretationContent');
     interpretationContent.innerHTML = `
-        <h3>塔罗指引</h3>
-        ${indicesHtml}
-        <div class="interpretation-text">${interpretation.interpretation}</div>
-        <div class="card-details">${interpretation.cardDetails}</div>
-        <div class="guidance">${interpretation.guidance}</div>
+        <div class="comprehensive-interpretation">
+            <h3>🔮 时间维度解读</h3>
+            ${indicesHtml}
+            <div class="storyline-section">
+                ${interpretation.storylineInterpretation}
+            </div>
+            <div class="guidance-section">
+                <h4>💫 命运指引</h4>
+                <p>${interpretation.guidance}</p>
+            </div>
+        </div>
     `;
+
+    // 添加样式支持
+    addTimeBasedInterpretationStyles();
 
     // 切换到结果界面
     showScreen('resultScreen');
+}
+
+// 生成运势分析
+function generateFortuneAnalysis(score) {
+    if (score >= 85) {
+        return '运势极佳！宇宙的能量完全站在你这边，这是实现梦想和目标的黄金时期。';
+    } else if (score >= 70) {
+        return '运势良好，大部分事情都会顺利进行，继续保持积极的心态和行动力。';
+    } else if (score >= 55) {
+        return '运势平稳，既有机遇也有挑战，关键在于如何把握时机和应对困难。';
+    } else if (score >= 40) {
+        return '运势需要努力，虽然面临一些阻碍，但正是这些挑战让你变得更加坚强。';
+    } else {
+        return '运势处于低谷期，这是一个反思和积蓄力量的时期，为未来的转机做准备。';
+    }
+}
+
+// 生成和谐分析
+function generateHarmonyAnalysis(score) {
+    if (score >= 80) {
+        return '内在和谐度很高，你的身心处于平衡状态，能够从容应对各种情况。';
+    } else if (score >= 60) {
+        return '整体和谐良好，虽然偶有小波动，但你有能力维持内在的平衡。';
+    } else if (score >= 40) {
+        return '和谐度中等，需要更多关注内心的声音，调整自己的状态。';
+    } else {
+        return '和谐度较低，建议花时间进行自我反思和调整，寻找内心的平静。';
+    }
+}
+
+// 添加时间维度解读的样式
+function addTimeBasedInterpretationStyles() {
+    let styleElement = document.getElementById('time-interpretation-styles');
+    if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'time-interpretation-styles';
+        document.head.appendChild(styleElement);
+    }
+
+    styleElement.textContent = `
+        .comprehensive-interpretation {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .storyline-interpretation {
+            background: linear-gradient(135deg, rgba(45, 27, 61, 0.3), rgba(26, 26, 46, 0.3));
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .timeline-reading {
+            margin: 20px 0;
+        }
+
+        .time-period {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border-left: 4px solid #d4af37;
+        }
+
+        .time-period:last-child {
+            margin-bottom: 0;
+        }
+
+        .time-period h5 {
+            color: #d4af37;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .time-period p {
+            color: #fff;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .overall-trend {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .overall-trend h5 {
+            color: #d4af37;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .overall-trend p {
+            color: #fff;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .indices-analysis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .index-card {
+            background: linear-gradient(135deg, rgba(45, 27, 61, 0.4), rgba(26, 26, 46, 0.4));
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .index-card h4 {
+            color: #d4af37;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+        }
+
+        .index-score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .index-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .index-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .fortune-fill {
+            background: linear-gradient(90deg, #f39c12, #f1c40f);
+        }
+
+        .harmony-fill {
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+
+        .index-card p {
+            color: #fff;
+            line-height: 1.5;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .guidance-section {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(26, 26, 46, 0.3));
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .guidance-section h4 {
+            color: #d4af37;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .guidance-section p {
+            color: #fff;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .result-card {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(45, 27, 61, 0.4), rgba(26, 26, 46, 0.4));
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .time-position {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* 移动端响应式 */
+        @media (max-width: 768px) {
+            .indices-analysis {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .storyline-interpretation {
+                padding: 20px;
+            }
+
+            .time-period {
+                padding: 12px;
+                margin-bottom: 20px;
+            }
+
+            .index-card {
+                padding: 15px;
+            }
+        }
+    `;
 }
 
 // 新的占卜
