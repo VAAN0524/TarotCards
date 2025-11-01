@@ -1937,41 +1937,41 @@ function createScrollCards() {
     }
 }
 
-// 根据屏幕尺寸计算动态卡牌尺寸
+// 根据屏幕尺寸计算动态卡牌尺寸 - 增大显示尺寸
 function calculateDynamicCardSize() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
 
-    // 基础尺寸
+    // 基础尺寸 - 大幅增大
     let cardWidth, cardHeight, containerHeight;
 
     if (screenWidth <= 480) {
-        // 移动设备
-        cardWidth = Math.min(60, screenWidth / 5);
-        cardHeight = cardWidth * 1.6;
-        containerHeight = 180;
-    } else if (screenWidth <= 768) {
-        // 平板设备
-        cardWidth = Math.min(80, screenWidth / 6);
-        cardHeight = cardWidth * 1.6;
-        containerHeight = 220;
-    } else if (screenWidth <= 1200) {
-        // 桌面设备
-        cardWidth = Math.min(100, screenWidth / 8);
-        cardHeight = cardWidth * 1.6;
-        containerHeight = 250;
-    } else {
-        // 大屏设备
-        cardWidth = Math.min(120, screenWidth / 10);
+        // 移动设备 - 增大80%
+        cardWidth = Math.min(110, screenWidth / 3.5);
         cardHeight = cardWidth * 1.6;
         containerHeight = 280;
+    } else if (screenWidth <= 768) {
+        // 平板设备 - 增大70%
+        cardWidth = Math.min(140, screenWidth / 4);
+        cardHeight = cardWidth * 1.6;
+        containerHeight = 350;
+    } else if (screenWidth <= 1200) {
+        // 桌面设备 - 增大60%
+        cardWidth = Math.min(170, screenWidth / 5);
+        cardHeight = cardWidth * 1.6;
+        containerHeight = 400;
+    } else {
+        // 大屏设备 - 增大50%
+        cardWidth = Math.min(200, screenWidth / 6);
+        cardHeight = cardWidth * 1.6;
+        containerHeight = 450;
     }
 
     return {
         cardWidth,
         cardHeight,
         containerHeight,
-        gap: screenWidth <= 480 ? 15 : 20
+        gap: screenWidth <= 480 ? 20 : 25
     };
 }
 
@@ -1990,6 +1990,21 @@ function applyDynamicCardStyles() {
     dynamicStyle.textContent = `
         #cardFanContainer {
             height: ${dimensions.containerHeight}px !important;
+            padding: 20px 0 !important;
+        }
+
+        .scroll-wrapper {
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        .card-track {
+            gap: ${dimensions.gap}px !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
         .scroll-card {
@@ -1998,16 +2013,33 @@ function applyDynamicCardStyles() {
             min-width: ${dimensions.cardWidth}px !important;
             min-height: ${dimensions.cardHeight}px !important;
             flex-shrink: 0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+            cursor: pointer !important;
         }
 
-        .card-track {
-            gap: ${dimensions.gap}px !important;
+        .scroll-card:hover {
+            transform: translateY(-10px) scale(1.05) !important;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .scroll-card .card-face {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
         }
 
         .scroll-card .card-face img {
             width: 100% !important;
             height: 100% !important;
             object-fit: cover !important;
+        }
+
+        .selected-cards-area .scroll-card {
+            transform: scale(0.9) !important;
+            margin: 0 -10px !important;
         }
     `;
 
@@ -2083,19 +2115,21 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
     const container = document.getElementById('cardFanContainer');
 
     if (track && container) {
-        // 创建一个特殊的"已选卡牌"容器
+        // 创建一个特殊的"已选卡牌"容器 - 适应更大的卡牌
         let selectedCardsArea = document.querySelector('.selected-cards-area');
         if (!selectedCardsArea) {
             selectedCardsArea = document.createElement('div');
             selectedCardsArea.className = 'selected-cards-area';
+            const dimensions = calculateDynamicCardSize();
             selectedCardsArea.style.cssText = `
                 position: absolute;
-                top: -80px;
+                top: ${-dimensions.cardHeight - 30}px;
                 left: 50%;
                 transform: translateX(-50%);
                 display: flex;
-                gap: 15px;
+                gap: ${dimensions.gap}px;
                 z-index: 100;
+                max-width: 90vw;
             `;
             container.appendChild(selectedCardsArea);
         }
