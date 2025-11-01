@@ -486,8 +486,8 @@ function prepareCardDraw() {
 
     console.log(`准备${availableCardsForDivination.length}张不重复的塔罗牌供抽取`);
 
-    // 显示扇形排列的卡牌
-    createFanCards();
+    // 显示横向滚动的卡牌
+    createScrollCards();
 
     // 更新问题提示
     updateQuestionPrompt();
@@ -507,34 +507,27 @@ function updateQuestionPrompt() {
     promptElement.textContent = prompts[selectedQuestionType] || '请选择有缘的指引卡牌';
 }
 
-// 创建扇形排列的卡牌
-function createFanCards() {
+// 创建横向滚动的卡牌
+function createScrollCards() {
     const container = document.getElementById('cardFanContainer');
     container.innerHTML = '';
 
     const cards = availableCardsForDivination;
-    const totalCards = cards.length;
-    const angleRange = 160; // 增大扇形角度范围以容纳22张卡牌
-    const startAngle = -angleRange / 2;
+    console.log(`创建横向滚动卡牌: ${cards.length}张`);
 
-    console.log(`创建扇形卡牌: ${totalCards}张, 角度范围: ${angleRange}度`);
+    // 创建滚动容器
+    const scrollWrapper = document.createElement('div');
+    scrollWrapper.className = 'scroll-wrapper';
+
+    // 创建卡牌轨道
+    const track = document.createElement('div');
+    track.className = 'card-track';
 
     cards.forEach((card, index) => {
         const cardElement = document.createElement('div');
-        cardElement.className = 'fan-card';
+        cardElement.className = 'scroll-card';
         cardElement.setAttribute('data-card-id', card.id);
         cardElement.setAttribute('data-index', index);
-
-        // 计算扇形位置 - 22张卡牌需要合适的半径和调整
-        const angle = startAngle + (angleRange / (totalCards - 1)) * index;
-        const radius = 180; // 适配较小卡牌的扇形半径
-        const x = Math.sin(angle * Math.PI / 180) * radius;
-        const y = -Math.cos(angle * Math.PI / 180) * 80; // 调整垂直位置
-
-        const transform = `translateX(${x}px) translateY(${y}px) rotate(${angle}deg)`;
-        cardElement.style.transform = transform;
-
-        console.log(`卡牌${index} (${card.name}): 角度=${angle.toFixed(1)}°, x=${x.toFixed(1)}px, y=${y.toFixed(1)}px`);
 
         // 创建卡牌内容（只显示卡背）
         cardElement.innerHTML = `
@@ -546,21 +539,19 @@ function createFanCards() {
         // 添加点击事件
         cardElement.addEventListener('click', () => selectCard(cardElement, card));
 
-        container.appendChild(cardElement);
+        track.appendChild(cardElement);
 
-        // 保存原始transform
-        const originalTransform = cardElement.style.transform;
-
-        // 添加进入动画 - 减少22张卡牌的总动画时间
+        // 添加进入动画
         setTimeout(() => {
             cardElement.style.opacity = '1';
-            cardElement.style.transform = transform + ' scale(1)';
-            console.log(`卡牌${index} 显示完成`);
-        }, index * 50); // 从100ms减少到50ms
-
-        // 保存原始transform到数据属性中
-        cardElement.setAttribute('data-original-transform', transform);
+            cardElement.style.transform = 'translateY(0)';
+        }, index * 30);
     });
+
+    scrollWrapper.appendChild(track);
+    container.appendChild(scrollWrapper);
+
+    console.log(`创建了${cards.length}张横向滚动卡牌`);
 }
 
 // 选择卡牌
