@@ -715,10 +715,10 @@ h1 {
 }
 
 .result-card img {
-    width: 240px;
-    height: 360px;
+    width: 200px;
+    height: 300px;
     object-fit: contain;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     border-radius: 12px;
 }
 
@@ -923,7 +923,8 @@ h1 {
     }
 
     .result-cards {
-        gap: 25px;
+        gap: 20px;
+        padding: 15px 0;
     }
 
     .result-card {
