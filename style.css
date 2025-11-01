@@ -1053,6 +1053,46 @@ footer {
     }
 }
 
+/* 超小屏幕优化 - 480px以下 */
+@media (max-width: 480px) {
+    .result-cards {
+        gap: 12px;
+        padding: 8px 0;
+        margin: 25px 0;
+    }
+
+    .result-card {
+        width: 140px;
+        min-width: 140px;
+        padding: 10px;
+    }
+
+    .result-card img {
+        width: 100px;
+        height: 150px;
+    }
+
+    .result-card h4 {
+        font-size: 0.9rem;
+        margin: 8px 0 4px 0;
+    }
+
+    .result-card .english-name {
+        font-size: 0.7rem;
+        margin: 0 0 4px 0;
+    }
+
+    .result-card .orientation {
+        font-size: 0.65rem;
+        margin: 0 0 6px 0;
+    }
+
+    .result-card .meaning {
+        font-size: 0.65rem;
+        line-height: 1.2;
+    }
+}
+
 @media (max-width: 650px) {
     .container {
         padding: 15px;
