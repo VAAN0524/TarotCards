@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端卡牌测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-info {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .screen-sizes {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .screen-test {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 300px;
+        }
+        .screen-preview {
+            border: 2px dashed #ccc;
+            margin: 10px 0;
+            background: #f9f9f9;
+            position: relative;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.pass { background: #d4edda; color: #155724; }
+        .status.fail { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>🎴 移动端卡牌显示测试</h1>
+        <p>测试各个屏幕尺寸下卡牌是否完整显示，无上下裁切问题</p>
+        <p><strong>修复要点：</strong></p>
+        <ul>
+            <li>✅ 移除 aspect-ratio 限制，避免强制裁切</li>
+            <li>✅ 改用 min-width/min-height 确保最小尺寸</li>
+            <li>✅ overflow: visible 确保内容不被裁切</li>
+            <li>✅ object-fit: contain 保持图片原比例</li>
+        </ul>
+    </div>
+
+    <div class="screen-sizes">
+        <div class="screen-test">
+            <h3>📱 大屏手机 (768px)</h3>
+            <div class="screen-preview" style="height: 400px;">
+                <iframe src="index.html" style="width: 100%; height: 100%; border: none; transform: scale(0.8); transform-origin: top left;"></iframe>
+            </div>
+            <div class="status pass">预期：160x240px 卡牌，无裁切</div>
+        </div>
+
+        <div class="screen-test">
+            <h3>📱 中屏手机 (550px)</h3>
+            <div class="screen-preview" style="height: 350px;">
+                <iframe src="index.html" style="width: 100%; height: 100%; border: none; transform: scale(0.6); transform-origin: top left;"></iframe>
+            </div>
+            <div class="status pass">预期：120x180px 卡牌，无裁切</div>
+        </div>
+
+        <div class="screen-test">
+            <h3>📱 小屏手机 (380px)</h3>
+            <div class="screen-preview" style="height: 300px;">
+                <iframe src="index.html" style="width: 100%; height: 100%; border: none; transform: scale(0.5); transform-origin: top left;"></iframe>
+            </div>
+            <div class="status pass">预期：85x127.5px 卡牌，无裁切</div>
+        </div>
+    </div>
+
+    <div class="test-info">
+        <h2>🔍 检查清单</h2>
+        <ul>
+            <li>☐ 卡牌图片是否完整显示（无上下裁切）</li>
+            <li>☐ 保持原始宽高比例（不变形）</li>
+            <li>☐ 3D翻转效果正常工作</li>
+            <li>☐ 响应式断点正确切换</li>
+            <li>☐ 卡背图片在移动端正常显示</li>
+        </ul>
+    </div>
+
+    <script>
+        // 检测当前屏幕尺寸并显示相应信息
+        function updateScreenInfo() {
+            const width = window.innerWidth;
+            let cardSize = '未知';
+
+            if (width <= 380) cardSize = '85x127.5px';
+            else if (width <= 450) cardSize = '100x150px';
+            else if (width <= 550) cardSize = '120x180px';
+            else if (width <= 650) cardSize = '140x210px';
+            else if (width <= 768) cardSize = '160x240px';
+            else if (width <= 1024) cardSize = '180x270px';
+            else if (width <= 1200) cardSize = '200x300px';
+            else cardSize = '220x330px';
+
+            console.log(`当前屏幕: ${width}px, 卡牌尺寸: ${cardSize}`);
+        }
+
+        window.addEventListener('resize', updateScreenInfo);
+        updateScreenInfo();
+    </script>
+</body>
+</html>
