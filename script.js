@@ -272,21 +272,32 @@ const setupLazyLoading = () => {
 
 // 初始化塔罗牌网格
 function initializeTarotCards() {
-    const cardsGrid = document.getElementById('cardsGrid');
+    try {
+        console.log('初始化塔罗牌网格...');
+        const cardsGrid = document.getElementById('cardsGrid');
 
-    // 清空现有卡片
-    cardsGrid.innerHTML = '';
+        if (!cardsGrid) {
+            console.error('找不到cardsGrid容器');
+            return;
+        }
 
-    // 生成初始的4套随机卡牌
-    cardSets = [
-        getRandomCardsForRound(),
-        getRandomCardsForRound(),
-        getRandomCardsForRound(),
-        getRandomCardsForRound()
-    ];
+        // 清空现有卡片
+        cardsGrid.innerHTML = '';
 
-    // 显示第一套卡牌
-    displayCardSet(cardSets[0]);
+        // 生成初始的4套随机卡牌 - 使用AppState管理
+        AppState.cardSets = [
+            getRandomCardsForRound(),
+            getRandomCardsForRound(),
+            getRandomCardsForRound(),
+            getRandomCardsForRound()
+        ];
+
+        // 显示第一套卡牌
+        displayCardSet(AppState.cardSets[0]);
+        console.log('塔罗牌网格初始化完成');
+    } catch (error) {
+        console.error('初始化塔罗牌网格失败:', error);
+    }
 }
 
 // 显示指定的卡牌集合
@@ -384,19 +395,23 @@ function addAutoRotate() {
 
 // 切换到下一套卡牌（在背面位置立即更换）
 function switchToNextCardSet() {
-    console.log('卡牌到达背面位置，立即切换新卡牌...');
+    try {
+        console.log('卡牌到达背面位置，立即切换新卡牌...');
 
-    // 切换到下一套卡牌
-    currentSetIndex = (currentSetIndex + 1) % cardSets.length;
+        // 切换到下一套卡牌 - 使用AppState管理
+        AppState.currentSetIndex = (AppState.currentSetIndex + 1) % AppState.cardSets.length;
 
-    // 立即更新图片（因为卡牌已经在背面位置）
-    updateCardImages(cardSets[currentSetIndex]);
-    console.log(`在背面位置切换为正面随机${currentSetIndex + 1}:`, cardSets[currentSetIndex].map(card => card.name));
+        // 立即更新图片（因为卡牌已经在背面位置）
+        updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
+        console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}:`, AppState.cardSets[AppState.currentSetIndex].map(card => card.name));
 
     // 预生成更多卡牌组，确保有足够的随机组合
-    if (cardSets.length < 10) { // 保持至少10组，避免重复
-        cardSets.push(getRandomCardsForRound());
-        console.log(`生成新的随机组合，当前共${cardSets.length}组`);
+    if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复
+        AppState.cardSets.push(getRandomCardsForRound());
+        console.log(`生成新的随机组合，当前共${AppState.cardSets.length}组`);
+    }
+    } catch (error) {
+        console.error('切换卡牌集失败:', error);
     }
 }
 
@@ -488,73 +503,168 @@ window.addEventListener('resize', debouncedResize);
 
 // ==================== 占卜功能 ====================
 
-// 初始化占卜系统
+// 极简占卜系统初始化
 function initializeDivination() {
-    console.log('开始初始化占卜系统...');
+    console.log('极简占卜系统初始化...');
 
-    // 延迟初始化，确保DOM完全准备好
     setTimeout(() => {
         try {
-            // 占卜入口按钮
+            // 简单的开始按钮绑定
             const startBtn = document.getElementById('startDivination');
             if (startBtn) {
-                console.log('找到开始占卜按钮');
-                startBtn.addEventListener('click', function(e) {
-                    console.log('点击开始占卜按钮');
-                    e.preventDefault();
-                    startDivination();
-                });
-            } else {
-                console.error('找不到开始占卜按钮');
+                console.log('绑定开始按钮');
+                startBtn.onclick = function() {
+                    console.log('点击开始占卜');
+                    showSimpleDivination();
+                };
             }
 
-            // 问题类型选择 - 添加详细错误处理
-            const questionTypes = document.querySelectorAll('.question-type');
-            console.log(`找到 ${questionTypes.length} 个问题类型选择器`);
-
-            if (questionTypes.length === 0) {
-                console.error('没有找到任何问题类型选择器');
-            } else {
-                questionTypes.forEach((type, index) => {
-                    const typeValue = type.getAttribute('data-type');
-                    console.log(`绑定问题类型 ${index}: ${typeValue}`);
-
-                    type.addEventListener('click', function(event) {
-                        console.log('点击问题类型:', typeValue);
-                        event.preventDefault();
-                        selectQuestionType(event);
-                    });
-                });
-            }
-
-            // 导航按钮
-            const buttons = [
-                { id: 'backToMain', func: backToMain },
-                { id: 'backToQuestionType', func: backToQuestionType },
-                { id: 'startInterpretation', func: startInterpretation },
-                { id: 'newReading', func: newReading },
-                { id: 'backHome', func: backHome }
-            ];
-
-            buttons.forEach(btn => {
-                const element = document.getElementById(btn.id);
-                if (element) {
-                    console.log(`绑定按钮: ${btn.id}`);
-                    element.addEventListener('click', function(e) {
-                        console.log(`点击按钮: ${btn.id}`);
-                        e.preventDefault();
-                        btn.func();
-                    });
-                } else {
-                    console.warn(`找不到按钮: ${btn.id}`);
-                }
+            // 简单的问题类型绑定
+            const types = document.querySelectorAll('.question-type');
+            console.log(`找到 ${types.length} 个问题类型`);
+            types.forEach((type, index) => {
+                type.onclick = function() {
+                    console.log(`选择问题类型: ${this.getAttribute('data-type')}`);
+                    showSimpleCardDraw();
+                };
             });
 
-            console.log('占卜系统初始化完成');
+            // 简单的返回按钮绑定
+            const backBtn = document.getElementById('backToMain');
+            if (backBtn) {
+                backBtn.onclick = function() {
+                    console.log('返回主页');
+                    hideDivination();
+                };
+            }
+
+            console.log('极简占卜系统初始化完成');
         } catch (error) {
-            console.error('占卜系统初始化失败:', error);
+            console.error('占卜初始化失败:', error);
         }
-    }, 100); // 100ms延迟确保DOM完全准备好
+    }, 100);
+}
+
+// 极简显示占卜界面
+function showSimpleDivination() {
+    try {
+        console.log('显示占卜界面');
+        const container = document.getElementById('divinationContainer');
+        if (container) {
+            container.style.display = 'block';
+            container.style.visibility = 'visible';
+            container.style.opacity = '1';
+            container.style.zIndex = '1000';
+
+            // 显示问题类型界面
+            const questionScreen = document.getElementById('questionTypeScreen');
+            if (questionScreen) {
+                questionScreen.style.display = 'block';
+                questionScreen.classList.remove('hidden');
+            }
+
+            console.log('占卜界面显示成功');
+        }
+    } catch (error) {
+        console.error('显示占卜界面失败:', error);
+    }
+}
+
+// 极简显示卡牌抽取界面
+function showSimpleCardDraw() {
+    try {
+        console.log('显示卡牌抽取界面');
+
+        // 隐藏问题类型界面
+        document.getElementById('questionTypeScreen').style.display = 'none';
+
+        // 显示卡牌抽取界面
+        const drawScreen = document.getElementById('cardDrawScreen');
+        if (drawScreen) {
+            drawScreen.style.display = 'block';
+            drawScreen.classList.remove('hidden');
+        }
+
+        // 创建简单的卡牌
+        createSimpleCards();
+
+    } catch (error) {
+        console.error('显示卡牌抽取界面失败:', error);
+    }
+}
+
+// 创建简单的卡牌
+function createSimpleCards() {
+    try {
+        console.log('创建简单卡牌');
+        const container = document.getElementById('cardFanContainer');
+        if (!container) {
+            console.error('找不到卡牌容器');
+            return;
+        }
+
+        container.innerHTML = '';
+
+        // 创建6张简单的卡牌用于测试
+        const simpleCards = [
+            { id: 0, name: '愚人', file: '0. 愚人 (The Fool).png' },
+            { id: 1, name: '魔术师', file: '1. 魔术师 (The Magician) .png' },
+            { id: 2, name: '女祭司', file: '2. 女祭司 (The High Priestess).png' },
+            { id: 3, name: '皇后', file: '3. 皇后 (The Empress).png' },
+            { id: 4, name: '皇帝', file: '4. 皇帝 (The Emperor).png' },
+            { id: 5, name: '教皇', file: '5. 教皇 (The Hierophant).png' }
+        ];
+
+        simpleCards.forEach((card, index) => {
+            const cardElement = document.createElement('div');
+            cardElement.style.cssText = `
+                display: inline-block;
+                width: 120px;
+                height: 180px;
+                margin: 10px;
+                background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
+                border: 2px solid #d4af37;
+                border-radius: 10px;
+                cursor: pointer;
+                text-align: center;
+                line-height: 180px;
+                color: #d4af37;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            `;
+            cardElement.textContent = card.name;
+            cardElement.onclick = function() {
+                alert(`你选择了 ${card.name}`);
+            };
+
+            container.appendChild(cardElement);
+        });
+
+        console.log('创建了6张简单测试卡牌');
+
+    } catch (error) {
+        console.error('创建简单卡牌失败:', error);
+    }
+}
+
+// 隐藏占卜界面
+function hideDivination() {
+    try {
+        console.log('隐藏占卜界面');
+        const container = document.getElementById('divinationContainer');
+        if (container) {
+            container.style.display = 'none';
+        }
+
+        // 隐藏所有占卜界面
+        document.querySelectorAll('.divination-screen').forEach(screen => {
+            screen.style.display = 'none';
+        });
+
+        console.log('占卜界面已隐藏');
+    } catch (error) {
+        console.error('隐藏占卜界面失败:', error);
+    }
 }
 
 // 开始占卜
