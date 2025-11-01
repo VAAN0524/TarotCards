@@ -199,6 +199,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('延迟初始化占卜系统...');
         initializeDivination();
         setupLazyLoading(); // 启用图片懒加载优化
+
+        // 初始化智能卡牌尺寸系统
+        window.smartCardSizer = new SmartCardSizer();
     }, 200);
 
     // 添加全局测试函数
@@ -247,6 +250,115 @@ const debounce = (func, wait) => {
         timeout = setTimeout(later, wait);
     };
 };
+
+// 智能卡牌尺寸适配系统
+class SmartCardSizer {
+    constructor() {
+        this.isMobile = window.innerWidth <= 768;
+        this.viewportWidth = window.innerWidth;
+        this.viewportHeight = window.innerHeight;
+        this.init();
+    }
+
+    init() {
+        this.setupResponsiveCards();
+        this.bindResizeEvent();
+        console.log('智能卡牌尺寸系统已初始化');
+    }
+
+    // 计算最佳卡牌尺寸
+    calculateOptimalCardSize() {
+        const vw = this.viewportWidth;
+        const vh = this.viewportHeight;
+        const isLandscape = vw > vh;
+
+        if (this.isMobile) {
+            if (isLandscape) {
+                // 横屏模式 - 基于高度计算
+                return {
+                    width: Math.min(vh * 0.35, vw * 0.25),
+                    height: Math.min(vh * 0.5, vw * 0.375),
+                    fontSize: Math.max(vw * 0.025, 14)
+                };
+            } else {
+                // 竖屏模式 - 基于宽度计算
+                return {
+                    width: Math.min(vw * 0.32, 180),
+                    height: Math.min(vw * 0.48, 270),
+                    fontSize: Math.max(vw * 0.035, 14)
+                };
+            }
+        } else {
+            // 桌面端保持现有尺寸
+            return {
+                width: Math.min(vw * 0.18, 280),
+                height: Math.min(vw * 0.27, 420),
+                fontSize: Math.max(vw * 0.012, 16)
+            };
+        }
+    }
+
+    // 应用动态卡牌尺寸
+    setupResponsiveCards() {
+        const cardSize = this.calculateOptimalCardSize();
+        const cards = document.querySelectorAll('.card');
+        const resultCards = document.querySelectorAll('.result-card');
+        const scrollCards = document.querySelectorAll('.scroll-card');
+
+        // 首页卡牌
+        cards.forEach(card => {
+            if (this.isMobile) {
+                card.style.width = `${cardSize.width}px`;
+                card.style.height = `${cardSize.height}px`;
+                card.style.minWidth = `${cardSize.width * 0.9}px`;
+                card.style.minHeight = `${cardSize.height * 0.9}px`;
+            }
+        });
+
+        // 结果页面卡牌
+        resultCards.forEach(card => {
+            if (this.isMobile) {
+                const cardImg = card.querySelector('img');
+                if (cardImg) {
+                    cardImg.style.width = `${cardSize.width * 0.75}px`;
+                    cardImg.style.height = `${cardSize.height * 0.75}px`;
+                }
+
+                // 调整字体大小
+                const title = card.querySelector('h4');
+                const subtitle = card.querySelector('.english-name');
+                const meaning = card.querySelector('.meaning');
+
+                if (title) title.style.fontSize = `${cardSize.fontSize}px`;
+                if (subtitle) subtitle.style.fontSize = `${cardSize.fontSize * 0.8}px`;
+                if (meaning) meaning.style.fontSize = `${cardSize.fontSize * 0.75}px`;
+            }
+        });
+
+        // 滚动卡牌
+        scrollCards.forEach(card => {
+            if (this.isMobile) {
+                card.style.width = `${cardSize.width * 0.85}px`;
+                card.style.height = `${cardSize.height * 0.85}px`;
+            }
+        });
+
+        console.log('应用智能卡牌尺寸:', cardSize);
+    }
+
+    // 绑定窗口大小变化事件
+    bindResizeEvent() {
+        const debouncedResize = debounce(() => {
+            this.viewportWidth = window.innerWidth;
+            this.viewportHeight = window.innerHeight;
+            this.isMobile = this.viewportWidth <= 768;
+            this.setupResponsiveCards();
+        }, 250);
+
+        window.addEventListener('resize', debouncedResize);
+        window.addEventListener('orientationchange', debouncedResize);
+    }
+}
 
 // 内存管理：清理未使用的DOM事件监听器
 const cleanupEventListeners = () => {
@@ -2859,7 +2971,12 @@ function generateInterpretation() {
 // 显示结果界面 - 优化版本，支持时间维度解读
 function showResultScreen(interpretation) {
     // 设置问题标题
-    document.getElementById('resultQuestion').textContent = interpretation.question;
+    const resultQuestion = document.getElementById('resultQuestion');
+    if (resultQuestion && interpretation.question) {
+        resultQuestion.textContent = interpretation.question;
+    } else if (resultQuestion) {
+        resultQuestion.textContent = '塔罗占卜指引';
+    }
 
     // 显示抽取的卡牌（按时间顺序排列）
     const resultCardsContainer = document.getElementById('resultCards');
@@ -2870,12 +2987,12 @@ function showResultScreen(interpretation) {
         const cardElement = document.createElement('div');
         cardElement.className = 'result-card';
         cardElement.innerHTML = `
-            <div class="time-position">${timePositions[index]}</div>
-            <img src="images/${card.file}" alt="${card.name}" style="${card.isReversed ? 'transform: rotate(180deg);' : ''}">
-            <h4>${card.name}</h4>
-            <div class="english-name">${card.english}</div>
+            <div class="time-position">${timePositions[index] || ''}</div>
+            <img src="images/${card.file || ''}" alt="${card.name || ''}" style="${card.isReversed ? 'transform: rotate(180deg);' : ''}">
+            <h4>${card.name || ''}</h4>
+            <div class="english-name">${card.english || ''}</div>
             <div class="orientation" style="color: ${card.isReversed ? '#ff4444' : '#d4af37'}; font-weight: ${card.isReversed ? 'bold' : 'normal'};">${card.isReversed ? '逆位' : '正位'}</div>
-            <div class="meaning">${card.isReversed ? card.reversed : card.upright}</div>
+            <div class="meaning">${card.isReversed ? (card.reversed || '') : (card.upright || '')}</div>
         `;
         resultCardsContainer.appendChild(cardElement);
 
@@ -2915,11 +3032,11 @@ function showResultScreen(interpretation) {
             <h3>🔮 时间维度解读</h3>
             ${indicesHtml}
             <div class="storyline-section">
-                ${interpretation.storylineInterpretation}
+                ${interpretation.storylineInterpretation || ''}
             </div>
             <div class="guidance-section">
                 <h4>💫 命运指引</h4>
-                <p>${interpretation.guidance}</p>
+                <p>${interpretation.guidance || ''}</p>
             </div>
         </div>
     `;
@@ -2929,6 +3046,30 @@ function showResultScreen(interpretation) {
 
     // 切换到结果界面
     showScreen('resultScreen');
+
+    // 重新绑定按钮事件并应用智能尺寸
+    setTimeout(() => {
+        const newReadingBtn = document.getElementById('newReading');
+        if (newReadingBtn) {
+            newReadingBtn.onclick = function() {
+                console.log('开始新的占卜');
+                newReading();
+            };
+        }
+
+        const backHomeBtn = document.getElementById('backHome');
+        if (backHomeBtn) {
+            backHomeBtn.onclick = function() {
+                console.log('返回主页');
+                backHome();
+            };
+        }
+
+        // 应用智能卡牌尺寸到新创建的结果卡牌
+        if (window.smartCardSizer) {
+            window.smartCardSizer.setupResponsiveCards();
+        }
+    }, 100);
 }
 
 // 生成运势分析
@@ -3180,9 +3321,20 @@ function newReading() {
 
 // 返回主页
 function backHome() {
+    console.log('返回主页');
     AppState.isDivinationMode = false;
-    document.getElementById('divinationContainer').classList.remove('active');
-    startMainPageAnimation();
+    AppState.selectedCards = [];
+    AppState.selectedQuestionType = '';
+
+    const container = document.getElementById('divinationContainer');
+    if (container) {
+        container.classList.remove('active');
+    }
+
+    // 延迟重启动画
+    setTimeout(() => {
+        startMainPageAnimation();
+    }, 100);
 }
 
 // 返回问题类型选择

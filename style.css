@@ -497,6 +497,7 @@ h1 {
     width: 100%;
     text-align: center;
     padding: 0 20px;
+    margin: 0 auto;
 }
 
 .divination-title {
@@ -903,10 +904,39 @@ h1 {
     background: transparent;
     border: none;
     border-radius: 15px;
-    padding: 30px;
-    margin: 30px 0;
+    padding: clamp(15px, 4vw, 30px);
+    margin: clamp(20px, 5vw, 30px) auto;
     backdrop-filter: none;
-    text-align: left;
+    text-align: center;
+    max-width: 1000px;
+    width: 100%;
+}
+
+/* 移动端解读内容优化 */
+@media (max-width: 768px) {
+    .interpretation-content {
+        padding: clamp(12px, 3.5vw, 25px);
+        margin: clamp(15px, 4vw, 25px) auto;
+    }
+
+    .interpretation-content h3 {
+        font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+        margin-bottom: clamp(12px, 3vw, 20px);
+    }
+
+    .interpretation-content .interpretation-text {
+        font-size: clamp(0.95rem, 2.8vw, 1.1rem);
+        line-height: 1.5;
+        margin-bottom: clamp(12px, 3vw, 20px);
+        text-align: left;
+    }
+
+    .interpretation-content .guidance {
+        padding: clamp(10px, 2.5vw, 15px);
+        margin-top: clamp(12px, 3vw, 20px);
+        font-size: clamp(0.9rem, 2.6vw, 1rem);
+        text-align: left;
+    }
 }
 
 .interpretation-content h3 {
@@ -1071,10 +1101,81 @@ h1 {
     box-shadow: 0 12px 35px rgba(212, 175, 55, 0.5);
 }
 
-/* 响应式设计 */
+/* 智能响应式适配 - 基于视口的动态尺寸 */
 @media (max-width: 768px) {
+    /* 通用移动端容器优化 */
+    .container {
+        padding: clamp(10px, 3vw, 20px);
+    }
+
+    /* 移动端解读界面优化 */
+    .divination-screen {
+        padding: clamp(20px, 5vh, 40px) clamp(10px, 3vw, 20px);
+        min-height: 100vh;
+    }
+
+    .divination-content {
+        padding: 0 clamp(10px, 3vw, 20px);
+    }
+
+    /* 移动端解读内容字体优化 */
     .divination-title {
-        font-size: 2rem;
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+    }
+
+    .divination-subtitle {
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    }
+
+    /* 移动端结果卡牌优化 - 防止边框遮挡 */
+    .result-cards {
+        gap: clamp(8px, 2vw, 15px);
+        padding: 5px 0;
+        margin: 20px 0;
+        overflow-x: auto;
+    }
+
+    .result-card {
+        width: clamp(120px, 35vw, 160px);
+        min-width: 120px;
+        padding: clamp(5px, 1.5vw, 8px);
+        margin: 0;
+        border: 1px solid rgba(212, 175, 55, 0.15);
+        border-radius: clamp(8px, 2vw, 12px);
+        background: linear-gradient(135deg, rgba(45, 27, 61, 0.3), rgba(26, 26, 46, 0.3));
+        overflow: visible;
+    }
+
+    .result-card img {
+        width: clamp(90px, 28vw, 120px);
+        height: clamp(135px, 42vw, 180px);
+        margin: 0 auto 8px;
+        border-radius: clamp(6px, 1.5vw, 10px);
+        object-fit: contain;
+        display: block;
+    }
+
+    .result-card h4 {
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        margin: 6px 0 3px 0;
+        line-height: 1.2;
+    }
+
+    .result-card .english-name {
+        font-size: clamp(0.7rem, 2vw, 0.8rem);
+        margin: 3px 0;
+    }
+
+    .result-card .orientation {
+        font-size: clamp(0.6rem, 1.8vw, 0.7rem);
+        margin: 2px 0 4px 0;
+        padding: 1px 6px;
+    }
+
+    .result-card .meaning {
+        font-size: clamp(0.65rem, 2vw, 0.75rem);
+        line-height: 1.2;
+        margin: 0;
     }
 
     .question-types {
@@ -1205,7 +1306,7 @@ footer {
 
 @media (max-width: 768px) {
     .container {
-        padding: 18px;
+        padding: 15px;
     }
 
     .artistic-title {
@@ -1218,17 +1319,18 @@ footer {
     }
 
     .cards-grid {
-        gap: 18px;
+        gap: 15px;
         justify-content: center;
     }
 
+    /* 智能卡牌尺寸 - 基于视口宽度和高度 */
     .card {
-        width: 160px;
-        height: 240px;
-        min-width: 160px;
-        min-height: 240px;
-        max-width: 160px;
-        max-height: 240px;
+        width: clamp(120px, 28vw, 180px);
+        height: clamp(180px, 42vw, 270px);
+        min-width: 120px;
+        min-height: 180px;
+        max-width: 180px;
+        max-height: 270px;
     }
 
     .card-face {
@@ -1238,35 +1340,50 @@ footer {
     .card-face img {
         border-radius: 8px;
     }
+
+    /* 移动端卡牌容器优化 */
+    .card-fan-container {
+        height: clamp(200px, 45vh, 280px);
+        margin: 30px 0;
+    }
+
+    /* 滚动卡牌移动端优化 */
+    .scroll-card {
+        width: clamp(100px, 25vw, 160px);
+        height: clamp(150px, 37.5vw, 240px);
+    }
 }
 
 /* 超小屏幕优化 - 480px以下 */
 @media (max-width: 480px) {
     /* 滚动卡牌超小屏优化 */
     .scroll-card {
-        width: 120px;
-        height: 180px;
+        width: clamp(90px, 22vw, 120px);
+        height: clamp(135px, 33vw, 180px);
     }
 
     .card-fan-container {
-        height: 180px;
+        height: clamp(160px, 40vh, 200px);
     }
 
     .result-cards {
-        gap: 12px;
-        padding: 8px 0;
-        margin: 25px 0;
+        gap: clamp(8px, 2vw, 12px);
+        padding: 5px 0;
+        margin: 20px 0;
     }
 
     .result-card {
-        width: 140px;
-        min-width: 140px;
-        padding: 10px;
+        width: clamp(110px, 30vw, 140px);
+        min-width: 110px;
+        padding: clamp(5px, 1.5vw, 10px);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: clamp(8px, 2vw, 12px);
     }
 
     .result-card img {
-        width: 100px;
-        height: 150px;
+        width: clamp(80px, 25vw, 100px);
+        height: clamp(120px, 37.5vw, 150px);
+        border-radius: clamp(6px, 1.5vw, 8px);
     }
 
     .result-card h4 {
@@ -1292,7 +1409,7 @@ footer {
 
 @media (max-width: 650px) {
     .container {
-        padding: 15px;
+        padding: 12px;
     }
 
     .artistic-title {
@@ -1306,30 +1423,33 @@ footer {
 
     /* 滚动卡牌移动端优化 */
     .scroll-card {
-        width: 140px;
-        height: 210px;
+        width: clamp(110px, 26vw, 140px);
+        height: clamp(165px, 39vw, 210px);
     }
 
     .card-fan-container {
-        height: 200px;
+        height: clamp(180px, 42vh, 220px);
     }
 
     /* 结果卡牌移动端优化 */
     .result-cards {
-        gap: 15px;
-        padding: 10px 0;
-        margin: 30px 0;
+        gap: clamp(10px, 2.5vw, 15px);
+        padding: 8px 0;
+        margin: 25px 0;
     }
 
     .result-card {
-        width: 160px;
-        min-width: 160px;
-        padding: 12px;
+        width: clamp(130px, 35vw, 160px);
+        min-width: 130px;
+        padding: clamp(8px, 2vw, 12px);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: clamp(10px, 2.5vw, 15px);
     }
 
     .result-card img {
-        width: 120px;
-        height: 180px;
+        width: clamp(100px, 30vw, 120px);
+        height: clamp(150px, 45vw, 180px);
+        border-radius: clamp(8px, 2vw, 12px);
     }
 
     .result-card h4 {
@@ -1349,15 +1469,15 @@ footer {
     }
 
     .cards-grid {
-        gap: 15px;
+        gap: clamp(12px, 3vw, 15px);
         justify-content: center;
     }
 
     .card {
-        width: 140px;
-        height: 210px;
-        min-width: 140px;
-        min-height: 210px;
+        width: clamp(130px, 32vw, 140px);
+        height: clamp(195px, 48vw, 210px);
+        min-width: 130px;
+        min-height: 195px;
         max-width: 140px;
         max-height: 210px;
     }
@@ -1386,15 +1506,15 @@ footer {
     }
 
     .cards-grid {
-        gap: 12px;
+        gap: clamp(10px, 2.5vw, 12px);
         justify-content: center;
     }
 
     .card {
-        width: 120px;
-        height: 180px;
-        min-width: 120px;
-        min-height: 180px;
+        width: clamp(110px, 30vw, 120px);
+        height: clamp(165px, 45vw, 180px);
+        min-width: 110px;
+        min-height: 165px;
         max-width: 120px;
         max-height: 180px;
     }
@@ -1423,15 +1543,15 @@ footer {
     }
 
     .cards-grid {
-        gap: 10px;
+        gap: clamp(8px, 2vw, 10px);
         justify-content: center;
     }
 
     .card {
-        width: 100px;
-        height: 150px;
-        min-width: 100px;
-        min-height: 150px;
+        width: clamp(95px, 28vw, 100px);
+        height: clamp(142px, 42vw, 150px);
+        min-width: 95px;
+        min-height: 142px;
         max-width: 100px;
         max-height: 150px;
     }
