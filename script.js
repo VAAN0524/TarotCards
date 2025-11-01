@@ -722,7 +722,7 @@ function createProfessionalScrollSystem(cards) {
         width: 100%;
         height: 100%;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         background: transparent;
         border: none;
         box-shadow: none;
@@ -890,12 +890,15 @@ function handleProfessionalCardSelection(card, cardElement) {
         // 更新计数
         updateSelectedCountDisplay();
 
-        // 3张选择完毕，自动开始解读
+        // 3张选择完毕，继续滚动展示一段时间后开始解读
         if (AppState.selectedCards.length === 3) {
-            console.log('✨ 已选择3张卡牌，3秒后自动开始解读...');
+            console.log('✨ 已选择3张卡牌，继续滚动5秒后自动开始解读...');
+
+            // 延长滚动时间，让用户能看到更多卡牌选择
             setTimeout(() => {
+                console.log('🔮 开始解读卡牌...');
                 startInterpretation();
-            }, 3000);
+            }, 5000);
         }
 
     } catch (error) {
