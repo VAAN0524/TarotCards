@@ -146,6 +146,242 @@ h1 {
     font-style: italic;
 }
 
+/* 英文翻译样式 */
+.english-title {
+    font-size: 0.6em;
+    color: rgba(212, 175, 55, 0.8);
+    font-weight: 300;
+    letter-spacing: 2px;
+    margin-top: 0.2em;
+    display: block;
+    text-transform: uppercase;
+    font-family: 'Arial', sans-serif;
+}
+
+.english-subtitle {
+    font-size: 0.8em;
+    color: rgba(184, 184, 184, 0.7);
+    font-weight: 300;
+    margin-top: 0.3em;
+    display: block;
+    font-family: 'Arial', sans-serif;
+}
+
+.english-footer {
+    font-size: 0.8em;
+    color: rgba(102, 102, 102, 0.7);
+    margin-top: 0.2em;
+    display: block;
+    font-family: 'Arial', sans-serif;
+}
+
+/* 按钮英文翻译样式 */
+.btn-english-text {
+    font-size: 0.6em;
+    color: rgba(30, 30, 46, 0.8);
+    font-weight: 400;
+    margin-top: 0.2em;
+    display: block;
+    letter-spacing: 1px;
+}
+
+.btn-english-description {
+    font-size: 0.7em;
+    color: rgba(30, 30, 46, 0.7);
+    font-weight: 300;
+    margin-top: 0.2em;
+    display: block;
+    letter-spacing: 0.5px;
+}
+
+/* 占卜界面英文翻译样式 */
+.divination-english-title {
+    font-size: 0.5em;
+    color: rgba(212, 175, 55, 0.7);
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-top: 0.3em;
+    display: block;
+    text-transform: uppercase;
+    font-family: 'Arial', sans-serif;
+}
+
+.divination-english-subtitle {
+    font-size: 0.75em;
+    color: rgba(184, 184, 184, 0.6);
+    font-weight: 300;
+    margin-top: 0.3em;
+    display: block;
+    font-family: 'Arial', sans-serif;
+}
+
+/* 问题类型英文翻译样式 */
+.question-english-title {
+    font-size: 0.6em;
+    color: rgba(212, 175, 55, 0.8);
+    font-weight: 300;
+    margin-top: 0.2em;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Arial', sans-serif;
+}
+
+.question-english-desc {
+    font-size: 0.7em;
+    color: rgba(153, 153, 153, 0.7);
+    font-weight: 300;
+    margin-top: 0.2em;
+    display: block;
+    font-family: 'Arial', sans-serif;
+}
+
+/* 返回按钮英文翻译样式 */
+.back-english-text,
+.back-english-theme,
+.back-home-english-btn {
+    font-size: 0.7em;
+    color: rgba(212, 175, 55, 0.8);
+    font-weight: 300;
+    margin-top: 0.1em;
+    display: block;
+    font-family: 'Arial', sans-serif;
+}
+
+/* 抽卡界面英文翻译样式 */
+.draw-english-instruction {
+    font-size: 0.75em;
+    color: rgba(184, 184, 184, 0.6);
+    font-weight: 300;
+    margin-top: 0.2em;
+    display: block;
+    font-family: 'Arial', sans-serif;
+}
+
+.selected-english-count {
+    font-size: 0.7em;
+    color: rgba(212, 175, 55, 0.7);
+    font-weight: 300;
+    margin-top: 0.2em;
+    display: block;
+    font-family: 'Arial', sans-serif;
+}
+
+.interpretation-english-btn,
+.new-reading-english-btn {
+    font-size: 0.6em;
+    color: rgba(30, 30, 46, 0.8);
+    font-weight: 400;
+    margin-top: 0.1em;
+    display: block;
+    letter-spacing: 0.5px;
+}
+
+/* 移动端英文翻译优化 */
+@media (max-width: 768px) {
+    .english-title {
+        font-size: 0.5em;
+        letter-spacing: 1px;
+    }
+
+    .english-subtitle,
+    .english-footer {
+        font-size: 0.7em;
+    }
+
+    .btn-english-text,
+    .btn-english-description {
+        font-size: 0.6em;
+    }
+
+    .divination-english-title {
+        font-size: 0.45em;
+        letter-spacing: 0.8px;
+    }
+
+    .divination-english-subtitle,
+    .draw-english-instruction {
+        font-size: 0.65em;
+    }
+
+    .question-english-title {
+        font-size: 0.5em;
+        letter-spacing: 0.8px;
+    }
+
+    .question-english-desc {
+        font-size: 0.6em;
+    }
+
+    .back-english-text,
+    .back-english-theme,
+    .back-home-english-btn {
+        font-size: 0.6em;
+    }
+
+    .selected-english-count {
+        font-size: 0.6em;
+    }
+
+    .interpretation-english-btn,
+    .new-reading-english-btn {
+        font-size: 0.55em;
+        letter-spacing: 0.3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .english-title {
+        font-size: 0.45em;
+        letter-spacing: 0.8px;
+    }
+
+    .english-subtitle,
+    .english-footer {
+        font-size: 0.65em;
+    }
+
+    .btn-english-text,
+    .btn-english-description {
+        font-size: 0.55em;
+    }
+
+    .divination-english-title {
+        font-size: 0.4em;
+        letter-spacing: 0.6px;
+    }
+
+    .divination-english-subtitle,
+    .draw-english-instruction {
+        font-size: 0.6em;
+    }
+
+    .question-english-title {
+        font-size: 0.45em;
+        letter-spacing: 0.6px;
+    }
+
+    .question-english-desc {
+        font-size: 0.55em;
+    }
+
+    .back-english-text,
+    .back-english-theme,
+    .back-home-english-btn {
+        font-size: 0.55em;
+    }
+
+    .selected-english-count {
+        font-size: 0.55em;
+    }
+
+    .interpretation-english-btn,
+    .new-reading-english-btn {
+        font-size: 0.5em;
+        letter-spacing: 0.2px;
+    }
+}
+
 .tarot-section {
     margin-bottom: 60px;
 }
@@ -1600,4 +1836,222 @@ footer {
     .card-face img {
         border-radius: 3px;
     }
+}
+
+/* 故事线解读样式优化 */
+.storyline-interpretation {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px 0;
+}
+
+.storyline-interpretation h4 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #d4af37;
+    font-size: 1.4rem;
+}
+
+.timeline-reading {
+    margin-bottom: 30px;
+}
+
+.time-period {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(45, 27, 61, 0.2);
+    border-radius: 12px;
+    border-left: 3px solid rgba(212, 175, 55, 0.4);
+    transition: all 0.3s ease;
+}
+
+.time-period:hover {
+    background: rgba(45, 27, 61, 0.3);
+    transform: translateX(5px);
+}
+
+.time-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.time-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 50%;
+}
+
+.time-info {
+    flex: 1;
+}
+
+.time-title {
+    margin: 0 0 5px 0;
+    color: #d4af37;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.card-name {
+    margin: 0 0 8px 0;
+    color: #e0e0e0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.card-orientation {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 5px;
+}
+
+.card-orientation:not(.reversed-orientation) {
+    background: rgba(212, 175, 55, 0.2);
+    color: #d4af37;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.card-orientation.reversed-orientation {
+    background: rgba(255, 68, 68, 0.2);
+    color: #ff4444;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.time-content {
+    padding-left: 55px;
+}
+
+.time-content p {
+    margin: 0;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.overall-trend {
+    background: rgba(212, 175, 55, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.overall-trend h5 {
+    margin: 0 0 15px 0;
+    color: #d4af37;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.overall-trend p {
+    margin: 0;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* 移动端故事线优化 */
+@media (max-width: 768px) {
+    .storyline-interpretation {
+        padding: 20px;
+        margin: 25px 0;
+    }
+
+    .storyline-interpretation h4 {
+        font-size: 1.2rem;
+    }
+
+    .time-period {
+        padding: 15px;
+        margin-bottom: 25px;
+    }
+
+    .time-header {
+        gap: 12px;
+    }
+
+    .time-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1.3rem;
+    }
+
+    .time-title {
+        font-size: 1rem;
+    }
+
+    .card-name {
+        font-size: 0.9rem;
+    }
+
+    .card-orientation {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+
+    .time-content {
+        padding-left: 47px;
+    }
+
+    .time-content p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .storyline-interpretation {
+        padding: 15px;
+        margin: 20px 0;
+    }
+
+    .time-period {
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+
+    .time-header {
+        gap: 10px;
+    }
+
+    .time-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 1.2rem;
+    }
+
+    .time-title {
+        font-size: 0.9rem;
+    }
+
+    .card-name {
+        font-size: 0.85rem;
+    }
+
+    .card-orientation {
+        font-size: 0.65rem;
+        padding: 2px 5px;
+    }
+
+    .time-content {
+        padding-left: 40px;
+    }
+
+    .time-content p {
+        font-size: 0.85rem;
+    }
+}
 }

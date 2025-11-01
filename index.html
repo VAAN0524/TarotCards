@@ -13,8 +13,8 @@
 <body>
     <div class="container">
         <header>
-            <h1 class="artistic-title">塔罗牌</h1>
-            <p class="subtitle">探索内在智慧，寻找生命指引</p>
+            <h1 class="artistic-title">塔罗牌<br><span class="english-title">Tarot Cards</span></h1>
+            <p class="subtitle">探索内在智慧，寻找生命指引<br><span class="english-subtitle">Explore Inner Wisdom, Seek Life Guidance</span></p>
         </header>
 
         <main>
@@ -28,14 +28,14 @@
             <div class="divination-entrance">
                 <button class="divination-btn" id="startDivination">
                     <span class="btn-icon">🔮</span>
-                    <span class="btn-text">开始塔罗占卜</span>
-                    <span class="btn-description">探索内心的神秘指引</span>
+                    <span class="btn-text">开始塔罗占卜<br><span class="btn-english-text">Start Tarot Reading</span></span>
+                    <span class="btn-description">探索内心的神秘指引<br><span class="btn-english-description">Explore Your Inner Mystical Guidance</span></span>
                 </button>
             </div>
         </main>
 
         <footer>
-            <p>&copy; 2024 塔罗牌神秘世界</p>
+            <p>&copy; 2024 塔罗牌神秘世界<br><span class="english-footer">Tarot Mystical World</span></p>
         </footer>
     </div>
 
@@ -45,39 +45,39 @@
         <!-- 问题类型选择界面 -->
         <div class="divination-screen" id="questionTypeScreen">
             <div class="divination-content">
-                <h2 class="divination-title">选择你的占卜主题</h2>
-                <p class="divination-subtitle">静心思考你最想探索的领域</p>
+                <h2 class="divination-title">选择你的占卜主题<br><span class="divination-english-title">Choose Your Divination Theme</span></h2>
+                <p class="divination-subtitle">静心思考你最想探索的领域<br><span class="divination-english-subtitle">Quietly Reflect on the Area You Wish to Explore</span></p>
 
                 <div class="question-types">
                     <div class="question-type" data-type="love">
                         <div class="type-icon">💕</div>
-                        <h3>爱情占卜</h3>
-                        <p>探索感情关系与爱的指引</p>
+                        <h3>爱情占卜<br><span class="question-english-title">Love Reading</span></h3>
+                        <p>探索感情关系与爱的指引<br><span class="question-english-desc">Explore Emotional Relationships & Love Guidance</span></p>
                     </div>
                     <div class="question-type" data-type="career">
                         <div class="type-icon">🚀</div>
-                        <h3>事业发展</h3>
-                        <p>寻找职业道路与成功方向</p>
+                        <h3>事业发展<br><span class="question-english-title">Career Development</span></h3>
+                        <p>寻找职业道路与成功方向<br><span class="question-english-desc">Find Career Paths & Success Directions</span></p>
                     </div>
                     <div class="question-type" data-type="relationship">
                         <div class="type-icon">🤝</div>
-                        <h3>人际关系</h3>
-                        <p>理解人际互动与社交智慧</p>
+                        <h3>人际关系<br><span class="question-english-title">Relationships</span></h3>
+                        <p>理解人际互动与社交智慧<br><span class="question-english-desc">Understand Interpersonal Interactions & Social Wisdom</span></p>
                     </div>
                     <div class="question-type" data-type="growth">
                         <div class="type-icon">🌱</div>
-                        <h3>个人成长</h3>
-                        <p>发现内在潜能与心灵成长</p>
+                        <h3>个人成长<br><span class="question-english-title">Personal Growth</span></h3>
+                        <p>发现内在潜能与心灵成长<br><span class="question-english-desc">Discover Inner Potential & Spiritual Growth</span></p>
                     </div>
                     <div class="question-type" data-type="fortune">
                         <div class="type-icon">⭐</div>
-                        <h3>日常运势</h3>
-                        <p>洞察近期运势与生活指引</p>
+                        <h3>日常运势<br><span class="question-english-title">Daily Fortune</span></h3>
+                        <p>洞察近期运势与生活指引<br><span class="question-english-desc">Insight Into Recent Fortune & Life Guidance</span></p>
                     </div>
                 </div>
 
                 <button class="back-btn" id="backToMain">
-                    <span>← 返回主页</span>
+                    <span>← 返回主页<br><span class="back-english-text">Back to Home</span></span>
                 </button>
             </div>
         </div>
@@ -85,8 +85,8 @@
         <!-- 卡牌抽取界面 -->
         <div class="divination-screen hidden" id="cardDrawScreen">
             <div class="divination-content">
-                <h2 class="divination-title">选择3张指引卡牌</h2>
-                <p class="divination-subtitle" id="drawInstruction">请点击选择你感觉最有缘的卡牌</p>
+                <h2 class="divination-title">选择3张指引卡牌<br><span class="divination-english-title">Choose 3 Guidance Cards</span></h2>
+                <p class="divination-subtitle" id="drawInstruction">请点击选择你感觉最有缘的卡牌<br><span class="draw-english-instruction">Click on the cards you feel most connected to</span></p>
 
                 <div class="card-fan-container" id="cardFanContainer">
                     <!-- 扇形排列的卡牌将通过JavaScript动态生成 -->
@@ -94,15 +94,15 @@
 
                 <div class="draw-controls">
                     <div class="selected-count">
-                        已选择 <span id="selectedCount">0</span> / 3 张
+                        已选择 <span id="selectedCount">0</span> / 3 张<br><span class="selected-english-count">Selected <span id="selectedCountEn">0</span> / 3 cards</span>
                     </div>
                     <button class="start-interpretation-btn hidden" id="startInterpretation">
-                        开始解读
+                        开始解读<br><span class="interpretation-english-btn">Start Reading</span>
                     </button>
                 </div>
 
                 <button class="back-btn" id="backToQuestionType">
-                    <span>← 重新选择主题</span>
+                    <span>← 重新选择主题<br><span class="back-english-theme">Choose Different Theme</span></span>
                 </button>
             </div>
         </div>
@@ -110,7 +110,7 @@
         <!-- 结果解读界面 -->
         <div class="divination-screen hidden" id="resultScreen">
             <div class="divination-content">
-                <h2 class="divination-title">塔罗指引解读</h2>
+                <h2 class="divination-title">塔罗指引解读<br><span class="divination-english-title">Tarot Guidance Reading</span></h2>
                 <p class="divination-subtitle" id="resultQuestion"></p>
 
                 <div class="result-cards" id="resultCards">
@@ -123,10 +123,10 @@
 
                 <div class="result-controls">
                     <button class="new-reading-btn" id="newReading">
-                        开始新的占卜
+                        开始新的占卜<br><span class="new-reading-english-btn">Start New Reading</span>
                     </button>
                     <button class="back-home-btn" id="backHome">
-                        返回主页
+                        返回主页<br><span class="back-home-english-btn">Back to Home</span>
                     </button>
                 </div>
             </div>
