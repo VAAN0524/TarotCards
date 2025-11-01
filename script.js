@@ -497,77 +497,103 @@ function prepareCardDraw() {
 function updateQuestionPrompt() {
     const promptElement = document.getElementById('drawInstruction');
     const prompts = {
-        love: '请为你的爱情问题选择有缘的指引卡牌',
-        career: '请为你的事业发展选择有缘的指引卡牌',
-        relationship: '请为你的人际关系选择有缘的指引卡牌',
-        growth: '请为你的个人成长选择有缘的指引卡牌',
-        fortune: '请为你的日常运势选择有缘的指引卡牌'
+        love: '请为你的爱情问题选择3张有缘的指引卡牌',
+        career: '请为你的事业发展选择3张有缘的指引卡牌',
+        relationship: '请为你的人际关系选择3张有缘的指引卡牌',
+        growth: '请为你的个人成长选择3张有缘的指引卡牌',
+        fortune: '请为你的日常运势选择3张有缘的指引卡牌'
     };
 
-    promptElement.textContent = prompts[selectedQuestionType] || '请选择有缘的指引卡牌';
+    promptElement.textContent = prompts[selectedQuestionType] || '请选择3张有缘的指引卡牌';
 }
 
-// 创建横向滚动的卡牌
+// 创建无缝循环滚动的卡牌
 function createScrollCards() {
     const container = document.getElementById('cardFanContainer');
     container.innerHTML = '';
 
     const cards = availableCardsForDivination;
-    console.log(`创建横向滚动卡牌: ${cards.length}张`);
+    console.log(`创建无缝循环滚动卡牌: ${cards.length}张`);
 
     // 创建滚动容器
     const scrollWrapper = document.createElement('div');
     scrollWrapper.className = 'scroll-wrapper';
 
-    // 创建卡牌轨道
+    // 创建卡牌轨道 - 复制两份实现无缝循环
     const track = document.createElement('div');
     track.className = 'card-track';
 
+    // 第一组卡牌
     cards.forEach((card, index) => {
-        const cardElement = document.createElement('div');
-        cardElement.className = 'scroll-card';
-        cardElement.setAttribute('data-card-id', card.id);
-        cardElement.setAttribute('data-index', index);
-
-        // 创建卡牌内容（只显示卡背）
-        cardElement.innerHTML = `
-            <div class="card-face card-back">
-                <img src="images/塔罗牌背面.png" alt="塔罗牌背面" loading="eager">
-            </div>
-        `;
-
-        // 添加点击事件
-        cardElement.addEventListener('click', () => selectCard(cardElement, card));
-
+        const cardElement = createScrollCard(card, index);
         track.appendChild(cardElement);
+    });
 
-        // 添加进入动画
-        setTimeout(() => {
-            cardElement.style.opacity = '1';
-            cardElement.style.transform = 'translateY(0)';
-        }, index * 30);
+    // 第二组卡牌（用于无缝循环）
+    cards.forEach((card, index) => {
+        const cardElement = createScrollCard(card, index + cards.length);
+        track.appendChild(cardElement);
     });
 
     scrollWrapper.appendChild(track);
     container.appendChild(scrollWrapper);
 
-    console.log(`创建了${cards.length}张横向滚动卡牌`);
+    console.log(`创建了${cards.length * 2}张无缝循环滚动卡牌`);
 }
 
-// 选择卡牌
-function selectCard(cardElement, cardData) {
+// 创建单个滚动卡牌元素
+function createScrollCard(card, index) {
+    const cardElement = document.createElement('div');
+    cardElement.className = 'scroll-card';
+    cardElement.setAttribute('data-card-id', card.id);
+    cardElement.setAttribute('data-index', index % cards.length);
+    cardElement.setAttribute('data-original-index', index % cards.length);
+
+    // 创建卡牌内容（只显示卡背）
+    cardElement.innerHTML = `
+        <div class="card-face card-back">
+            <img src="images/塔罗牌背面.png" alt="塔罗牌背面" loading="eager">
+        </div>
+    `;
+
+    // 添加点击事件
+    cardElement.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectScrollCard(cardElement, card, index % cards.length);
+    });
+
+    // 添加进入动画
+    setTimeout(() => {
+        cardElement.style.opacity = '1';
+        cardElement.style.transform = 'translateY(0)';
+    }, index * 30);
+
+    return cardElement;
+}
+
+// 选择滚动卡牌
+function selectScrollCard(cardElement, cardData, originalIndex) {
     if (cardElement.classList.contains('selected')) return;
+
+    // 限制最多选择3张卡牌
+    if (selectedCards.length >= 3) return;
 
     // 随机决定正位还是逆位（30%逆位，70%正位）
     const isReversed = Math.random() < 0.30;
     const orientation = isReversed ? 'reversed' : 'upright';
 
-    console.log(`选择卡牌: ${cardData.name} - ${isReversed ? '逆位' : '正位'}`);
+    console.log(`选择卡牌: ${cardData.name} - ${isReversed ? '逆位' : '正位'} (第${selectedCards.length + 1}张)`);
 
     // 从可用卡牌中移除已选择的卡牌，确保不重复
     const cardIndex = availableCardsForDivination.findIndex(card => card.id === cardData.id);
     if (cardIndex > -1) {
         availableCardsForDivination.splice(cardIndex, 1);
+    }
+
+    // 暂停滚动动画
+    const track = cardElement.closest('.card-track');
+    if (track) {
+        track.style.animationPlayState = 'paused';
     }
 
     // 添加选中效果
@@ -576,12 +602,11 @@ function selectCard(cardElement, cardData) {
         cardElement.classList.add('reversed');
     }
 
-    // 立即替换卡背为卡牌正面
+    // 立即替换卡背为卡牌正面，不显示正位逆位标注
     const transformStyle = isReversed ? 'transform: rotate(180deg);' : '';
     cardElement.innerHTML = `
         <div class="card-face" style="${transformStyle}">
             <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
-            ${isReversed ? '<div class="orientation-badge">逆位</div>' : '<div class="orientation-badge">正位</div>'}
         </div>
     `;
 
@@ -590,21 +615,43 @@ function selectCard(cardElement, cardData) {
         ...cardData,
         orientation: orientation,
         isReversed: isReversed,
-        element: cardElement
+        element: cardElement,
+        originalIndex: originalIndex
     });
 
     // 更新计数
     updateSelectedCount();
 
-    // 禁用其他卡牌的hover效果
-    document.querySelectorAll('.fan-card:not(.selected)').forEach(card => {
-        card.style.opacity = '0.7';
+    // 如果选择了3张卡牌，禁用其他卡牌并准备自动解读
+    if (selectedCards.length === 3) {
+        disableRemainingCards();
+
+        // 2秒后自动开始解读
+        setTimeout(() => {
+            startInterpretation();
+        }, 2000);
+    } else {
+        // 如果选择了1-2张卡牌，显示手动解读按钮
+        document.getElementById('startInterpretation').classList.remove('hidden');
+
+        // 部分禁用其他卡牌（但保持一些可选性）
+        document.querySelectorAll('.scroll-card:not(.selected)').forEach(card => {
+            card.style.opacity = '0.6';
+        });
+    }
+}
+
+// 禁用剩余卡牌
+function disableRemainingCards() {
+    document.querySelectorAll('.scroll-card:not(.selected)').forEach(card => {
+        card.style.opacity = '0.4';
+        card.style.pointerEvents = 'none';
     });
 
-    // 始终显示解读按钮（至少选择一张卡牌后）
-    if (selectedCards.length >= 1) {
-        document.getElementById('startInterpretation').classList.remove('hidden');
-    }
+    // 暂停所有滚动动画
+    document.querySelectorAll('.card-track').forEach(track => {
+        track.style.animationPlayState = 'paused';
+    });
 }
 
 // 更新已选择卡牌数量
