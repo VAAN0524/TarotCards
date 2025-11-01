@@ -1,0 +1,10 @@
+{
+  "name": "TarotCards",
+  "version": "1.0.0",
+  "description": "塔罗牌占卜网站",
+  "homepage": "https://vaan0524.github.io/TarotCards/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VAAN0524/TarotCards.git"
+  }
+}
