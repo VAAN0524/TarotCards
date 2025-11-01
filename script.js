@@ -998,10 +998,15 @@ function handleProfessionalCardSelection(card, cardElement) {
         // 3张选择完毕，继续滚动展示一段时间后开始解读
         if (AppState.selectedCards.length === 3) {
             console.log('✨ 已选择3张卡牌，继续滚动5秒后自动开始解读...');
+            console.log('📋 最终选择的3张卡牌:', AppState.selectedCards.map(c => ({ name: c.name, isReversed: c.isReversed })));
 
             // 延长滚动时间，让用户能看到更多卡牌选择
             setTimeout(() => {
-                console.log('🔮 开始解读卡牌...');
+                console.log('🔮 5秒倒计时结束，开始解读卡牌...');
+                console.log('📊 AppState状态检查:', {
+                    selectedCards: AppState.selectedCards.length,
+                    selectedQuestionType: AppState.selectedQuestionType
+                });
                 startInterpretation();
             }, 5000);
         }
@@ -2419,6 +2424,7 @@ function updateSelectedCount() {
 function startInterpretation() {
     console.log('🔮 开始专业解读...');
     console.log('选择的卡牌数量:', AppState.selectedCards.length);
+    console.log('选择的卡牌详情:', AppState.selectedCards);
     console.log('问题类型:', AppState.selectedQuestionType);
 
     if (AppState.selectedCards.length !== 3) {
@@ -2427,16 +2433,21 @@ function startInterpretation() {
     }
 
     try {
+        console.log('📊 准备生成专业解读内容...');
+        console.log('🚀 调用generateInterpretation函数...');
+
         // 生成解读内容
-        console.log('📊 生成专业解读内容...');
         const interpretation = generateInterpretation();
         console.log('✨ 解读生成完成');
+        console.log('生成的解读对象keys:', Object.keys(interpretation || {}));
 
         // 显示结果界面
+        console.log('🖼️ 准备显示结果界面...');
         showResultScreen(interpretation);
         console.log('🎯 解读界面显示完成');
     } catch (error) {
         console.error('❌ 解读生成失败:', error);
+        console.error('❌ 错误堆栈:', error.stack);
     }
 }
 
