@@ -327,8 +327,8 @@ function prepareCardDraw() {
     selectedCards = [];
     updateSelectedCount();
 
-    // 生成可抽取的卡牌（从完整牌组中随机选择7张）
-    availableCardsForDivination = shuffleArray([...tarotCards]).slice(0, 7);
+    // 使用全部22张塔罗牌
+    availableCardsForDivination = shuffleArray([...tarotCards]);
 
     // 显示扇形排列的卡牌
     createFanCards();
@@ -341,14 +341,14 @@ function prepareCardDraw() {
 function updateQuestionPrompt() {
     const promptElement = document.getElementById('drawInstruction');
     const prompts = {
-        love: '请为你的爱情问题选择三张指引卡牌',
-        career: '请为你的事业发展选择三张指引卡牌',
-        relationship: '请为你的人际关系选择三张指引卡牌',
-        growth: '请为你的个人成长选择三张指引卡牌',
-        fortune: '请为你的日常运势选择三张指引卡牌'
+        love: '请为你的爱情问题选择有缘的指引卡牌',
+        career: '请为你的事业发展选择有缘的指引卡牌',
+        relationship: '请为你的人际关系选择有缘的指引卡牌',
+        growth: '请为你的个人成长选择有缘的指引卡牌',
+        fortune: '请为你的日常运势选择有缘的指引卡牌'
     };
 
-    promptElement.textContent = prompts[selectedQuestionType] || '请选择三张指引卡牌';
+    promptElement.textContent = prompts[selectedQuestionType] || '请选择有缘的指引卡牌';
 }
 
 // 创建扇形排列的卡牌
@@ -358,7 +358,7 @@ function createFanCards() {
 
     const cards = availableCardsForDivination;
     const totalCards = cards.length;
-    const angleRange = 120; // 扇形角度范围
+    const angleRange = 160; // 增大扇形角度范围以容纳22张卡牌
     const startAngle = -angleRange / 2;
 
     console.log(`创建扇形卡牌: ${totalCards}张, 角度范围: ${angleRange}度`);
@@ -369,9 +369,9 @@ function createFanCards() {
         cardElement.setAttribute('data-card-id', card.id);
         cardElement.setAttribute('data-index', index);
 
-        // 计算扇形位置
+        // 计算扇形位置 - 22张卡牌需要合适的半径和调整
         const angle = startAngle + (angleRange / (totalCards - 1)) * index;
-        const radius = 180; // 增大扇形半径
+        const radius = 180; // 适配较小卡牌的扇形半径
         const x = Math.sin(angle * Math.PI / 180) * radius;
         const y = -Math.cos(angle * Math.PI / 180) * 80; // 调整垂直位置
 
@@ -395,12 +395,12 @@ function createFanCards() {
         // 保存原始transform
         const originalTransform = cardElement.style.transform;
 
-        // 添加进入动画
+        // 添加进入动画 - 减少22张卡牌的总动画时间
         setTimeout(() => {
             cardElement.style.opacity = '1';
             cardElement.style.transform = transform + ' scale(1)';
             console.log(`卡牌${index} 显示完成`);
-        }, index * 100);
+        }, index * 50); // 从100ms减少到50ms
 
         // 保存原始transform到数据属性中
         cardElement.setAttribute('data-original-transform', transform);
@@ -409,20 +409,17 @@ function createFanCards() {
 
 // 选择卡牌
 function selectCard(cardElement, cardData) {
-    if (selectedCards.length >= 3) return;
     if (cardElement.classList.contains('selected')) return;
 
     // 添加选中效果
     cardElement.classList.add('selected');
 
-    // 替换卡背为卡牌正面
-    setTimeout(() => {
-        cardElement.innerHTML = `
-            <div class="card-face">
-                <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
-            </div>
-        `;
-    }, 400);
+    // 立即替换卡背为卡牌正面
+    cardElement.innerHTML = `
+        <div class="card-face">
+            <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
+        </div>
+    `;
 
     // 添加到已选卡牌
     selectedCards.push({
@@ -438,14 +435,9 @@ function selectCard(cardElement, cardData) {
         card.style.opacity = '0.7';
     });
 
-    // 如果选满了3张，显示解读按钮
-    if (selectedCards.length === 3) {
-        setTimeout(() => {
-            document.getElementById('startInterpretation').classList.remove('hidden');
-            document.querySelectorAll('.fan-card:not(.selected)').forEach(card => {
-                card.classList.add('disabled');
-            });
-        }, 1200);
+    // 始终显示解读按钮（至少选择一张卡牌后）
+    if (selectedCards.length >= 1) {
+        document.getElementById('startInterpretation').classList.remove('hidden');
     }
 }
 
