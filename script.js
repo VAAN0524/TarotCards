@@ -707,7 +707,7 @@ function createProfessionalTarotCard(card, index) {
         backface-visibility: hidden;
     `;
 
-    // 创建卡背
+    // 创建卡背（不显示名称）
     cardElement.innerHTML = `
         <div class="card-back-face" style="
             width: 100%;
@@ -716,7 +716,6 @@ function createProfessionalTarotCard(card, index) {
             border: 3px solid #d4af37;
             border-radius: 15px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
@@ -730,23 +729,20 @@ function createProfessionalTarotCard(card, index) {
                 right: 0;
                 bottom: 0;
                 background: url('images/塔罗牌背面.png') center/contain no-repeat;
-                opacity: 0.9;
+                opacity: 1;
+                filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
             "></div>
-            <div class="card-label" style="
+            <div class="card-mystical-glow" style="
                 position: absolute;
-                bottom: 10px;
+                top: 50%;
                 left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.8);
-                color: #d4af37;
-                padding: 6px 12px;
-                border-radius: 6px;
-                font-size: 11px;
-                font-weight: bold;
-                text-align: center;
-                min-width: 80%;
-                z-index: 2;
-            ">${card.name}</div>
+                transform: translate(-50%, -50%);
+                width: 60px;
+                height: 60px;
+                background: radial-gradient(circle, rgba(212, 175, 55, 0.1), transparent 70%);
+                border-radius: 50%;
+                animation: mysticalPulse 3s ease-in-out infinite;
+            "></div>
         </div>
     `;
 
@@ -887,6 +883,17 @@ function addProfessionalScrollCSS() {
             }
             100% {
                 transform: translateX(calc(-50% - 30px));
+            }
+        }
+
+        @keyframes mysticalPulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.2);
             }
         }
 
