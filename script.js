@@ -903,24 +903,15 @@ function flipProfessionalCard(cardElement, card, isReversed) {
                     transform: ${isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
                 ">
                     <div class="card-image" style="
-                        width: 70%;
-                        height: 60%;
+                        width: 100%;
+                        height: 100%;
                         background: url('images/${card.file}') center/contain no-repeat;
-                        border-radius: 10px;
-                        margin-bottom: 10px;
+                        border-radius: 15px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
                         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
                     "></div>
-                    <div class="card-name" style="
-                        background: rgba(0, 0, 0, 0.9);
-                        color: #d4af37;
-                        padding: 8px 15px;
-                        border-radius: 8px;
-                        font-size: 12px;
-                        font-weight: bold;
-                        text-align: center;
-                        width: 90%;
-                        transform: ${isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
-                    ">${card.name}</div>
                 </div>
             `;
         }, 400);
