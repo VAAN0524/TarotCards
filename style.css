@@ -31,6 +31,45 @@ body {
     padding: 30px;
 }
 
+/* 电脑端整体布局优化 */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1400px;
+        padding: 40px 30px;
+    }
+
+    .divination-content {
+        max-width: 1400px;
+    }
+
+    /* 确保大屏幕上内容居中 */
+    .divination-screen {
+        padding: 60px 40px;
+    }
+}
+
+/* 超大屏幕优化 */
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1200px;
+        padding: 50px 40px;
+    }
+
+    .divination-content {
+        max-width: 1200px;
+    }
+
+    .divination-screen {
+        padding: 80px 60px;
+    }
+
+    /* 卡牌容器在大屏幕上的优化 */
+    .card-fan-container {
+        height: 400px;
+        margin: 50px 0;
+    }
+}
+
 header {
     text-align: center;
     margin-bottom: 50px;
@@ -427,7 +466,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 40px 20px;
 }
 
 .divination-content {
