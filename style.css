@@ -523,10 +523,10 @@ h1 {
     border-color: #d4af37;
 }
 
-/* 卡牌抽取界面 */
+/* 卡牌抽取界面 - 增大容器高度以适应更大的卡牌 */
 .card-fan-container {
     width: 100%;
-    height: 200px;
+    height: 280px;
     margin: 40px 0;
     overflow: hidden;
     position: relative;
@@ -570,8 +570,8 @@ h1 {
 
 .scroll-card {
     flex-shrink: 0;
-    width: 120px;
-    height: 180px;
+    width: 180px;
+    height: 270px;
     cursor: pointer;
     transition: all 0.3s ease;
     opacity: 1; /* 修改：默认显示，避免移动端看不到 */
@@ -680,12 +680,12 @@ h1 {
     box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
 }
 
-/* 结果解读界面 */
+/* 结果解读界面 - 大幅增大卡牌显示 */
 .result-cards {
     display: flex;
     justify-content: center;
-    gap: 30px;
-    margin: 40px 0;
+    gap: 40px;
+    margin: 50px 0;
     flex-wrap: wrap;
 }
 
@@ -693,8 +693,8 @@ h1 {
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(212, 175, 55, 0.3);
     border-radius: 15px;
-    padding: 20px;
-    width: 200px;
+    padding: 25px;
+    width: 260px;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     opacity: 0;
@@ -704,15 +704,15 @@ h1 {
 .result-card:hover {
     background: rgba(212, 175, 55, 0.1);
     border-color: rgba(212, 175, 55, 0.5);
-    transform: translateY(-5px);
+    transform: translateY(-8px) scale(1.02);
 }
 
 .result-card img {
-    width: 120px;
-    height: 180px;
+    width: 180px;
+    height: 270px;
     object-fit: contain;
-    margin-bottom: 15px;
-    border-radius: 10px;
+    margin-bottom: 20px;
+    border-radius: 12px;
 }
 
 .result-card h4 {
@@ -902,12 +902,12 @@ h1 {
     }
 
     .card-fan-container {
-        height: 150px;
+        height: 220px;
     }
 
     .scroll-card {
-        width: 80px;
-        height: 120px;
+        width: 130px;
+        height: 195px;
     }
 
     .card-track {
@@ -916,17 +916,17 @@ h1 {
     }
 
     .result-cards {
-        gap: 20px;
+        gap: 25px;
     }
 
     .result-card {
-        width: 150px;
-        padding: 15px;
+        width: 200px;
+        padding: 20px;
     }
 
     .result-card img {
-        width: 80px;
-        height: 120px;
+        width: 140px;
+        height: 210px;
     }
 
     .result-controls {

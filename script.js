@@ -705,11 +705,14 @@ function createProfessionalTarotCard(card, index) {
     cardElement.setAttribute('data-card-id', card.id);
     cardElement.setAttribute('data-original-index', index % 22);
 
+    // 根据屏幕尺寸动态设置卡牌大小
+    const dimensions = calculateDynamicCardSize();
+
     cardElement.style.cssText = `
         flex-shrink: 0;
-        width: 120px;
-        height: 180px;
-        margin: 0 15px;
+        width: ${dimensions.cardWidth}px;
+        height: ${dimensions.cardHeight}px;
+        margin: 0 ${dimensions.gap}px;
         cursor: pointer;
         position: relative;
         transition: all 0.4s cubic-bezier(0.4, 0.1, 0.2, 1);
@@ -917,12 +920,12 @@ function addProfessionalScrollCSS() {
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.8) !important;
         }
 
-        /* 移动端响应式 */
+        /* 移动端响应式 - 增大卡牌尺寸 */
         @media (max-width: 768px) {
             .professional-tarot-card {
-                width: 90px !important;
-                height: 135px !important;
-                margin: 0 12px !important;
+                width: 140px !important;
+                height: 224px !important;
+                margin: 0 20px !important;
             }
 
             .tarot-track-container {
@@ -931,15 +934,15 @@ function addProfessionalScrollCSS() {
 
             @keyframes seamlessScroll {
                 0% { transform: translateX(0); }
-                100% { transform: translateX(calc(-50% - 24px)); }
+                100% { transform: translateX(calc(-50% - 40px)); }
             }
         }
 
         @media (max-width: 480px) {
             .professional-tarot-card {
-                width: 70px !important;
-                height: 105px !important;
-                margin: 0 8px !important;
+                width: 110px !important;
+                height: 176px !important;
+                margin: 0 15px !important;
             }
 
             .tarot-track-container {
@@ -948,7 +951,7 @@ function addProfessionalScrollCSS() {
 
             @keyframes seamlessScroll {
                 0% { transform: translateX(0); }
-                100% { transform: translateX(calc(-50% - 16px)); }
+                100% { transform: translateX(calc(-50% - 30px)); }
             }
         }
     `;
@@ -1579,26 +1582,26 @@ function generateSimpleInterpretation() {
                         ${AppState.selectedCards.map(card => `
                             <div style="text-align: center;">
                                 <div style="
-                                    width: 80px;
-                                    height: 120px;
+                                    width: 140px;
+                                    height: 210px;
                                     background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
                                     border: 2px solid #d4af37;
-                                    border-radius: 8px;
-                                    margin: 0 auto 8px;
+                                    border-radius: 12px;
+                                    margin: 0 auto 12px;
                                     display: flex;
                                     align-items: center;
                                     justify-content: center;
                                     transform: ${card.isReversed ? 'rotate(180deg)' : 'rotate(0deg)'};
                                 ">
                                     <div style="
-                                        width: 60px;
-                                        height: 80px;
+                                        width: 110px;
+                                        height: 165px;
                                         background: url('images/${card.file}') center/contain no-repeat;
-                                        border-radius: 4px;
+                                        border-radius: 8px;
                                     "></div>
                                 </div>
-                                <div style="color: #d4af37; font-size: 12px; font-weight: bold;">${card.name}</div>
-                                <div style="color: #999; font-size: 10px;">${card.isReversed ? '逆位' : '正位'}</div>
+                                <div style="color: #d4af37; font-size: 14px; font-weight: bold;">${card.name}</div>
+                                <div style="color: #999; font-size: 12px;">${card.isReversed ? '逆位' : '正位'}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -1937,41 +1940,41 @@ function createScrollCards() {
     }
 }
 
-// 根据屏幕尺寸计算动态卡牌尺寸 - 增大显示尺寸
+// 根据屏幕尺寸计算动态卡牌尺寸 - 大幅增大显示尺寸，提升占屏比
 function calculateDynamicCardSize() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
 
-    // 基础尺寸 - 大幅增大
+    // 基础尺寸 - 极大幅增大，特别是电脑端
     let cardWidth, cardHeight, containerHeight;
 
     if (screenWidth <= 480) {
-        // 移动设备 - 增大80%
-        cardWidth = Math.min(110, screenWidth / 3.5);
+        // 移动设备 - 增大120%，充分利用屏幕空间
+        cardWidth = Math.min(140, screenWidth / 2.8);
         cardHeight = cardWidth * 1.6;
-        containerHeight = 280;
+        containerHeight = 320;
     } else if (screenWidth <= 768) {
-        // 平板设备 - 增大70%
-        cardWidth = Math.min(140, screenWidth / 4);
+        // 平板设备 - 增大100%
+        cardWidth = Math.min(180, screenWidth / 3.2);
         cardHeight = cardWidth * 1.6;
-        containerHeight = 350;
+        containerHeight = 420;
     } else if (screenWidth <= 1200) {
-        // 桌面设备 - 增大60%
-        cardWidth = Math.min(170, screenWidth / 5);
+        // 桌面设备 - 增大100%，大幅提升视觉效果
+        cardWidth = Math.min(220, screenWidth / 4);
         cardHeight = cardWidth * 1.6;
-        containerHeight = 400;
+        containerHeight = 500;
     } else {
-        // 大屏设备 - 增大50%
-        cardWidth = Math.min(200, screenWidth / 6);
+        // 大屏设备 - 增大80%，充分利用大屏空间
+        cardWidth = Math.min(260, screenWidth / 4.5);
         cardHeight = cardWidth * 1.6;
-        containerHeight = 450;
+        containerHeight = 550;
     }
 
     return {
         cardWidth,
         cardHeight,
         containerHeight,
-        gap: screenWidth <= 480 ? 20 : 25
+        gap: screenWidth <= 480 ? 25 : 35
     };
 }
 
