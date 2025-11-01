@@ -1628,7 +1628,7 @@ function generateSimpleInterpretation() {
                                     "></div>
                                 </div>
                                 <div style="color: #d4af37; font-size: 14px; font-weight: bold;">${card.name}</div>
-                                <div style="color: #999; font-size: 12px;">${card.isReversed ? '逆位' : '正位'}</div>
+                                <div style="color: ${card.isReversed ? '#ff4444' : '#999'}; font-size: 12px; font-weight: ${card.isReversed ? 'bold' : 'normal'};">${card.isReversed ? '逆位' : '正位'}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -2704,7 +2704,7 @@ function generateInterpretation() {
                 <div class="timeline-reading">
                     ${timeReadings.map((reading, index) => `
                         <div class="time-period">
-                            <h5>🕐 ${reading.position}：${reading.card.name}(${reading.orientation})</h5>
+                            <h5>🕐 ${reading.position}：${reading.card.name}(<span class="${reading.orientation === '逆位' ? 'reversed-orientation' : ''}">${reading.orientation}</span>)</h5>
                             <p>${reading.detailedInterpretation}</p>
                         </div>
                     `).join('')}
@@ -2741,7 +2741,7 @@ function generateInterpretation() {
             } else if (reversedTime === '现在') {
                 trendAnalysis = '虽然目前面临一些挑战（现在的逆位卡牌），但过去的良好基础和未来的积极预示表明这只是暂时的困难，坚持下去就会看到曙光。';
             } else {
-                trendAnalysis = '过去和现在的正位卡牌为你奠定了坚实的基础，虽然未来需要注意某些问题（未来的逆位卡牌），但你完全有能力预防和应对。';
+                trendAnalysis = '过去和现在的正位卡牌为你奠定了坚实的基础，虽然未来需要注意潜在挑战（未来的逆位卡牌），但你的智慧和经验将帮助你成功应对，迎来更美好的发展。';
             }
         } else {
             trendAnalysis = '正位和逆位卡牌的组合显示出事物发展的复杂性，既有有利因素也有需要注意的地方。关键在于保持平衡，发挥优势，同时谨慎应对挑战。';
@@ -2825,7 +2825,7 @@ function showResultScreen(interpretation) {
             <img src="images/${card.file}" alt="${card.name}" style="${card.isReversed ? 'transform: rotate(180deg);' : ''}">
             <h4>${card.name}</h4>
             <div class="english-name">${card.english}</div>
-            <div class="orientation">${card.isReversed ? '逆位' : '正位'}</div>
+            <div class="orientation" style="color: ${card.isReversed ? '#ff4444' : '#d4af37'}; font-weight: ${card.isReversed ? 'bold' : 'normal'};">${card.isReversed ? '逆位' : '正位'}</div>
             <div class="meaning">${card.isReversed ? card.reversed : card.upright}</div>
         `;
         resultCardsContainer.appendChild(cardElement);
@@ -3080,6 +3080,12 @@ function addTimeBasedInterpretationStyles() {
             font-weight: bold;
             margin-bottom: 10px;
             display: inline-block;
+        }
+
+        .time-position .reversed-orientation {
+            color: #ff4444 !important;
+            background: rgba(255, 68, 68, 0.1);
+            font-weight: bold;
         }
 
         /* 移动端响应式 */
