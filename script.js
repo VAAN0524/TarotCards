@@ -757,16 +757,9 @@ function createProfessionalScrollSystem(cards) {
 
     outerContainer.appendChild(trackContainer);
 
-    // 悬停暂停功能
-    outerContainer.addEventListener('mouseenter', () => {
-        trackContainer.style.animationPlayState = 'paused';
-        console.log('⏸️ 滚动已暂停');
-    });
-
-    outerContainer.addEventListener('mouseleave', () => {
-        trackContainer.style.animationPlayState = 'running';
-        console.log('▶️ 滚动已恢复');
-    });
+    // 移除悬停暂停功能 - 让卡牌持续滚动
+    // 用户选择卡牌时才会暂停，鼠标移动不影响滚动
+    console.log('🔄 卡牌将持续滚动，不受鼠标悬停影响');
 
     return outerContainer;
 }
@@ -1425,9 +1418,7 @@ function addTarotScrollAnimation() {
             }
         }
 
-        .tarot-scroll-wrapper:hover .tarot-scroll-track {
-            animation-play-state: paused;
-        }
+        /* 移除悬停暂停规则，让卡牌持续滚动 */
 
         .tarot-scroll-card.selected {
             transform: translateY(-12px) scale(1.1) !important;
