@@ -361,6 +361,8 @@ function createFanCards() {
     const angleRange = 120; // 扇形角度范围
     const startAngle = -angleRange / 2;
 
+    console.log(`创建扇形卡牌: ${totalCards}张, 角度范围: ${angleRange}度`);
+
     cards.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.className = 'fan-card';
@@ -369,11 +371,14 @@ function createFanCards() {
 
         // 计算扇形位置
         const angle = startAngle + (angleRange / (totalCards - 1)) * index;
-        const radius = 150; // 扇形半径
+        const radius = 180; // 增大扇形半径
         const x = Math.sin(angle * Math.PI / 180) * radius;
-        const y = -Math.cos(angle * Math.PI / 180) * 50;
+        const y = -Math.cos(angle * Math.PI / 180) * 80; // 调整垂直位置
 
-        cardElement.style.transform = `translateX(${x}px) translateY(${y}px) rotate(${angle}deg)`;
+        const transform = `translateX(${x}px) translateY(${y}px) rotate(${angle}deg)`;
+        cardElement.style.transform = transform;
+
+        console.log(`卡牌${index} (${card.name}): 角度=${angle.toFixed(1)}°, x=${x.toFixed(1)}px, y=${y.toFixed(1)}px`);
 
         // 创建卡牌内容（只显示卡背）
         cardElement.innerHTML = `
@@ -387,11 +392,18 @@ function createFanCards() {
 
         container.appendChild(cardElement);
 
+        // 保存原始transform
+        const originalTransform = cardElement.style.transform;
+
         // 添加进入动画
         setTimeout(() => {
             cardElement.style.opacity = '1';
-            cardElement.style.transform += ' scale(1)';
+            cardElement.style.transform = transform + ' scale(1)';
+            console.log(`卡牌${index} 显示完成`);
         }, index * 100);
+
+        // 保存原始transform到数据属性中
+        cardElement.setAttribute('data-original-transform', transform);
     });
 }
 
@@ -402,6 +414,15 @@ function selectCard(cardElement, cardData) {
 
     // 添加选中效果
     cardElement.classList.add('selected');
+
+    // 替换卡背为卡牌正面
+    setTimeout(() => {
+        cardElement.innerHTML = `
+            <div class="card-face">
+                <img src="images/${cardData.file}" alt="${cardData.name}" loading="eager">
+            </div>
+        `;
+    }, 400);
 
     // 添加到已选卡牌
     selectedCards.push({
@@ -424,7 +445,7 @@ function selectCard(cardElement, cardData) {
             document.querySelectorAll('.fan-card:not(.selected)').forEach(card => {
                 card.classList.add('disabled');
             });
-        }, 800);
+        }, 1200);
     }
 }
 
