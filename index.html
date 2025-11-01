@@ -23,11 +23,114 @@
                     <!-- 塔罗牌将通过JavaScript动态生成 -->
                 </div>
             </div>
+
+            <!-- 占卜入口按钮 -->
+            <div class="divination-entrance">
+                <button class="divination-btn" id="startDivination">
+                    <span class="btn-icon">🔮</span>
+                    <span class="btn-text">开始塔罗占卜</span>
+                    <span class="btn-description">探索内心的神秘指引</span>
+                </button>
+            </div>
         </main>
 
         <footer>
             <p>&copy; 2024 塔罗牌神秘世界</p>
         </footer>
+    </div>
+
+    <!-- 占卜界面容器 -->
+    <div class="divination-container" id="divinationContainer">
+
+        <!-- 问题类型选择界面 -->
+        <div class="divination-screen" id="questionTypeScreen">
+            <div class="divination-content">
+                <h2 class="divination-title">选择你的占卜主题</h2>
+                <p class="divination-subtitle">静心思考你最想探索的领域</p>
+
+                <div class="question-types">
+                    <div class="question-type" data-type="love">
+                        <div class="type-icon">💕</div>
+                        <h3>爱情占卜</h3>
+                        <p>探索感情关系与爱的指引</p>
+                    </div>
+                    <div class="question-type" data-type="career">
+                        <div class="type-icon">🚀</div>
+                        <h3>事业发展</h3>
+                        <p>寻找职业道路与成功方向</p>
+                    </div>
+                    <div class="question-type" data-type="relationship">
+                        <div class="type-icon">🤝</div>
+                        <h3>人际关系</h3>
+                        <p>理解人际互动与社交智慧</p>
+                    </div>
+                    <div class="question-type" data-type="growth">
+                        <div class="type-icon">🌱</div>
+                        <h3>个人成长</h3>
+                        <p>发现内在潜能与心灵成长</p>
+                    </div>
+                    <div class="question-type" data-type="fortune">
+                        <div class="type-icon">⭐</div>
+                        <h3>日常运势</h3>
+                        <p>洞察近期运势与生活指引</p>
+                    </div>
+                </div>
+
+                <button class="back-btn" id="backToMain">
+                    <span>← 返回主页</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 卡牌抽取界面 -->
+        <div class="divination-screen hidden" id="cardDrawScreen">
+            <div class="divination-content">
+                <h2 class="divination-title">抽取三张指引卡牌</h2>
+                <p class="divination-subtitle" id="drawInstruction">请点击选择你感觉最有缘的三张卡牌</p>
+
+                <div class="card-fan-container" id="cardFanContainer">
+                    <!-- 扇形排列的卡牌将通过JavaScript动态生成 -->
+                </div>
+
+                <div class="draw-controls">
+                    <div class="selected-count">
+                        已选择 <span id="selectedCount">0</span> / 3 张
+                    </div>
+                    <button class="start-interpretation-btn hidden" id="startInterpretation">
+                        开始解读
+                    </button>
+                </div>
+
+                <button class="back-btn" id="backToQuestionType">
+                    <span>← 重新选择主题</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 结果解读界面 -->
+        <div class="divination-screen hidden" id="resultScreen">
+            <div class="divination-content">
+                <h2 class="divination-title">塔罗指引解读</h2>
+                <p class="divination-subtitle" id="resultQuestion"></p>
+
+                <div class="result-cards" id="resultCards">
+                    <!-- 抽取的三张卡牌将在这里显示 -->
+                </div>
+
+                <div class="interpretation-content" id="interpretationContent">
+                    <!-- 占卜解读内容将在这里显示 -->
+                </div>
+
+                <div class="result-controls">
+                    <button class="new-reading-btn" id="newReading">
+                        开始新的占卜
+                    </button>
+                    <button class="back-home-btn" id="backHome">
+                        返回主页
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

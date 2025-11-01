@@ -28,6 +28,7 @@ const tarotCards = [
 document.addEventListener('DOMContentLoaded', function() {
     initializeTarotCards();
     addAutoRotate();
+    initializeDivination();
 });
 
 // 全局变量
@@ -36,6 +37,12 @@ let currentRound = 1;
 const CARDS_PER_ROUND = 5;
 let cardSets = []; // 存储多套不同的卡牌
 let currentSetIndex = 0;
+
+// 占卜相关变量
+let selectedQuestionType = '';
+let selectedCards = [];
+let availableCardsForDivination = [];
+let isDivinationMode = false;
 
 // 初始化塔罗牌网格
 function initializeTarotCards() {
@@ -250,3 +257,312 @@ window.addEventListener('resize', function() {
         }
     });
 });
+
+// ==================== 占卜功能 ====================
+
+// 初始化占卜系统
+function initializeDivination() {
+    // 占卜入口按钮
+    document.getElementById('startDivination').addEventListener('click', startDivination);
+
+    // 问题类型选择
+    document.querySelectorAll('.question-type').forEach(type => {
+        type.addEventListener('click', selectQuestionType);
+    });
+
+    // 导航按钮
+    document.getElementById('backToMain').addEventListener('click', backToMain);
+    document.getElementById('backToQuestionType').addEventListener('click', backToQuestionType);
+    document.getElementById('startInterpretation').addEventListener('click', startInterpretation);
+    document.getElementById('newReading').addEventListener('click', newReading);
+    document.getElementById('backHome').addEventListener('click', backHome);
+}
+
+// 开始占卜
+function startDivination() {
+    isDivinationMode = true;
+    selectedCards = [];
+    selectedQuestionType = '';
+
+    // 停止主页面的卡牌动画
+    stopMainPageAnimation();
+
+    // 显示占卜界面
+    document.getElementById('divinationContainer').classList.add('active');
+    showScreen('questionTypeScreen');
+}
+
+// 显示指定界面
+function showScreen(screenId) {
+    document.querySelectorAll('.divination-screen').forEach(screen => {
+        screen.classList.add('hidden');
+    });
+    document.getElementById(screenId).classList.remove('hidden');
+}
+
+// 选择问题类型
+function selectQuestionType(event) {
+    const typeElement = event.currentTarget;
+    const type = typeElement.getAttribute('data-type');
+
+    // 移除之前的选中状态
+    document.querySelectorAll('.question-type').forEach(t => {
+        t.classList.remove('selected');
+    });
+
+    // 添加选中状态
+    typeElement.classList.add('selected');
+    selectedQuestionType = type;
+
+    // 延迟后进入卡牌抽取界面
+    setTimeout(() => {
+        prepareCardDraw();
+        showScreen('cardDrawScreen');
+    }, 500);
+}
+
+// 准备卡牌抽取
+function prepareCardDraw() {
+    // 重置抽取状态
+    selectedCards = [];
+    updateSelectedCount();
+
+    // 生成可抽取的卡牌（从完整牌组中随机选择7张）
+    availableCardsForDivination = shuffleArray([...tarotCards]).slice(0, 7);
+
+    // 显示扇形排列的卡牌
+    createFanCards();
+
+    // 更新问题提示
+    updateQuestionPrompt();
+}
+
+// 更新问题提示
+function updateQuestionPrompt() {
+    const promptElement = document.getElementById('drawInstruction');
+    const prompts = {
+        love: '请为你的爱情问题选择三张指引卡牌',
+        career: '请为你的事业发展选择三张指引卡牌',
+        relationship: '请为你的人际关系选择三张指引卡牌',
+        growth: '请为你的个人成长选择三张指引卡牌',
+        fortune: '请为你的日常运势选择三张指引卡牌'
+    };
+
+    promptElement.textContent = prompts[selectedQuestionType] || '请选择三张指引卡牌';
+}
+
+// 创建扇形排列的卡牌
+function createFanCards() {
+    const container = document.getElementById('cardFanContainer');
+    container.innerHTML = '';
+
+    const cards = availableCardsForDivination;
+    const totalCards = cards.length;
+    const angleRange = 120; // 扇形角度范围
+    const startAngle = -angleRange / 2;
+
+    cards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'fan-card';
+        cardElement.setAttribute('data-card-id', card.id);
+        cardElement.setAttribute('data-index', index);
+
+        // 计算扇形位置
+        const angle = startAngle + (angleRange / (totalCards - 1)) * index;
+        const radius = 150; // 扇形半径
+        const x = Math.sin(angle * Math.PI / 180) * radius;
+        const y = -Math.cos(angle * Math.PI / 180) * 50;
+
+        cardElement.style.transform = `translateX(${x}px) translateY(${y}px) rotate(${angle}deg)`;
+
+        // 创建卡牌内容（只显示卡背）
+        cardElement.innerHTML = `
+            <div class="card-face card-back">
+                <img src="images/塔罗牌背面.png" alt="塔罗牌背面" loading="eager">
+            </div>
+        `;
+
+        // 添加点击事件
+        cardElement.addEventListener('click', () => selectCard(cardElement, card));
+
+        container.appendChild(cardElement);
+
+        // 添加进入动画
+        setTimeout(() => {
+            cardElement.style.opacity = '1';
+            cardElement.style.transform += ' scale(1)';
+        }, index * 100);
+    });
+}
+
+// 选择卡牌
+function selectCard(cardElement, cardData) {
+    if (selectedCards.length >= 3) return;
+    if (cardElement.classList.contains('selected')) return;
+
+    // 添加选中效果
+    cardElement.classList.add('selected');
+
+    // 添加到已选卡牌
+    selectedCards.push({
+        ...cardData,
+        element: cardElement
+    });
+
+    // 更新计数
+    updateSelectedCount();
+
+    // 禁用其他卡牌的hover效果
+    document.querySelectorAll('.fan-card:not(.selected)').forEach(card => {
+        card.style.opacity = '0.7';
+    });
+
+    // 如果选满了3张，显示解读按钮
+    if (selectedCards.length === 3) {
+        setTimeout(() => {
+            document.getElementById('startInterpretation').classList.remove('hidden');
+            document.querySelectorAll('.fan-card:not(.selected)').forEach(card => {
+                card.classList.add('disabled');
+            });
+        }, 800);
+    }
+}
+
+// 更新已选择卡牌数量
+function updateSelectedCount() {
+    document.getElementById('selectedCount').textContent = selectedCards.length;
+}
+
+// 开始解读
+function startInterpretation() {
+    if (selectedCards.length !== 3) return;
+
+    // 生成解读内容
+    const interpretation = generateInterpretation();
+
+    // 显示结果界面
+    showResultScreen(interpretation);
+}
+
+// 生成占卜解读
+function generateInterpretation() {
+    const questionNames = {
+        love: '爱情占卜',
+        career: '事业发展',
+        relationship: '人际关系',
+        growth: '个人成长',
+        fortune: '日常运势'
+    };
+
+    // 生成综合解读
+    const cards = selectedCards.map(c => c.name).join('、');
+    const baseInterpretation = `你抽取的三张牌是${cards}。`;
+
+    // 根据不同问题类型生成解读
+    const specificInterpretations = {
+        love: `${baseInterpretation}这些卡牌暗示着你的感情生活将迎来重要的转折。第一张牌代表现状，第二张牌显示挑战，第三张牌指引未来。建议你保持开放的心态，真诚面对内心的感受。`,
+        career: `${baseInterpretation}这些卡牌表明你的事业发展正处于关键时期。它们提示你需要发挥领导才能，同时保持谦逊学习的态度。新的机会即将出现，要勇于把握。`,
+        relationship: `${baseInterpretation}这些卡牌反映着你的人际关系状况。它们建议你加强沟通，理解他人立场，同时保持自己的原则。和谐的关系建立在相互尊重的基础上。`,
+        growth: `${baseInterpretation}这些卡牌指向你内在成长的路径。它们鼓励你探索内心深处，面对真正的自己，释放潜能。这个过程需要勇气和耐心。`,
+        fortune: `${baseInterpretation}这些卡牌预示着你近期的运势走向。它们提醒你保持积极心态，抓住机遇，同时也要谨慎处理可能出现的变化。`
+    };
+
+    return {
+        question: questionNames[selectedQuestionType],
+        cards: selectedCards,
+        interpretation: specificInterpretations[selectedQuestionType] || baseInterpretation,
+        guidance: '相信自己的直觉，这些指引将帮助你找到前行的方向。记住，命运掌握在自己手中。'
+    };
+}
+
+// 显示结果界面
+function showResultScreen(interpretation) {
+    // 设置问题标题
+    document.getElementById('resultQuestion').textContent = interpretation.question;
+
+    // 显示抽取的三张卡牌
+    const resultCardsContainer = document.getElementById('resultCards');
+    resultCardsContainer.innerHTML = '';
+
+    interpretation.cards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'result-card';
+        cardElement.innerHTML = `
+            <img src="images/${card.file}" alt="${card.name}">
+            <h4>${card.name}</h4>
+            <div class="english-name">${card.english}</div>
+            <div class="meaning">${card.meaning}</div>
+        `;
+        resultCardsContainer.appendChild(cardElement);
+
+        // 添加动画延迟
+        setTimeout(() => {
+            cardElement.style.opacity = '1';
+            cardElement.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+
+    // 显示解读内容
+    const interpretationContent = document.getElementById('interpretationContent');
+    interpretationContent.innerHTML = `
+        <h3>塔罗指引</h3>
+        <div class="interpretation-text">${interpretation.interpretation}</div>
+        <div class="guidance">${interpretation.guidance}</div>
+    `;
+
+    // 切换到结果界面
+    showScreen('resultScreen');
+}
+
+// 新的占卜
+function newReading() {
+    selectedCards = [];
+    selectedQuestionType = '';
+    showScreen('questionTypeScreen');
+}
+
+// 返回主页
+function backHome() {
+    isDivinationMode = false;
+    document.getElementById('divinationContainer').classList.remove('active');
+    startMainPageAnimation();
+}
+
+// 返回问题类型选择
+function backToQuestionType() {
+    selectedCards = [];
+    showScreen('questionTypeScreen');
+}
+
+// 返回主页面
+function backToMain() {
+    isDivinationMode = false;
+    document.getElementById('divinationContainer').classList.remove('active');
+    startMainPageAnimation();
+}
+
+// 停止主页面动画
+function stopMainPageAnimation() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.style.animationPlayState = 'paused';
+    });
+}
+
+// 开始主页面动画
+function startMainPageAnimation() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.style.animationPlayState = 'running';
+    });
+}
+
+// 工具函数：洗牌算法
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}

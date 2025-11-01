@@ -324,6 +324,443 @@ h1 {
 
 
 
+/* 占卜入口按钮 */
+.divination-entrance {
+    text-align: center;
+    margin: 60px 0;
+    padding: 40px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.divination-btn {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%);
+    border: none;
+    border-radius: 15px;
+    padding: 20px 40px;
+    color: #1e1e2e;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto;
+    min-width: 280px;
+}
+
+.divination-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.divination-btn:hover::before {
+    left: 100%;
+}
+
+.divination-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(212, 175, 55, 0.4);
+}
+
+.divination-btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    font-size: 2.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.btn-text {
+    font-size: 1.4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.btn-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-weight: normal;
+    letter-spacing: 1px;
+}
+
+/* 占卜界面容器 */
+.divination-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 50%, #1a1a2e 100%);
+    z-index: 1000;
+    display: none;
+    overflow-y: auto;
+}
+
+.divination-container.active {
+    display: block;
+}
+
+.divination-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.divination-content {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+.divination-title {
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, #d4af37, #f4e4c1, #d4af37);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.divination-subtitle {
+    font-size: 1.1rem;
+    color: #b8b8b8;
+    margin-bottom: 40px;
+    font-style: italic;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 问题类型选择 */
+.question-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.question-type {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    border-radius: 15px;
+    padding: 30px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.question-type:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: rgba(212, 175, 55, 0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+}
+
+.question-type.selected {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.type-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.question-type h3 {
+    color: #d4af37;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.question-type p {
+    color: #999;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 返回按钮 */
+.back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+    padding: 12px 25px;
+    color: #d4af37;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.back-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: #d4af37;
+}
+
+/* 卡牌抽取界面 */
+.card-fan-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    margin: 40px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fan-card {
+    position: absolute;
+    width: 120px;
+    height: 180px;
+    cursor: pointer;
+    transition: all 0.6s cubic-bezier(0.4, 0.1, 0.2, 1);
+    transform-origin: bottom center;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    .fan-card {
+        transition: all 0.4s ease;
+    }
+}
+
+.fan-card:hover {
+    transform: translateY(-20px) scale(1.1);
+    z-index: 10;
+}
+
+.fan-card.selected {
+    transform: translateY(-60px) scale(1.15) rotateY(180deg);
+    z-index: 20;
+    pointer-events: none;
+}
+
+.fan-card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(0.5);
+}
+
+/* 抽取控制按钮 */
+.draw-controls {
+    margin: 40px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.selected-count {
+    font-size: 1.2rem;
+    color: #d4af37;
+    font-weight: bold;
+}
+
+.start-interpretation-btn {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 15px 30px;
+    color: #1e1e2e;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+}
+
+.start-interpretation-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+/* 结果解读界面 */
+.result-cards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    width: 200px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.result-card:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: rgba(212, 175, 55, 0.5);
+    transform: translateY(-5px);
+}
+
+.result-card img {
+    width: 120px;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+.result-card h4 {
+    color: #d4af37;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.result-card .english-name {
+    color: #999;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.result-card .meaning {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.interpretation-content {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 30px 0;
+    backdrop-filter: blur(10px);
+    text-align: left;
+}
+
+.interpretation-content h3 {
+    color: #d4af37;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.interpretation-content .interpretation-text {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.interpretation-content .guidance {
+    background: rgba(212, 175, 55, 0.1);
+    border-left: 4px solid #d4af37;
+    padding: 15px;
+    margin-top: 20px;
+    font-style: italic;
+}
+
+.result-controls {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.new-reading-btn, .back-home-btn {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 15px 30px;
+    color: #1e1e2e;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+}
+
+.back-home-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+}
+
+.new-reading-btn:hover, .back-home-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .divination-title {
+        font-size: 2rem;
+    }
+
+    .question-types {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .question-type {
+        padding: 20px 15px;
+    }
+
+    .card-fan-container {
+        height: 300px;
+    }
+
+    .fan-card {
+        width: 80px;
+        height: 120px;
+    }
+
+    .result-cards {
+        gap: 20px;
+    }
+
+    .result-card {
+        width: 150px;
+        padding: 15px;
+    }
+
+    .result-card img {
+        width: 80px;
+        height: 120px;
+    }
+
+    .result-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
 footer {
     text-align: center;
     padding: 30px 0;
