@@ -128,6 +128,10 @@ h1 {
     flex: 0 0 auto;
     will-change: transform;
     backface-visibility: hidden;
+    /* 确保比例保持1.5:1 */
+    aspect-ratio: 2/3;
+    max-width: 220px;
+    max-height: 330px;
 }
 
 .card.flipped {
@@ -205,44 +209,84 @@ footer {
     color: #666;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
+    .container {
+        padding: 25px;
+    }
+
+    .artistic-title {
+        font-size: 4rem;
+        letter-spacing: 6px;
+    }
+
+    .cards-grid {
+        gap: 25px;
+    }
+
+    .card {
+        width: 200px;
+        height: 300px;
+        max-width: 200px;
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 1024px) {
     .container {
         padding: 20px;
     }
 
-    h1 {
-        font-size: 2.5rem;
-    }
-
     .artistic-title {
-        font-size: 3rem;
-        letter-spacing: 4px;
+        font-size: 3.5rem;
+        letter-spacing: 5px;
     }
 
-  
     .cards-grid {
-        grid-template-columns: repeat(auto-fit, 240px);
-        gap: 20px;
+        gap: 22px;
     }
 
     .card {
-        width: 240px;
-        height: 360px;
-    }
-
-    .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 360'%3E%3Crect x='0' y='0' width='240' height='360' rx='15' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 360'%3E%3Crect x='0' y='0' width='240' height='360' rx='15' fill='white'/%3E%3C/svg%3E");
+        width: 180px;
+        height: 270px;
+        max-width: 180px;
+        max-height: 270px;
     }
 }
 
-@media (max-width: 480px) {
-    h1 {
-        font-size: 2rem;
+@media (max-width: 768px) {
+    .container {
+        padding: 18px;
     }
 
     .artistic-title {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
+        letter-spacing: 3px;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
+    .cards-grid {
+        gap: 18px;
+        justify-content: center;
+    }
+
+    .card {
+        width: 160px;
+        height: 240px;
+        max-width: 160px;
+        max-height: 240px;
+    }
+}
+
+@media (max-width: 650px) {
+    .container {
+        padding: 15px;
+    }
+
+    .artistic-title {
+        font-size: 2.4rem;
         letter-spacing: 2px;
     }
 
@@ -250,19 +294,96 @@ footer {
         font-size: 1rem;
     }
 
-    
     .cards-grid {
-        grid-template-columns: repeat(auto-fit, 200px);
         gap: 15px;
+        justify-content: center;
     }
 
     .card {
-        width: 200px;
-        height: 300px;
+        width: 140px;
+        height: 210px;
+        max-width: 140px;
+        max-height: 210px;
+    }
+}
+
+@media (max-width: 550px) {
+    .container {
+        padding: 12px;
     }
 
-    .card-face img {
-        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect x='0' y='0' width='200' height='300' rx='15' fill='white'/%3E%3C/svg%3E");
-        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Crect x='0' y='0' width='200' height='300' rx='15' fill='white'/%3E%3C/svg%3E");
+    .artistic-title {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .cards-grid {
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .card {
+        width: 120px;
+        height: 180px;
+        max-width: 120px;
+        max-height: 180px;
+    }
+}
+
+@media (max-width: 450px) {
+    .container {
+        padding: 10px;
+    }
+
+    .artistic-title {
+        font-size: 1.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .cards-grid {
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .card {
+        width: 100px;
+        height: 150px;
+        max-width: 100px;
+        max-height: 150px;
+    }
+}
+
+@media (max-width: 380px) {
+    .container {
+        padding: 8px;
+    }
+
+    .artistic-title {
+        font-size: 1.6rem;
+        letter-spacing: 0px;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+    }
+
+    .cards-grid {
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .card {
+        width: 85px;
+        height: 127.5px;
+        max-width: 85px;
+        max-height: 127.5px;
     }
 }
