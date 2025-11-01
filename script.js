@@ -377,7 +377,7 @@ function getRandomCardsForRound() {
         AppState.displayedCards.push(shuffled[i].id);
     }
 
-    console.log(`生成随机组合${AppState.currentRound}:`, selectedCards.map(card => card.name));
+    console.log(`生成随机组合${AppState.currentRound}: 已选择${selectedCards.length}张卡牌`);
     AppState.currentRound++;
 
     return selectedCards;
@@ -403,7 +403,7 @@ function switchToNextCardSet() {
 
         // 立即更新图片（因为卡牌已经在背面位置）
         updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
-        console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}:`, AppState.cardSets[AppState.currentSetIndex].map(card => card.name));
+        console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}: 已切换到新卡牌组`);
 
     // 预生成更多卡牌组，确保有足够的随机组合
     if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复
@@ -773,8 +773,6 @@ function createProfessionalTarotCard(card, index) {
 // 处理专业卡牌选择
 function handleProfessionalCardSelection(card, cardElement) {
     try {
-        console.log(`🎴 选择塔罗牌: ${card.name}`);
-
         // 检查选择限制
         if (AppState.selectedCards.length >= 3) {
             console.log('⚠️ 已选择3张卡牌，无法继续选择');
@@ -788,7 +786,7 @@ function handleProfessionalCardSelection(card, cardElement) {
 
         // 随机正位逆位
         const isReversed = Math.random() < 0.30;
-        console.log(`🔄 ${card.name} - ${isReversed ? '逆位' : '正位'} (第${AppState.selectedCards.length + 1}张)`);
+        console.log(`🔄 选择了第${AppState.selectedCards.length + 1}张卡牌 - ${isReversed ? '逆位' : '正位'}`);
 
         // 标记为已选择
         cardElement.classList.add('selected');
@@ -822,7 +820,7 @@ function handleProfessionalCardSelection(card, cardElement) {
 // 专业卡牌翻转
 function flipProfessionalCard(cardElement, card, isReversed) {
     try {
-        console.log(`🔄 翻转卡牌: ${card.name}`);
+        console.log(`🔄 卡牌正在翻转...`);
 
         // 添加翻转动画
         cardElement.style.transition = 'transform 0.8s cubic-bezier(0.4, 0.1, 0.2, 1)';
@@ -1061,7 +1059,7 @@ function createOptimizedTarotCard(card, index) {
 // 处理优化卡牌选择
 function handleOptimizedCardSelection(card, cardElement) {
     try {
-        console.log(`选择卡牌: ${card.name}`);
+        console.log(`选择卡牌: 第${AppState.selectedCards.length + 1}张卡牌`);
 
         // 检查是否已选择3张
         if (AppState.selectedCards.length >= 3) {
@@ -1078,7 +1076,7 @@ function handleOptimizedCardSelection(card, cardElement) {
         // 随机正位逆位
         const isReversed = Math.random() < 0.30;
 
-        console.log(`${card.name} - ${isReversed ? '逆位' : '正位'}`);
+        console.log(`第${AppState.selectedCards.length + 1}张卡牌 - ${isReversed ? '逆位' : '正位'}`);
 
         // 添加选中状态
         cardElement.classList.add('selected');
@@ -1385,7 +1383,7 @@ function addTarotScrollAnimation() {
 // 处理塔罗牌选择
 function handleTarotCardSelection(card, cardElement) {
     try {
-        console.log(`选择塔罗牌: ${card.name}`);
+        console.log(`选择塔罗牌: 第${AppState.selectedCards.length + 1}张卡牌`);
 
         // 如果已选择3张，不允许再选择
         if (AppState.selectedCards.length >= 3) {
@@ -1403,7 +1401,7 @@ function handleTarotCardSelection(card, cardElement) {
         const isReversed = Math.random() < 0.30;
         const orientation = isReversed ? 'reversed' : 'upright';
 
-        console.log(`${card.name} - ${isReversed ? '逆位' : '正位'} (第${AppState.selectedCards.length + 1}张)`);
+        console.log(`第${AppState.selectedCards.length + 1}张卡牌 - ${isReversed ? '逆位' : '正位'}`);
 
         // 添加选中状态
         cardElement.classList.add('selected');
@@ -1438,7 +1436,7 @@ function handleTarotCardSelection(card, cardElement) {
 // 翻转塔罗牌显示正面
 function flipTarotCard(cardElement, card, isReversed) {
     try {
-        console.log(`翻转卡牌: ${card.name}`);
+        console.log(`卡牌正在翻转...`);
 
         // 添加翻转动画
         cardElement.style.transition = 'transform 0.8s cubic-bezier(0.4, 0.1, 0.2, 1)';
@@ -1899,14 +1897,14 @@ function createScrollCards() {
 
         // 第一组卡牌
         cards.forEach((card, index) => {
-            console.log(`创建第一组卡牌 ${index}:`, card.name);
+            console.log(`创建第一组卡牌 ${index}`);
             const cardElement = createScrollCard(card, index);
             track.appendChild(cardElement);
         });
 
         // 第二组卡牌（用于无缝循环）
         cards.forEach((card, index) => {
-            console.log(`创建第二组卡牌 ${index}:`, card.name);
+            console.log(`创建第二组卡牌 ${index}`);
             const cardElement = createScrollCard(card, index + cards.length);
             track.appendChild(cardElement);
         });
@@ -1932,7 +1930,7 @@ function createScrollCards() {
 // 创建单个滚动卡牌元素
 function createScrollCard(card, index) {
     try {
-        console.log(`创建滚动卡牌: ${card.name} (索引: ${index})`);
+        console.log(`创建滚动卡牌: 索引 ${index}`);
 
         const cardElement = document.createElement('div');
         cardElement.className = 'scroll-card';
@@ -1955,7 +1953,7 @@ function createScrollCard(card, index) {
         // 添加点击事件
         cardElement.addEventListener('click', (e) => {
             e.stopPropagation();
-            console.log(`点击滚动卡牌: ${card.name}`);
+            console.log(`点击滚动卡牌: 索引 ${originalIndex}`);
             selectScrollCard(cardElement, card, originalIndex);
         });
 
@@ -1963,7 +1961,7 @@ function createScrollCard(card, index) {
 
         return cardElement;
     } catch (error) {
-        console.error(`创建滚动卡牌失败 (${card.name}):`, error);
+        console.error(`创建滚动卡牌失败 (索引 ${index}):`, error);
         return document.createElement('div'); // 返回空元素避免崩溃
     }
 }
@@ -1979,7 +1977,7 @@ function selectScrollCard(cardElement, cardData, originalIndex) {
     const isReversed = Math.random() < 0.30;
     const orientation = isReversed ? 'reversed' : 'upright';
 
-    console.log(`选择卡牌: ${cardData.name} - ${isReversed ? '逆位' : '正位'} (第${AppState.selectedCards.length + 1}张)`);
+    console.log(`选择卡牌: 第${AppState.selectedCards.length + 1}张 - ${isReversed ? '逆位' : '正位'}`);
 
     // 从可用卡牌中移除已选择的卡牌，确保不重复
     const cardIndex = AppState.availableCardsForDivination.findIndex(card => card.id === cardData.id);
