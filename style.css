@@ -571,8 +571,8 @@ h1 {
 
 .scroll-card {
     flex-shrink: 0;
-    width: 180px;
-    height: 270px;
+    width: 200px;
+    height: 300px;
     cursor: pointer;
     transition: all 0.3s ease;
     opacity: 1; /* 修改：默认显示，避免移动端看不到 */
@@ -913,8 +913,8 @@ h1 {
     }
 
     .scroll-card {
-        width: 130px;
-        height: 195px;
+        width: 160px;
+        height: 240px;
     }
 
     .card-track {
@@ -1055,6 +1055,16 @@ footer {
 
 /* 超小屏幕优化 - 480px以下 */
 @media (max-width: 480px) {
+    /* 滚动卡牌超小屏优化 */
+    .scroll-card {
+        width: 120px;
+        height: 180px;
+    }
+
+    .card-fan-container {
+        height: 180px;
+    }
+
     .result-cards {
         gap: 12px;
         padding: 8px 0;
@@ -1105,6 +1115,16 @@ footer {
 
     .subtitle {
         font-size: 1rem;
+    }
+
+    /* 滚动卡牌移动端优化 */
+    .scroll-card {
+        width: 140px;
+        height: 210px;
+    }
+
+    .card-fan-container {
+        height: 200px;
     }
 
     /* 结果卡牌移动端优化 */
