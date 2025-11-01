@@ -689,16 +689,17 @@ function createSimpleCards() {
 
 // 创建专业滚动系统
 function createProfessionalScrollSystem(cards) {
-    // 创建外层容器
+    // 创建外层容器 - 移除外框样式
     const outerContainer = document.createElement('div');
     outerContainer.style.cssText = `
         width: 100%;
         height: 100%;
         position: relative;
         overflow: hidden;
-        background: linear-gradient(135deg, rgba(45, 27, 61, 0.4), rgba(26, 26, 46, 0.4));
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
     `;
 
     // 创建滚动轨道容器
