@@ -71,9 +71,34 @@ function displayCardSet(cardSet) {
                 <img src="images/${card.file}" alt="${card.name}" loading="lazy">
             </div>
             <div class="card-face card-back">
-                <img src="images/塔罗牌背面.png" alt="塔罗牌背面">
+                <img src="images/塔罗牌背面.png" alt="塔罗牌背面" loading="eager">
             </div>
         `;
+
+        // 移动端调试：强制加载卡背图片
+        if (window.innerWidth <= 1200) {
+            const backImg = cardElement.querySelector('.card-back img');
+            if (backImg) {
+                // 强制重新加载图片
+                const src = backImg.src;
+                backImg.src = '';
+                backImg.src = src + '?t=' + Date.now();
+
+                // 添加错误处理
+                backImg.onerror = function() {
+                    console.error('卡背图片加载失败:', src);
+                    // 如果加载失败，显示备用样式
+                    this.style.display = 'none';
+                    const cardBack = this.parentElement;
+                    cardBack.style.background = 'linear-gradient(135deg, #2d1b3d, #1a1a2e)';
+                    cardBack.innerHTML += '<div style="color: #d4af37; font-size: 2rem; text-align: center;">背面</div>';
+                };
+
+                backImg.onload = function() {
+                    console.log('卡背图片加载成功:', src);
+                };
+            }
+        }
 
         // 纯展示模式，移除所有交互效果
         // 不添加点击事件，卡牌仅用于展示

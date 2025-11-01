@@ -116,9 +116,20 @@ h1 {
     width: 220px;
     height: 330px;
     position: relative;
+    /* 移动端3D支持 - 添加所有前缀 */
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
     transform-style: preserve-3d;
+
+    -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.1, 0.2, 1);
+    -moz-transition: transform 0.6s cubic-bezier(0.4, 0.1, 0.2, 1);
     transition: transform 0.6s cubic-bezier(0.4, 0.1, 0.2, 1);
+
+    -webkit-animation: autoSpin 8s linear infinite;
+    -moz-animation: autoSpin 8s linear infinite;
     animation: autoSpin 8s linear infinite;
+
     cursor: default;
     border: none !important;
     outline: none !important;
@@ -127,11 +138,20 @@ h1 {
     background: transparent !important;
     flex: 0 0 auto;
     will-change: transform;
+
+    /* 移动端backface-visibility支持 */
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
     backface-visibility: hidden;
+
     /* 确保比例保持1.5:1 */
     aspect-ratio: 2/3;
     max-width: 220px;
     max-height: 330px;
+
+    /* 移动端GPU加速 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 /* 移动端专用：确保卡牌背面显示 */
@@ -140,14 +160,59 @@ h1 {
         visibility: visible !important;
         opacity: 1 !important;
         display: flex !important;
+
+        /* 强制transform - 所有前缀 */
+        -webkit-transform: rotateY(180deg) !important;
+        -moz-transform: rotateY(180deg) !important;
+        -ms-transform: rotateY(180deg) !important;
         transform: rotateY(180deg) !important;
+
+        /* 强制backface-visibility - 所有前缀 */
+        -webkit-backface-visibility: hidden !important;
+        -moz-backface-visibility: hidden !important;
+        -ms-backface-visibility: hidden !important;
         backface-visibility: hidden !important;
+
+        /* 移动端特殊处理 */
+        -webkit-perspective: 1000px !important;
+        perspective: 1000px !important;
+
+        /* 强制GPU加速 */
+        -webkit-transform: rotateY(180deg) translateZ(0) !important;
+        transform: rotateY(180deg) translateZ(0) !important;
     }
 
     .card-back img {
         visibility: visible !important;
         opacity: 1 !important;
         display: block !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+
+        /* 强制GPU加速 */
+        -webkit-transform: translateZ(0) !important;
+        transform: translateZ(0) !important;
+    }
+
+    /* 移动端动画优化 */
+    .card {
+        -webkit-animation-fill-mode: both !important;
+        animation-fill-mode: both !important;
+    }
+
+    /* 确保动画在移动端正常工作 */
+    @-webkit-keyframes autoSpin {
+        0% {
+            -webkit-transform: rotateY(0deg);
+            transform: rotateY(0deg);
+        }
+        100% {
+            -webkit-transform: rotateY(360deg);
+            transform: rotateY(360deg);
+        }
     }
 }
 
@@ -169,7 +234,13 @@ h1 {
     position: absolute;
     width: 100%;
     height: 100%;
+
+    /* 移动端backface-visibility完整支持 */
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
     backface-visibility: hidden;
+
     border-radius: 15px;
     padding: 0;
     margin: 0;
@@ -180,6 +251,10 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    /* 移动端GPU加速 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 .card-front {
@@ -190,11 +265,25 @@ h1 {
 .card-back {
     background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 50%, #1a1a2e 100%);
     color: #e0e0e0;
+
+    /* 移动端transform完整支持 */
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    -ms-transform: rotateY(180deg);
     transform: rotateY(180deg);
+
     /* 强制显示确保移动端可见 */
     visibility: visible !important;
     opacity: 1 !important;
     display: flex !important;
+
+    /* 移动端特殊处理 */
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+
+    /* 移动端GPU加速 */
+    -webkit-transform: rotateY(180deg) translateZ(0);
+    transform: rotateY(180deg) translateZ(0);
 }
 
 .card-face img {
