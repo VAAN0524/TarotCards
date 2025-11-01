@@ -2442,6 +2442,10 @@ function startInterpretation() {
 
 // 生成占卜解读 - 优化版本，包含时间维度深度解读
 function generateInterpretation() {
+    console.log('🔮 开始生成占卜解读...');
+    console.log('AppState.selectedCards:', AppState.selectedCards);
+    console.log('AppState.selectedQuestionType:', AppState.selectedQuestionType);
+
     const questionNames = {
         love: '爱情占卜<br><span style="font-size:0.7em;color:rgba(212,175,55,0.8);">Love Reading</span>',
         career: '事业发展<br><span style="font-size:0.7em;color:rgba(212,175,55,0.8);">Career Development</span>',
@@ -3097,6 +3101,13 @@ function generateInterpretation() {
     const fortuneIndex = calculateFortuneIndex();
     const harmonyIndex = calculateHarmonyIndex();
     const storylineInterpretation = generateStorylineInterpretation();
+    const timeBasedAnalysis = generateTimeBasedInterpretation();
+
+    console.log('📊 生成的时间维度分析:', timeBasedAnalysis);
+    console.log('📈 开始分析整体趋势...');
+
+    const overallTrend = analyzeOverallTrend(timeBasedAnalysis);
+    console.log('📈 趋势分析完成');
 
     return {
         question: questionNames[AppState.selectedQuestionType],
@@ -3104,8 +3115,8 @@ function generateInterpretation() {
         storylineInterpretation: storylineInterpretation,
         fortuneIndex: fortuneIndex,
         harmonyIndex: harmonyIndex,
-        timeBasedAnalysis: generateTimeBasedInterpretation(),
-        overallTrend: analyzeOverallTrend(generateTimeBasedInterpretation()),
+        timeBasedAnalysis: timeBasedAnalysis,
+        overallTrend: overallTrend,
         guidance: `塔罗牌通过时间维度为你揭示了事物发展的完整轨迹。记住，过去无法改变，但可以从中学习；现在是你行动的力量所在；未来充满了无限的可能性。相信自己的选择，勇敢地书写属于你的命运故事。<br><span style="font-size:0.85em;color:rgba(184,184,184,0.8);">The Tarot cards reveal the complete trajectory of development through time dimensions. Remember, the past cannot be changed, but you can learn from it; the present is where your power to act lies; the future is filled with infinite possibilities. Trust your choices and bravely write your own destiny story.</span>`
     };
 }
