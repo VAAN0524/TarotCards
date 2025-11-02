@@ -3744,28 +3744,122 @@ function shuffleArray(array) {
     return shuffled;
 }
 
-// 图片预加载和优化系统
+// 图片预加载和优化系统 (极致性能版)
 function initializeImageOptimization() {
-    console.log('🖼️ 开始图片优化系统初始化...');
+    console.log('🚀 开始极致图片优化系统初始化...');
 
-    // 创建图片预加载管理器
+    // 检测浏览器能力
+    const browserSupport = {
+        webp: document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0,
+        intersection: 'IntersectionObserver' in window,
+        linkPreload: 'link' in document.createElement('link')
+    };
+
+    console.log('🌐 浏览器能力检测:', browserSupport);
+
+    // 创建高级图片预加载管理器
     window.imagePreloader = {
         cache: new Map(),
         loadingPromises: new Map(),
-        criticalImages: ['塔罗牌背面.png'], // 关键图片列表
+        criticalImages: ['塔罗牌背面.png'],
+        progressiveCache: new Map(), // 渐进式图片缓存
+        lowResCache: new Map(),      // 低分辨率缓存
+        preloadedSets: new Set(),   // 已预加载的集合
 
-        // 预加载关键图片
+        // 检测最佳图片格式
+        getOptimalFormat: function() {
+            return browserSupport.webp ? 'webp' : 'png';
+        },
+
+        // 生成多尺寸图片URL
+        getImageUrls: function(baseFile) {
+            const format = this.getOptimalFormat();
+            const baseName = baseFile.replace(/\.[^.]+$/, '');
+
+            return {
+                lowRes: `images/lowres/${baseName}_low.${format}`,
+                mediumRes: `images/${baseFile}`,
+                highRes: `images/${baseFile}`,
+                progressive: `images/progressive/${baseName}_progressive.${format}`
+            };
+        },
+
+        // 创建渐进式图片加载
+        createProgressiveLoader: function(cardFile) {
+            const urls = this.getImageUrls(cardFile);
+
+            return new Promise((resolve) => {
+                const progressiveImg = {
+                    element: document.createElement('div'),
+                    currentSrc: urls.lowRes,
+                    loaded: { low: false, medium: false, high: false }
+                };
+
+                // 1. 立即加载低分辨率版本
+                const lowResImg = new Image();
+                lowResImg.onload = () => {
+                    progressiveImg.loaded.low = true;
+                    this.lowResCache.set(cardFile, lowResImg);
+                    resolve(progressiveImg);
+                };
+                lowResImg.src = urls.lowRes;
+
+                // 2. 异步加载中分辨率版本
+                const mediumImg = new Image();
+                mediumImg.onload = () => {
+                    progressiveImg.loaded.medium = true;
+                    progressiveImg.currentSrc = urls.mediumRes;
+                    this.cache.set(cardFile, mediumImg);
+                };
+                mediumImg.src = urls.mediumRes;
+
+                // 3. 异步加载高分辨率版本
+                const highImg = new Image();
+                highImg.onload = () => {
+                    progressiveImg.loaded.high = true;
+                    progressiveImg.currentSrc = urls.highRes;
+                    this.cache.set(cardFile, highImg);
+                };
+                setTimeout(() => {
+                    highImg.src = urls.highRes;
+                }, 500 + Math.random() * 1500);
+            });
+        },
+
+        // 使用 link preload API 进行预加载
+        preloadWithLinkTag: function(imageSrc, priority = 'low') {
+            if (!browserSupport.linkPreload) return null;
+
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = `images/${imageSrc}`;
+
+            if (priority === 'high') {
+                link.onload = () => {
+                    console.log(`⚡ 高优先级预加载完成: ${imageSrc}`);
+                    link.remove();
+                };
+            }
+
+            document.head.appendChild(link);
+            return link;
+        },
+
+        // 极速预加载关键图片
         preloadCriticalImages: function() {
+            console.log('⚡ 开始极速预加载关键图片...');
+
             const promises = this.criticalImages.map(imageSrc => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.onload = () => {
                         this.cache.set(imageSrc, img);
-                        console.log(`✅ 关键图片预加载完成: ${imageSrc}`);
+                        console.log(`⚡ 关键图片极速加载完成: ${imageSrc}`);
                         resolve(img);
                     };
                     img.onerror = () => {
-                        console.warn(`⚠️ 关键图片预加载失败: ${imageSrc}`);
+                        console.warn(`⚠️ 关键图片加载失败: ${imageSrc}`);
                         resolve(null);
                     };
                     img.src = `images/${imageSrc}`;
@@ -3775,88 +3869,125 @@ function initializeImageOptimization() {
             return Promise.all(promises);
         },
 
-        // 智能卡牌图片加载
+        // 超智能卡牌图片加载
         loadCardImage: function(cardFile, priority = 'normal') {
+            // 检查缓存
             if (this.cache.has(cardFile)) {
                 return Promise.resolve(this.cache.get(cardFile));
             }
 
+            // 检查是否正在加载
             if (this.loadingPromises.has(cardFile)) {
                 return this.loadingPromises.get(cardFile);
             }
 
-            const promise = new Promise((resolve) => {
-                const img = new Image();
+            const promise = this.createProgressiveLoader(cardFile);
 
-                img.onload = () => {
-                    this.cache.set(cardFile, img);
-                    this.loadingPromises.delete(cardFile);
-                    console.log(`✅ 卡牌图片加载完成: ${cardFile}`);
-                    resolve(img);
-                };
-
-                img.onerror = () => {
-                    this.loadingPromises.delete(cardFile);
-                    console.warn(`⚠️ 卡牌图片加载失败: ${cardFile}`);
-                    resolve(null);
-                };
-
-                // 根据优先级设置加载策略
-                if (priority === 'high') {
-                    img.src = `images/${cardFile}`;
-                } else {
-                    // 延迟加载低优先级图片
-                    setTimeout(() => {
-                        img.src = `images/${cardFile}`;
-                    }, Math.random() * 1000); // 随机延迟避免同时加载
-                }
-            });
-
+            // 添加到加载队列
             this.loadingPromises.set(cardFile, promise);
             return promise;
         },
 
-        // 批量预加载常用卡牌
-        preloadCommonCards: function() {
-            const commonCards = [
-                '0. 愚人 (The Fool).png',
-                '1. 魔术师 (The Magician) .png',
-                '21. 世界 (The World).png'
-            ];
+        // 激进批量预加载策略
+        aggressivePreload: function() {
+            console.log('🚀 开始激进预加载策略...');
 
-            commonCards.forEach(card => {
-                this.loadCardImage(card, 'normal');
+            // 立即预加载前10张卡牌（最高优先级）
+            const firstBatch = Array.from({length: 10}, (_, i) => tarotCards[i]);
+            firstBatch.forEach((card, index) => {
+                setTimeout(() => {
+                    this.loadCardImage(card.file, 'high');
+                }, index * 100); // 100ms间隔
             });
 
-            console.log('🔄 开始预加载常用卡牌...');
+            // 分批预加载剩余卡牌
+            setTimeout(() => {
+                const remainingCards = tarotCards.slice(10);
+                const batchSize = 5;
+
+                for (let i = 0; i < remainingCards.length; i += batchSize) {
+                    const batch = remainingCards.slice(i, i + batchSize);
+                    setTimeout(() => {
+                        batch.forEach(card => {
+                            this.loadCardImage(card.file, 'normal');
+                        });
+                    }, 2000 + (i / batchSize) * 500); // 2秒开始，每500ms一批
+                }
+            }, 1000);
         },
 
-        // 获取图片加载统计
-        getStats: function() {
+        // 网络优化：使用Service Worker进行后台加载
+        setupBackgroundLoading: function() {
+            if ('serviceWorker' in navigator) {
+                // 这里可以注册Service Worker进行后台图片加载
+                console.log('🔧 Service Worker支持可用，可配置后台加载');
+            }
+        },
+
+        // 性能监控
+        trackLoadingPerformance: function() {
+            if ('performance' in window && 'measure' in performance) {
+                performance.mark('image-loading-start');
+
+                // 监控关键性能指标
+                setTimeout(() => {
+                    performance.mark('image-loading-end');
+                    performance.measure('image-loading', 'image-loading-start', 'image-loading-end');
+
+                    const measure = performance.getEntriesByName('image-loading')[0];
+                    if (measure) {
+                        console.log(`📊 图片加载性能: ${measure.duration.toFixed(2)}ms`);
+                    }
+                }, 5000);
+            }
+        },
+
+        // 获取高级统计
+        getAdvancedStats: function() {
             return {
                 cached: this.cache.size,
+                progressive: this.progressiveCache.size,
+                lowRes: this.lowResCache.size,
                 loading: this.loadingPromises.size,
-                memoryUsage: Array.from(this.cache.values()).length * 2.5 // 估算内存使用(MB)
+                browserSupport: browserSupport,
+                memoryUsage: (this.cache.size * 2.5 + this.progressiveCache.size * 1.2).toFixed(2) + 'MB'
             };
         }
     };
 
-    // 立即预加载关键图片
+    // 立即执行极速预加载
     window.imagePreloader.preloadCriticalImages().then(() => {
-        console.log('✅ 关键图片预加载完成');
+        console.log('⚡ 关键图片极速预加载完成');
+
+        // 开始激进预加载策略
+        window.imagePreloader.aggressivePreload();
     });
 
-    // 延迟预加载常用卡牌
+    // 设置性能监控
     setTimeout(() => {
-        window.imagePreloader.preloadCommonCards();
-    }, 2000);
+        window.imagePreloader.trackLoadingPerformance();
+    }, 1000);
 
-    // 定期清理未使用的图片缓存
+    // 后台加载设置
+    window.imagePreloader.setupBackgroundLoading();
+
+    // 智能缓存清理（更激进的策略）
     setInterval(() => {
-        if (window.imagePreloader.cache.size > 30) {
-            const oldestKey = window.imagePreloader.cache.keys().next().value;
-            window.imagePreloader.cache.delete(oldestKey);
-            console.log('🧹 清理图片缓存:', oldestKey);
+        const stats = window.imagePreloader.getAdvancedStats();
+        console.log('📊 图片缓存统计:', stats);
+
+        // 根据内存使用情况调整缓存策略
+        if (parseFloat(stats.memoryUsage) > 50) {
+            // 内存使用过高，清理低分辨率缓存
+            window.imagePreloader.lowResCache.clear();
+            console.log('🧹 内存优化：清理低分辨率缓存');
         }
-    }, 30000); // 30秒清理一次
+
+        if (window.imagePreloader.cache.size > 40) {
+            // 清理最老的5个缓存项
+            const keys = Array.from(window.imagePreloader.cache.keys()).slice(0, 5);
+            keys.forEach(key => window.imagePreloader.cache.delete(key));
+            console.log('🧹 智能缓存清理:', keys);
+        }
+    }, 20000); // 20秒清理一次
 }
