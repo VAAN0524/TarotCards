@@ -424,9 +424,11 @@ h1 {
     -moz-transition: transform 0.6s cubic-bezier(0.4, 0.1, 0.2, 1);
     transition: transform 0.6s cubic-bezier(0.4, 0.1, 0.2, 1);
 
+    /* 暂时移除自动旋转动画，防止与JavaScript冲突
     -webkit-animation: autoSpin 8s linear infinite;
     -moz-animation: autoSpin 8s linear infinite;
     animation: autoSpin 8s linear infinite;
+    */
 
     cursor: default;
     border: none !important;
@@ -454,6 +456,14 @@ h1 {
 
     /* 确保内容不被裁切 */
     overflow: visible;
+
+    /* 添加安全的悬停效果 */
+}
+
+.card:hover {
+    -webkit-transform: translateY(-5px) rotateY(5deg);
+    -moz-transform: translateY(-5px) rotateY(5deg);
+    transform: translateY(-5px) rotateY(5deg);
 }
 
 /* 移动端专用：确保卡牌背面显示 */
@@ -507,11 +517,12 @@ h1 {
         transform: translateZ(0) !important;
     }
 
-    /* 移动端动画优化 */
+    /* 移动端动画优化 - 暂时移除动画相关设置防止冲突
     .card {
         -webkit-animation-fill-mode: both !important;
         animation-fill-mode: both !important;
     }
+    */
 
     /* 确保动画在移动端正常工作 */
     @-webkit-keyframes autoSpin {

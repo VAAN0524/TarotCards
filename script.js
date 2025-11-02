@@ -423,6 +423,23 @@ function initializeTarotCards() {
     }
 }
 
+// 安全地初始化卡牌状态，防止动画冲突
+function initializeCardState(cardElement) {
+    // 清除所有可能的动画相关属性
+    cardElement.style.animation = 'none';
+    cardElement.style.webkitAnimation = 'none';
+    cardElement.style.mozAnimation = 'none';
+    cardElement.style.animationPlayState = 'paused';
+
+    // 设置初始transform状态
+    cardElement.style.transform = 'rotateY(0deg)';
+
+    // 确保backface-visibility正确设置
+    cardElement.style.webkitBackfaceVisibility = 'hidden';
+    cardElement.style.backfaceVisibility = 'hidden';
+    cardElement.style.mozBackfaceVisibility = 'hidden';
+}
+
 // 显示指定的卡牌集合
 function displayCardSet(cardSet) {
     const cardsGrid = document.getElementById('cardsGrid');
@@ -432,7 +449,10 @@ function displayCardSet(cardSet) {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
         cardElement.setAttribute('data-card-id', card.id);
-        cardElement.style.animationDelay = `${index * 0.3}s`;
+
+        // 安全初始化卡牌状态
+        initializeCardState(cardElement);
+
         cardElement.innerHTML = `
             <div class="card-face card-front">
                 <img src="images/${card.file}" alt="${card.name}" loading="lazy">
@@ -529,10 +549,14 @@ function switchToNextCardSet() {
         // 获取所有卡牌元素
         const cards = document.querySelectorAll('.card');
 
-        // 临时停止所有卡牌的动画，锁定在背面位置
+        // 由于CSS动画已被禁用，直接设置所有卡牌显示背面
         cards.forEach(card => {
-            card.style.animationPlayState = 'paused';
+            // 移除动画状态控制，直接设置transform
             card.style.transform = 'rotateY(180deg)';
+            // 清除任何可能的动画相关属性
+            card.style.animation = 'none';
+            card.style.webkitAnimation = 'none';
+            card.style.mozAnimation = 'none';
         });
 
         // 切换到下一套卡牌 - 使用AppState管理
@@ -542,12 +566,9 @@ function switchToNextCardSet() {
         updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
         console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}: 已切换到新卡牌组`);
 
-        // 短暂延迟后恢复动画
-        setTimeout(() => {
-            cards.forEach(card => {
-                card.style.animationPlayState = 'running';
-            });
-        }, 50);
+        // 由于已禁用CSS动画，无需恢复动画状态
+        // 卡牌将保持当前的transform状态，直到用户交互或页面刷新
+        console.log('卡牌切换完成，保持当前显示状态');
 
         // 预生成更多卡牌组，确保有足够的随机组合
         if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复
