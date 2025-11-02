@@ -4,7 +4,7 @@
 
 ### 方式一：Cloudflare Pages (推荐)
 
-#### 方法1：通过Git仓库自动部署
+#### 方法1：通过Git仓库自动部署 (最简单)
 1. **连接仓库**：
    - 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
    - 选择 "Pages" → "Create a project"
@@ -13,7 +13,7 @@
 2. **构建设置**：
    ```
    Framework preset: None
-   Build command: echo 'No build needed'
+   Build command: echo 'Static site - no build needed'
    Build output directory: .
    Root directory: ./
    ```
@@ -23,7 +23,7 @@
    NODE_VERSION: 18
    ```
 
-#### 方法2：通过Wrangler CLI
+#### 方法2：通过Wrangler CLI Pages部署
 ```bash
 # 安装Wrangler
 npm install -g wrangler
@@ -31,9 +31,18 @@ npm install -g wrangler
 # 登录Cloudflare
 wrangler login
 
-# 部署（当前目录）
+# 部署为Pages项目
 wrangler pages deploy . --project-name=tarot-cards-app
+
+# 或者使用简短命令
+wrangler pages deploy .
 ```
+
+#### 方法3：使用functions目录（高级）
+如果需要自定义边缘逻辑：
+- 创建 `functions/_worker.js` 文件
+- 包含自定义路由或处理逻辑
+- 部署时会自动识别functions目录
 
 ### 方式二：Vercel (推荐)
 

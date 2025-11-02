@@ -31,5 +31,12 @@ yarn-error.log*
 dist/
 build/
 
+# Wrangler日志
+.wrangler/
+
+# 锁定文件
+package-lock.json
+bun.lockb
+
 # Claude相关
 .claude/
