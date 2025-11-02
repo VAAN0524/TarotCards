@@ -985,11 +985,11 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: clamp(20px, 4vw, 40px);
-    margin: 40px 0;
+    gap: clamp(15px, 3vw, 25px);
+    margin: 30px 0;
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding: clamp(15px, 3vw, 30px) clamp(10px, 2vw, 20px);
+    padding: clamp(10px, 2vw, 20px) clamp(8px, 1.5vw, 15px);
     max-width: 100%;
     width: fit-content;
     margin-left: auto;
@@ -1057,9 +1057,9 @@ h1 {
 
     /* 结果解读界面 - 电脑端优化 */
     .result-cards {
-        gap: clamp(30px, 5vw, 60px);
-        margin: 50px 0;
-        padding: clamp(20px, 3vw, 40px) clamp(20px, 2.5vw, 40px);
+        gap: clamp(20px, 4vw, 35px);
+        margin: 35px 0;
+        padding: clamp(15px, 2vw, 25px) clamp(15px, 2vw, 25px);
         max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
@@ -1096,10 +1096,10 @@ h1 {
 }
 
 .result-card {
-    background: linear-gradient(135deg, rgba(45, 27, 61, 0.4), rgba(26, 26, 46, 0.4));
-    border: 1px solid rgba(212, 175, 55, 0.25);
-    border-radius: 15px;
-    padding: 20px 15px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 10px 8px;
     width: clamp(200px, 25vw, 320px);
     min-width: clamp(180px, 22vw, 280px);
     max-width: 320px;
@@ -1113,10 +1113,9 @@ h1 {
 }
 
 .result-card:hover {
-    background: linear-gradient(135deg, rgba(45, 27, 61, 0.6), rgba(26, 26, 46, 0.6));
-    border-color: rgba(212, 175, 55, 0.4);
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
+    background: rgba(45, 27, 61, 0.2);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.2);
 }
 
 .result-card img {
@@ -1379,9 +1378,9 @@ h1 {
 
     /* 移动端结果卡牌优化 - 防止边框遮挡 */
     .result-cards {
-        gap: clamp(10px, 3vw, 20px);
-        padding: clamp(10px, 2.5vw, 20px) clamp(15px, 4vw, 30px);
-        margin: 20px 0;
+        gap: clamp(8px, 2.5vw, 15px);
+        padding: clamp(8px, 2vw, 15px) clamp(12px, 3vw, 20px);
+        margin: 15px 0;
         overflow-x: auto;
         justify-content: flex-start;
         scrollbar-width: thin;
@@ -1405,11 +1404,11 @@ h1 {
     .result-card {
         width: clamp(140px, 35vw, 180px);
         min-width: clamp(130px, 32vw, 160px);
-        padding: clamp(6px, 1.5vw, 12px);
+        padding: clamp(4px, 1vw, 8px);
         margin: 0;
-        border: 1px solid rgba(212, 175, 55, 0.2);
-        border-radius: clamp(8px, 2vw, 12px);
-        background: linear-gradient(135deg, rgba(45, 27, 61, 0.3), rgba(26, 26, 46, 0.3));
+        border: none;
+        border-radius: 0;
+        background: transparent;
         overflow: visible;
         flex-shrink: 0;
     }
@@ -1471,15 +1470,16 @@ h1 {
     }
 
     .result-cards {
-        gap: 20px;
-        padding: 15px 0;
+        gap: 15px;
+        padding: 10px 0;
     }
 
     .result-card {
         width: 200px;
         min-width: 200px;
-        padding: 12px;
-        border: 1px solid rgba(212, 175, 55, 0.2);
+        padding: 8px;
+        border: none;
+        background: transparent;
     }
 
     .result-card img {
@@ -1636,17 +1636,18 @@ footer {
     }
 
     .result-cards {
-        gap: clamp(8px, 2vw, 12px);
-        padding: 5px 0;
-        margin: 20px 0;
+        gap: clamp(6px, 1.5vw, 10px);
+        padding: 3px 0;
+        margin: 15px 0;
     }
 
     .result-card {
         width: clamp(110px, 30vw, 140px);
         min-width: 110px;
-        padding: clamp(4px, 1.2vw, 8px);
-        border: 1px solid rgba(212, 175, 55, 0.18);
-        border-radius: clamp(8px, 2vw, 12px);
+        padding: clamp(3px, 1vw, 6px);
+        border: none;
+        border-radius: 0;
+        background: transparent;
     }
 
     .result-card img {
@@ -1702,9 +1703,9 @@ footer {
 
     /* 结果卡牌移动端优化 */
     .result-cards {
-        gap: clamp(15px, 3vw, 25px);
-        padding: clamp(15px, 3vw, 25px) clamp(20px, 4vw, 35px);
-        margin: 25px 0;
+        gap: clamp(12px, 2.5vw, 20px);
+        padding: clamp(10px, 2vw, 18px) clamp(15px, 3vw, 25px);
+        margin: 20px 0;
         justify-content: flex-start;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -1714,9 +1715,10 @@ footer {
     .result-card {
         width: clamp(150px, 38vw, 180px);
         min-width: clamp(140px, 35vw, 170px);
-        padding: clamp(8px, 2vw, 12px);
-        border: 1px solid rgba(212, 175, 55, 0.15);
-        border-radius: clamp(10px, 2.5vw, 15px);
+        padding: clamp(5px, 1.5vw, 8px);
+        border: none;
+        border-radius: 0;
+        background: transparent;
         scroll-snap-align: start;
         overflow: visible;
         flex-shrink: 0;
