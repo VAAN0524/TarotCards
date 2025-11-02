@@ -271,6 +271,52 @@ document.addEventListener('DOMContentLoaded', function() {
         switchToNextCardSet();
     };
 
+    // 测试时间同步功能
+    window.testTimingSync = function() {
+        console.log('🧪 测试时间同步...');
+
+        const now = Date.now();
+        const pageLoadTime = window.performance.timing.domContentLoadedEventEnd;
+        const elapsedSinceLoad = now - pageLoadTime;
+        const timeToNextSidePosition = 2000 - (elapsedSinceLoad % 2000);
+
+        console.log(`当前时间: ${now}ms`);
+        console.log(`页面加载: ${pageLoadTime}ms`);
+        console.log(`已过时间: ${elapsedSinceLoad}ms`);
+        console.log(`到下一个侧面位置: ${timeToNextSidePosition}ms`);
+
+        // 计算当前CSS动画应该处于什么角度
+        const animationProgress = (elapsedSinceLoad % 8000) / 8000;
+        const currentAngle = animationProgress * 360;
+        console.log(`当前动画进度: ${(animationProgress * 100).toFixed(1)}%`);
+        console.log(`当前角度: ${currentAngle.toFixed(1)}°`);
+
+        // 判断当前是什么位置
+        if (currentAngle < 45 || currentAngle >= 315) {
+            console.log('🔍 当前位置: 正面朝向用户');
+        } else if (currentAngle >= 45 && currentAngle < 135) {
+            console.log('🔍 当前位置: 右侧面（用户看不到内容）');
+        } else if (currentAngle >= 135 && currentAngle < 225) {
+            console.log('🔍 当前位置: 背面朝向用户');
+        } else {
+            console.log('🔍 当前位置: 左侧面（用户看不到内容）');
+        }
+    };
+
+    // 强制重新同步
+    window.resyncAnimation = function() {
+        console.log('🔄 强制重新同步动画...');
+
+        // 清理现有的interval
+        if (AppState.cardSwitchInterval) {
+            clearInterval(AppState.cardSwitchInterval);
+            console.log('✓ 清理了现有的切换定时器');
+        }
+
+        // 重新启动动画系统
+        addAutoRotate();
+    };
+
     console.log('基础初始化完成，占卜系统将在200ms后初始化');
 });
 
@@ -579,29 +625,55 @@ function getRandomCardsForRound() {
 
 // 添加自动旋转效果（完全同步CSS动画）
 function addAutoRotate() {
-    // 关键：CSS动画在页面加载时立即开始（0秒）
-    // 我们需要在第一个2秒位置（侧面）进行第一次切换
+    console.log('🚀 启动精确同步的自动旋转系统...');
 
-    // 计算到下一个2秒位置的时间
-    const now = Date.now();
-    const pageLoadTime = window.performance.timing.domContentLoadedEventEnd;
-    const elapsedSinceLoad = now - pageLoadTime;
-    const timeToNextSidePosition = 2000 - (elapsedSinceLoad % 2000);
-
-    console.log(`🕐 页面加载时间: ${pageLoadTime}ms, 已过时间: ${elapsedSinceLoad}ms`);
-    console.log(`🕐 到下一个侧面位置: ${timeToNextSidePosition}ms`);
-
-    // 第一次切换：等待到下一个侧面位置
+    // 等待DOM完全加载和CSS动画稳定
     setTimeout(() => {
-        console.log('🎯 第一次切换开始（侧面位置）');
-        switchToNextCardSet();
+        console.log('🎯 DOM稳定，开始计算同步时间...');
 
-        // 后续切换：每8秒一次，与CSS动画完全同步
-        setInterval(() => {
-            console.log('🎯 循环切换开始');
+        // 关键：CSS动画在页面加载时立即开始（0秒）
+        // 我们需要在第一个2秒位置（侧面）进行第一次切换
+
+        // 计算到下一个2秒位置的时间
+        const now = Date.now();
+        const pageLoadTime = window.performance.timing.domContentLoadedEventEnd;
+        const elapsedSinceLoad = now - pageLoadTime;
+        const timeToNextSidePosition = 2000 - (elapsedSinceLoad % 2000);
+
+        console.log(`🕐 页面加载时间: ${pageLoadTime}ms`);
+        console.log(`🕐 当前时间: ${now}ms`);
+        console.log(`🕐 已过时间: ${elapsedSinceLoad}ms`);
+        console.log(`🕐 到下一个侧面位置: ${timeToNextSidePosition}ms`);
+
+        // 验证卡牌是否已经在旋转
+        const cards = document.querySelectorAll('.card');
+        console.log(`🔍 找到 ${cards.length} 张卡牌`);
+
+        cards.forEach((card, index) => {
+            const computedStyle = window.getComputedStyle(card);
+            const animationName = computedStyle.animationName;
+            const animationDuration = computedStyle.animationDuration;
+            console.log(`🔍 卡牌 ${index}: ${animationName} (${animationDuration})`);
+        });
+
+        // 第一次切换：等待到下一个侧面位置
+        console.log(`⏰ ${timeToNextSidePosition}ms后进行第一次切换...`);
+        setTimeout(() => {
+            console.log('🎯 第一次切换开始（侧面位置）');
             switchToNextCardSet();
-        }, 8000); // 完全匹配CSS动画周期
-    }, timeToNextSidePosition);
+
+            // 后续切换：每8秒一次，与CSS动画完全同步
+            console.log('🔄 设置8秒循环切换...');
+            const switchInterval = setInterval(() => {
+                console.log('🎯 循环切换开始');
+                switchToNextCardSet();
+            }, 8000); // 完全匹配CSS动画周期
+
+            // 存储interval ID以便清理
+            AppState.cardSwitchInterval = switchInterval;
+        }, Math.max(100, timeToNextSidePosition)); // 确保至少100ms延迟
+
+    }, 1000); // 1秒后开始，确保所有元素都稳定
 }
 
 // 切换到下一套卡牌（使用精确定时器，完全同步CSS动画）
