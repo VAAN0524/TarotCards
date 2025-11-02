@@ -1,0 +1,29 @@
+{
+  "name": "tarot-cards-app",
+  "version": "2.2.0",
+  "description": "神秘而优雅的塔罗牌占卜应用",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "dev": "npx http-server -p 8000",
+    "preview": "npx http-server -p 8000",
+    "deploy": "echo 'Use Cloudflare Pages dashboard for deployment'"
+  },
+  "keywords": [
+    "tarot",
+    "divination",
+    "cards",
+    "spirituality",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "Tarot Cards App",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -1,0 +1,3 @@
+# 静态网站重定向配置
+# 确保所有路径都指向index.html（SPA支持）
+/*    /index.html   200

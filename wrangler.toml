@@ -1,0 +1,16 @@
+name = "tarot-cards-app"
+compatibility_date = "2025-11-02"
+
+# 静态网站配置
+[assets]
+directory = "./"
+binding = "ASSETS"
+
+# 构建设置
+[build]
+command = "echo 'No build command needed for static site'"
+cwd = "."
+
+# 环境变量
+[vars]
+ENVIRONMENT = "production"
