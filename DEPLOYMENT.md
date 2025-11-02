@@ -31,14 +31,33 @@ npm install -g wrangler
 # 登录Cloudflare
 wrangler login
 
-# 部署为Pages项目
+# 部署为Pages项目 (推荐命令)
 wrangler pages deploy . --project-name=tarot-cards-app
 
 # 或者使用简短命令
 wrangler pages deploy .
+
+# 备选方案：指定assets目录
+wrangler pages deploy --assets=. --project-name=tarot-cards-app
 ```
 
-#### 方法3：使用functions目录（高级）
+#### 方法3：使用npm脚本 (最方便)
+```bash
+# 安装依赖
+npm install
+
+# 部署到Cloudflare Pages
+npm run deploy
+
+# 备选方案
+npm run deploy:alt
+
+# 部署到其他平台
+npm run deploy:vercel    # Vercel
+npm run deploy:netlify   # Netlify
+```
+
+#### 方法4：使用functions目录（高级）
 如果需要自定义边缘逻辑：
 - 创建 `functions/_worker.js` 文件
 - 包含自定义路由或处理逻辑
@@ -171,21 +190,41 @@ Cache-Control: public, max-age=31536000, immutable
 
 ## 🛠️ 故障排除
 
-### 常见问题
+### 常见部署问题
 
-#### 1. 图片404错误
+#### 1. "Missing entry-point to Worker script" 错误
+**问题**: 使用了错误的wrangler命令
+**解决**: 使用正确的Pages部署命令
+```bash
+# ❌ 错误命令 (用于Worker)
+npx wrangler deploy
+
+# ✅ 正确命令 (用于Pages)
+npx wrangler pages deploy .
+npm run deploy
+```
+
+#### 2. "Cannot use assets with a binding" 错误
+**问题**: wrangler.toml配置冲突
+**解决**: 使用简化的配置或正确的命令
+```bash
+# 使用正确的Pages命令，无需复杂的配置
+wrangler pages deploy .
+```
+
+#### 3. 图片404错误
 **问题**: 图片无法加载
 **解决**: 确保images目录及所有图片文件已上传
 
-#### 2. CSS/JS 404错误
+#### 4. CSS/JS 404错误
 **问题**: 样式或脚本文件无法加载
 **解决**: 检查文件路径和文件名大小写
 
-#### 3. 占卜功能不工作
+#### 5. 占卜功能不工作
 **问题**: JavaScript功能异常
 **解决**: 检查浏览器控制台错误信息
 
-#### 4. 动画卡顿
+#### 6. 动画卡顿
 **问题**: 卡牌旋转不流畅
 **解决**: 检查浏览器性能，启用GPU加速
 

@@ -1,11 +1,6 @@
 name = "tarot-cards-app"
 compatibility_date = "2025-11-02"
 
-# 构建设置 - 纯静态网站无需构建
-[build]
-command = "echo 'Static site - no build needed'"
-cwd = "."
-
 # 环境变量
 [vars]
 ENVIRONMENT = "production"

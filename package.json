@@ -7,7 +7,10 @@
     "build": "echo 'Static site - no build needed'",
     "dev": "npx http-server -p 8000",
     "preview": "npx http-server -p 8000",
-    "deploy": "echo 'Use Cloudflare Pages dashboard for deployment'"
+    "deploy": "npx wrangler pages deploy . --project-name=tarot-cards-app",
+    "deploy:alt": "npx wrangler pages deploy --assets=. --project-name=tarot-cards-app",
+    "deploy:vercel": "vercel --prod",
+    "deploy:netlify": "netlify deploy --prod --dir=."
   },
   "keywords": [
     "tarot",
