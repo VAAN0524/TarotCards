@@ -3757,6 +3757,25 @@ function initializeImageOptimization() {
 
     console.log('🌐 浏览器能力检测:', browserSupport);
 
+    // 移动端检测
+    const isMobile = () => {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               (window.innerWidth <= 768 && 'ontouchstart' in window);
+    };
+
+    // 检测网络类型
+    const getConnectionType = () => {
+        if (typeof navigator !== 'undefined' && navigator.connection) {
+            return {
+                type: navigator.connection.effectiveType || '4g',
+                downlink: navigator.connection.downlink || 10,
+                rtt: navigator.connection.rtt || 50,
+                saveData: navigator.connection.saveData || false
+            };
+        }
+        return { type: '4g', downlink: 10, rtt: 50, saveData: false };
+    };
+
     // 创建高级图片预加载管理器
     window.imagePreloader = {
         cache: new Map(),
@@ -3766,22 +3785,77 @@ function initializeImageOptimization() {
         lowResCache: new Map(),      // 低分辨率缓存
         preloadedSets: new Set(),   // 已预加载的集合
 
+        // 移动端专用缓存
+        mobileCache: new Map(),
+        mobileLowResCache: new Map(),
+        preloadingMobile: false,
+
         // 检测最佳图片格式
         getOptimalFormat: function() {
             return browserSupport.webp ? 'webp' : 'png';
         },
 
+        // 移动端专用图片策略
+        getMobileImageStrategy: function() {
+            const connection = getConnectionType();
+            const mobile = isMobile();
+
+            if (!mobile) {
+                return { quality: 'high', progressive: true, batchSize: 10, delay: 100 };
+            }
+
+            // 移动端根据网络状况调整策略
+            if (connection.saveData || connection.type === 'slow-2g' || connection.type === '2g') {
+                return {
+                    quality: 'low',
+                    progressive: false,
+                    batchSize: 2,
+                    delay: 1000,
+                    maxSize: 50 * 1024 // 50KB
+                };
+            } else if (connection.type === '3g' || connection.downlink < 1.5) {
+                return {
+                    quality: 'medium',
+                    progressive: true,
+                    batchSize: 5,
+                    delay: 500,
+                    maxSize: 150 * 1024 // 150KB
+                };
+            } else {
+                return {
+                    quality: 'high',
+                    progressive: true,
+                    batchSize: 8,
+                    delay: 200,
+                    maxSize: 300 * 1024 // 300KB
+                };
+            }
+        },
+
         // 生成多尺寸图片URL
         getImageUrls: function(baseFile) {
             const format = this.getOptimalFormat();
+            const strategy = this.getMobileImageStrategy();
             const baseName = baseFile.replace(/\.[^.]+$/, '');
 
-            return {
-                lowRes: `images/lowres/${baseName}_low.${format}`,
-                mediumRes: `images/${baseFile}`,
-                highRes: `images/${baseFile}`,
-                progressive: `images/progressive/${baseName}_progressive.${format}`
-            };
+            if (isMobile()) {
+                // 移动端专用URL生成
+                return {
+                    lowRes: `images/mobile/${baseName}_mobile_low.${format}`,
+                    mediumRes: `images/mobile/${baseName}_mobile_medium.${format}`,
+                    highRes: strategy.quality === 'high' ? `images/${baseFile}` : `images/mobile/${baseName}_mobile.${format}`,
+                    mobile: `images/mobile/${baseName}_mobile.${format}`,
+                    progressive: strategy.progressive ? `images/progressive/${baseName}_progressive.${format}` : null
+                };
+            } else {
+                // 桌面端URL生成
+                return {
+                    lowRes: `images/lowres/${baseName}_low.${format}`,
+                    mediumRes: `images/${baseFile}`,
+                    highRes: `images/${baseFile}`,
+                    progressive: `images/progressive/${baseName}_progressive.${format}`
+                };
+            }
         },
 
         // 创建渐进式图片加载
@@ -3823,6 +3897,111 @@ function initializeImageOptimization() {
                 setTimeout(() => {
                     highImg.src = urls.highRes;
                 }, 500 + Math.random() * 1500);
+            });
+        },
+
+        // 移动端快速加载
+        mobileQuickLoad: function(cardFile, priority = 'normal') {
+            if (!isMobile()) {
+                return this.createProgressiveLoader(cardFile);
+            }
+
+            const strategy = this.getMobileImageStrategy();
+            const urls = this.getImageUrls(cardFile);
+            const connection = getConnectionType();
+
+            return new Promise((resolve) => {
+                const mobileImg = {
+                    element: document.createElement('div'),
+                    currentSrc: urls.lowRes,
+                    loaded: { initial: false, full: false },
+                    strategy: strategy
+                };
+
+                // 根据网络状况选择加载策略
+                if (strategy.quality === 'low' || connection.saveData) {
+                    // 极简模式：只加载最小尺寸
+                    const img = new Image();
+                    img.onload = () => {
+                        mobileImg.loaded.initial = true;
+                        mobileImg.loaded.full = true;
+                        this.mobileLowResCache.set(cardFile, img);
+                        console.log(`📱 移动端极简加载完成: ${cardFile}`);
+                        resolve(mobileImg);
+                    };
+                    img.src = urls.lowRes;
+                } else if (strategy.quality === 'medium') {
+                    // 中等模式：先显示低质量，再加载中等质量
+                    const lowImg = new Image();
+                    lowImg.onload = () => {
+                        mobileImg.loaded.initial = true;
+                        this.mobileLowResCache.set(cardFile, lowImg);
+                        resolve(mobileImg); // 先返回，让用户看到内容
+
+                        // 后台加载中等质量
+                        const mediumImg = new Image();
+                        mediumImg.onload = () => {
+                            mobileImg.loaded.full = true;
+                            mobileImg.currentSrc = urls.mediumRes;
+                            this.mobileCache.set(cardFile, mediumImg);
+                            console.log(`📱 移动端中等质量加载完成: ${cardFile}`);
+                        };
+                        setTimeout(() => {
+                            mediumImg.src = urls.mediumRes;
+                        }, strategy.delay);
+                    };
+                    lowImg.src = urls.lowRes;
+                } else {
+                    // 高质量模式：渐进式加载
+                    this.createProgressiveLoader(cardFile).then(resolve);
+                }
+            });
+        },
+
+        // 移动端批量预加载
+        mobileBatchPreload: function(cardFiles, batchSize = null) {
+            if (!isMobile() || this.preloadingMobile) return Promise.resolve();
+
+            const strategy = this.getMobileImageStrategy();
+            const size = batchSize || strategy.batchSize;
+
+            console.log(`📱 开始移动端批量预加载，批次大小: ${size}`);
+
+            return new Promise((resolve) => {
+                this.preloadingMobile = true;
+                let loadedCount = 0;
+                const totalBatches = Math.ceil(cardFiles.length / size);
+
+                const loadBatch = (batchIndex) => {
+                    if (batchIndex >= totalBatches) {
+                        this.preloadingMobile = false;
+                        console.log(`📱 移动端批量预加载完成，总计: ${cardFiles.length} 张`);
+                        resolve();
+                        return;
+                    }
+
+                    const start = batchIndex * size;
+                    const end = Math.min(start + size, cardFiles.length);
+                    const batch = cardFiles.slice(start, end);
+
+                    const batchPromises = batch.map(cardFile => {
+                        return this.mobileQuickLoad(cardFile, 'background').catch(err => {
+                            console.warn(`📱 移动端预加载失败: ${cardFile}`, err);
+                            return null;
+                        });
+                    });
+
+                    Promise.all(batchPromises).then(() => {
+                        loadedCount += batch.length;
+                        console.log(`📱 移动端批次 ${batchIndex + 1}/${totalBatches} 完成，已加载: ${loadedCount}/${cardFiles.length}`);
+
+                        // 根据网络状况调整延迟
+                        const delay = strategy.delay * (connection.saveData ? 2 : 1);
+                        setTimeout(() => loadBatch(batchIndex + 1), delay);
+                    });
+                };
+
+                loadBatch(0);
             });
         },
 
@@ -3892,6 +4071,13 @@ function initializeImageOptimization() {
         aggressivePreload: function() {
             console.log('🚀 开始激进预加载策略...');
 
+            if (isMobile()) {
+                console.log('📱 检测到移动端，使用移动端专用预加载策略');
+                this.mobileAggressivePreload();
+                return;
+            }
+
+            // 桌面端原有策略
             // 立即预加载前10张卡牌（最高优先级）
             const firstBatch = Array.from({length: 10}, (_, i) => tarotCards[i]);
             firstBatch.forEach((card, index) => {
@@ -3914,6 +4100,47 @@ function initializeImageOptimization() {
                     }, 2000 + (i / batchSize) * 500); // 2秒开始，每500ms一批
                 }
             }, 1000);
+        },
+
+        // 移动端激进预加载策略
+        mobileAggressivePreload: function() {
+            const strategy = this.getMobileImageStrategy();
+            const connection = getConnectionType();
+
+            console.log(`📱 移动端预加载策略: ${strategy.quality}质量, 批次${strategy.batchSize}, 延迟${strategy.delay}ms`);
+
+            // 移动端优先加载关键图片
+            const priorityFiles = this.criticalImages.slice(0, 2); // 减少优先加载数量
+            this.mobileBatchPreload(priorityFiles, 1).then(() => {
+                console.log('📱 移动端关键图片加载完成');
+
+                // 分批加载常用卡牌（解读界面常用）
+                const commonCards = [
+                    '0. 愚人 (The Fool).png',
+                    '1. 魔术师 (The Magician) .png',
+                    '6. 恋人 (The Lovers).png',
+                    '7. 战车 (The Chariot).png',
+                    '10. 命运之轮 (Wheel of Fortune).png',
+                    '13. 死神 (Death).png',
+                    '16. 塔 (The Tower).png',
+                    '21. 世界 (The World).png',
+                    '塔罗牌背面.png'
+                ];
+
+                setTimeout(() => {
+                    this.mobileBatchPreload(commonCards).then(() => {
+                        console.log('📱 移动端常用卡牌加载完成');
+
+                        // 最后根据网络状况决定是否继续预加载
+                        if (strategy.quality === 'high' && !connection.saveData) {
+                            setTimeout(() => {
+                                const allCardFiles = tarotCards.slice(0, 12).map(card => card.file);
+                                this.mobileBatchPreload(allCardFiles, Math.min(strategy.batchSize, 3));
+                            }, 3000);
+                        }
+                    });
+                }, strategy.delay * 2);
+            });
         },
 
         // 网络优化：使用Service Worker进行后台加载
@@ -3955,21 +4182,56 @@ function initializeImageOptimization() {
         }
     };
 
-    // 立即执行极速预加载
-    window.imagePreloader.preloadCriticalImages().then(() => {
-        console.log('⚡ 关键图片极速预加载完成');
+    // 移动端检测和初始化
+    if (isMobile()) {
+        console.log('📱 移动端设备检测到，启用移动端优化策略');
+        const connection = getConnectionType();
+        console.log(`📱 网络状况: ${connection.type}, 速度: ${connection.downlink}Mbps, 延迟: ${connection.rtt}ms`);
 
-        // 开始激进预加载策略
-        window.imagePreloader.aggressivePreload();
-    });
+        // 移动端专用初始化
+        window.imagePreloader.preloadCriticalImages().then(() => {
+            console.log('📱 移动端关键图片加载完成');
 
-    // 设置性能监控
-    setTimeout(() => {
-        window.imagePreloader.trackLoadingPerformance();
-    }, 1000);
+            // 移动端激进预加载
+            window.imagePreloader.aggressivePreload();
+        });
 
-    // 后台加载设置
-    window.imagePreloader.setupBackgroundLoading();
+        // 移动端性能监控
+        setTimeout(() => {
+            window.imagePreloader.trackLoadingPerformance();
+        }, 2000); // 移动端延迟监控，避免影响性能
+
+        // 移动端后台加载
+        window.imagePreloader.setupBackgroundLoading();
+
+        // 移动端网络变化监听
+        if (typeof navigator !== 'undefined' && navigator.connection) {
+            navigator.connection.addEventListener('change', () => {
+                const newConnection = getConnectionType();
+                console.log(`📱 网络变化: ${newConnection.type}, 重新评估加载策略`);
+                // 重新启动预加载策略
+                window.imagePreloader.aggressivePreload();
+            });
+        }
+    } else {
+        console.log('🖥️ 桌面端设备，使用标准优化策略');
+
+        // 桌面端标准初始化
+        window.imagePreloader.preloadCriticalImages().then(() => {
+            console.log('⚡ 关键图片极速预加载完成');
+
+            // 开始激进预加载策略
+            window.imagePreloader.aggressivePreload();
+        });
+
+        // 设置性能监控
+        setTimeout(() => {
+            window.imagePreloader.trackLoadingPerformance();
+        }, 1000);
+
+        // 后台加载设置
+        window.imagePreloader.setupBackgroundLoading();
+    }
 
     // 智能缓存清理（更激进的策略）
     setInterval(() => {
