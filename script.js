@@ -423,27 +423,21 @@ function initializeTarotCards() {
     }
 }
 
-// 安全地初始化卡牌状态，确保动画完美运行
+// 简洁的卡牌初始化，让CSS动画自然运行
 function initializeCardState(cardElement) {
-    // 确保基本的3D属性正确设置
+    // 只设置必要的3D属性
     cardElement.style.webkitBackfaceVisibility = 'hidden';
     cardElement.style.backfaceVisibility = 'hidden';
     cardElement.style.mozBackfaceVisibility = 'hidden';
-
-    // 确保transform-style正确
     cardElement.style.webkitTransformStyle = 'preserve-3d';
     cardElement.style.transformStyle = 'preserve-3d';
     cardElement.style.mozTransformStyle = 'preserve-3d';
 
-    // 确保动画从一开始就正确运行
-    cardElement.style.animationPlayState = 'running';
-    cardElement.style.webkitAnimationPlayState = 'running';
-    cardElement.style.mozAnimationPlayState = 'running';
+    // 清理任何状态类
+    cardElement.classList.remove('switching');
 
-    // 清理任何可能的切换类
-    cardElement.classList.remove('switching', 'switching-back', 'switching-front');
-
-    console.log('卡牌初始化完成，动画状态正常');
+    // 让CSS动画自然运行，不进行任何干预
+    console.log('卡牌初始化完成，动画将自然循环运行');
 }
 
 // 显示指定的卡牌集合
@@ -557,9 +551,9 @@ function switchToNextCardSet() {
         // 获取所有卡牌元素
         const cards = document.querySelectorAll('.card');
 
-        // 智能同步切换策略：与CSS动画完美协调
+        // 真正的闭环切换策略：等待CSS动画自然转到背面
         cards.forEach((card, index) => {
-            // 计算当前动画时间，找到最佳切换时机
+            // 计算当前动画时间
             const currentTime = Date.now();
             const cardDelay = index * 0.4 * 1000; // 卡牌的初始延迟(ms)
             const animationCycle = 8000; // 8秒动画周期(ms)
@@ -568,30 +562,22 @@ function switchToNextCardSet() {
             // 计算当前旋转角度
             const currentRotation = (timeInCycle / animationCycle) * 360;
 
-            // 添加切换标记类
-            card.classList.add('switching');
-
-            // 计算到背面位置的最短路径
-            let targetRotation = 180;
-            let shortestDistance;
-
-            if (currentRotation < targetRotation) {
-                shortestDistance = targetRotation - currentRotation;
+            // 计算到达背面位置还需要的时间
+            let timeToBackFace;
+            if (currentRotation <= 180) {
+                timeToBackFace = (180 - currentRotation) / 360 * animationCycle;
             } else {
-                shortestDistance = 360 - currentRotation + targetRotation;
+                timeToBackFace = ((360 - currentRotation) + 180) / 360 * animationCycle;
             }
 
-            // 计算切换动画时间
-            const switchDuration = Math.min(800, shortestDistance * 3); // 最多800ms
-
-            // 设置切换动画
-            card.style.transition = `transform ${switchDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1)`;
-
-            // 添加切换到背面的类
+            // 在卡牌自然转到背面时进行切换
             setTimeout(() => {
-                card.classList.add('switching-back');
-                card.classList.remove('switching-front');
-            }, 50);
+                // 只在那个瞬间更换图片，不中断动画
+                updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
+                console.log(`卡牌 ${index} 在自然背面位置完成切换`);
+
+                // 不需要任何transform操作，让CSS动画继续自然运行
+            }, Math.max(100, timeToBackFace));
         });
 
         // 切换到下一套卡牌 - 使用AppState管理
@@ -601,39 +587,8 @@ function switchToNextCardSet() {
         updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
         console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}: 已切换到新卡牌组`);
 
-        // 智能延迟后，从背面位置平滑过渡并重新同步动画
-        setTimeout(() => {
-            cards.forEach((card, index) => {
-                // 设置回到正面的过渡动画
-                const returnDuration = 600;
-                card.style.transition = `transform ${returnDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1)`;
-
-                // 添加切换到正面的类
-                card.classList.add('switching-front');
-                card.classList.remove('switching-back');
-
-                // 延迟后清理切换状态并重新同步动画
-                setTimeout(() => {
-                    // 清理切换类和transition
-                    card.classList.remove('switching', 'switching-back', 'switching-front');
-                    card.style.transition = '';
-
-                    // 重新同步CSS动画
-                    const newDelay = index * 0.4; // 保持原始延迟
-                    card.style.animationDelay = `${newDelay}s`;
-                    card.style.webkitAnimationDelay = `${newDelay}s`;
-                    card.style.mozAnimationDelay = `${newDelay}s`;
-
-                    // 确保动画重新开始
-                    card.style.animationPlayState = 'running';
-                    card.style.webkitAnimationPlayState = 'running';
-                    card.style.mozAnimationPlayState = 'running';
-
-                    console.log(`卡牌 ${index} 动画已重新同步，延迟: ${newDelay}s`);
-                }, returnDuration);
-            });
-            console.log('所有卡牌已回到正面，动画重新同步');
-        }, 300);
+        // 真正的闭环：CSS动画继续自然运行，无需额外操作
+        console.log('所有卡牌将在自然循环中完成切换，动画保持连续运行');
 
         // 预生成更多卡牌组，确保有足够的随机组合
         if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复

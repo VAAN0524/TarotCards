@@ -535,20 +535,10 @@ h1 {
     animation: none;
 }
 
-/* 智能切换类 - 在动画进行中平滑切换 */
+/* 卡牌切换时禁用交互，防止意外点击 */
 .card.switching {
-    /* 保持动画运行，但标记为切换状态 */
     pointer-events: none;
-}
-
-.card.switching-back {
-    /* 切换到背面位置 */
-    transform: rotateY(180deg) !important;
-}
-
-.card.switching-front {
-    /* 切换回正面位置 */
-    transform: rotateY(0deg) !important;
+    opacity: 0.95;
 }
 
 @keyframes autoSpin {
