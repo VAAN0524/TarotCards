@@ -1097,9 +1097,9 @@ h1 {
 
 .result-card {
     background: linear-gradient(135deg, rgba(45, 27, 61, 0.4), rgba(26, 26, 46, 0.4));
-    border: 2px solid rgba(212, 175, 55, 0.3);
+    border: 1px solid rgba(212, 175, 55, 0.25);
     border-radius: 15px;
-    padding: 25px 20px;
+    padding: 20px 15px;
     width: clamp(200px, 25vw, 320px);
     min-width: clamp(180px, 22vw, 280px);
     max-width: 320px;
@@ -1114,8 +1114,8 @@ h1 {
 
 .result-card:hover {
     background: linear-gradient(135deg, rgba(45, 27, 61, 0.6), rgba(26, 26, 46, 0.6));
-    border-color: rgba(212, 175, 55, 0.5);
-    transform: translateY(-10px) scale(1.03);
+    border-color: rgba(212, 175, 55, 0.4);
+    transform: translateY(-10px) scale(1.02);
     box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
 }
 
@@ -1405,9 +1405,9 @@ h1 {
     .result-card {
         width: clamp(140px, 35vw, 180px);
         min-width: clamp(130px, 32vw, 160px);
-        padding: clamp(8px, 2vw, 15px);
+        padding: clamp(6px, 1.5vw, 12px);
         margin: 0;
-        border: 1px solid rgba(212, 175, 55, 0.15);
+        border: 1px solid rgba(212, 175, 55, 0.2);
         border-radius: clamp(8px, 2vw, 12px);
         background: linear-gradient(135deg, rgba(45, 27, 61, 0.3), rgba(26, 26, 46, 0.3));
         overflow: visible;
@@ -1478,7 +1478,8 @@ h1 {
     .result-card {
         width: 200px;
         min-width: 200px;
-        padding: 15px;
+        padding: 12px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
     }
 
     .result-card img {
@@ -1643,8 +1644,8 @@ footer {
     .result-card {
         width: clamp(110px, 30vw, 140px);
         min-width: 110px;
-        padding: clamp(5px, 1.5vw, 10px);
-        border: 1px solid rgba(212, 175, 55, 0.2);
+        padding: clamp(4px, 1.2vw, 8px);
+        border: 1px solid rgba(212, 175, 55, 0.18);
         border-radius: clamp(8px, 2vw, 12px);
     }
 
@@ -1713,8 +1714,8 @@ footer {
     .result-card {
         width: clamp(150px, 38vw, 180px);
         min-width: clamp(140px, 35vw, 170px);
-        padding: clamp(10px, 2.5vw, 15px);
-        border: 1px solid rgba(212, 175, 55, 0.2);
+        padding: clamp(8px, 2vw, 12px);
+        border: 1px solid rgba(212, 175, 55, 0.15);
         border-radius: clamp(10px, 2.5vw, 15px);
         scroll-snap-align: start;
         overflow: visible;
