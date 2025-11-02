@@ -543,61 +543,93 @@ function addAutoRotate() {
     }, 4100); // 稍微延迟确保第一次也在背面位置
 }
 
-// 切换到下一套卡牌（在背面位置立即更换）
+// 切换到下一套卡牌（使用CSS动画事件驱动）
 function switchToNextCardSet() {
     try {
-        console.log('卡牌到达背面位置，准备切换新卡牌...');
-
-        // 获取所有卡牌元素
-        const cards = document.querySelectorAll('.card');
-
-        // 真正的闭环切换策略：等待CSS动画自然转到背面
-        cards.forEach((card, index) => {
-            // 计算当前动画时间
-            const currentTime = Date.now();
-            const cardDelay = index * 0.4 * 1000; // 卡牌的初始延迟(ms)
-            const animationCycle = 8000; // 8秒动画周期(ms)
-            const timeInCycle = (currentTime - cardDelay) % animationCycle;
-
-            // 计算当前旋转角度
-            const currentRotation = (timeInCycle / animationCycle) * 360;
-
-            // 计算到达背面位置还需要的时间
-            let timeToBackFace;
-            if (currentRotation <= 180) {
-                timeToBackFace = (180 - currentRotation) / 360 * animationCycle;
-            } else {
-                timeToBackFace = ((360 - currentRotation) + 180) / 360 * animationCycle;
-            }
-
-            // 在卡牌自然转到背面时进行切换
-            setTimeout(() => {
-                // 只在那个瞬间更换图片，不中断动画
-                updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
-                console.log(`卡牌 ${index} 在自然背面位置完成切换`);
-
-                // 不需要任何transform操作，让CSS动画继续自然运行
-            }, Math.max(100, timeToBackFace));
-        });
+        console.log('准备切换卡牌组，等待CSS动画事件...');
 
         // 切换到下一套卡牌 - 使用AppState管理
         AppState.currentSetIndex = (AppState.currentSetIndex + 1) % AppState.cardSets.length;
 
-        // 立即更新图片（因为卡牌已经在背面位置）
-        updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
-        console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}: 已切换到新卡牌组`);
+        // 使用CSS动画事件监听器来确保精确同步
+        const cards = document.querySelectorAll('.card');
+        let switchedCount = 0;
+        const totalCards = cards.length;
 
-        // 真正的闭环：CSS动画继续自然运行，无需额外操作
-        console.log('所有卡牌将在自然循环中完成切换，动画保持连续运行');
+        cards.forEach((card, index) => {
+            // 为每个卡牌添加动画事件监听器
+            const handleAnimationIteration = (event) => {
+                // 检查是否是旋转到一半的时刻（约50%进度）
+                if (event.elapsedTime % 4 >= 1.9 && event.elapsedTime % 4 <= 2.1) { // 在2秒左右
+                    console.log(`卡牌 ${index} 到达背面位置，进行切换`);
 
-        // 预生成更多卡牌组，确保有足够的随机组合
-        if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复
-            AppState.cardSets.push(getRandomCardsForRound());
-            console.log(`生成新的随机组合，当前共${AppState.cardSets.length}组`);
-        }
+                    // 立即切换这张卡牌的图片
+                    const newCards = AppState.cardSets[AppState.currentSetIndex];
+                    if (newCards && newCards[index]) {
+                        updateSingleCard(card, newCards[index]);
+                    }
+
+                    switchedCount++;
+
+                    // 移除事件监听器，避免重复触发
+                    card.removeEventListener('animationiteration', handleAnimationIteration);
+
+                    // 所有卡牌切换完成
+                    if (switchedCount === totalCards) {
+                        console.log('所有卡牌已完成同步切换');
+                        // 预生成更多卡牌组
+                        if (AppState.cardSets.length < 10) {
+                            AppState.cardSets.push(getRandomCardsForRound());
+                            console.log(`生成新的随机组合，当前共${AppState.cardSets.length}组`);
+                        }
+                    }
+                }
+            };
+
+            // 添加动画迭代事件监听器
+            card.addEventListener('animationiteration', handleAnimationIteration);
+        });
+
+        console.log(`等待动画事件触发切换到第${AppState.currentSetIndex + 1}组卡牌`);
+
     } catch (error) {
         console.error('切换卡牌集失败:', error);
+        // 降级方案：使用定时器
+        fallbackCardSwitch();
     }
+}
+
+// 更新单张卡牌图片（用于精确切换）
+function updateSingleCard(cardElement, newCard) {
+    try {
+        const frontImg = cardElement.querySelector('.card-front img');
+        if (frontImg && newCard) {
+            const newSrc = `images/${newCard.file}`;
+            if (frontImg.src !== newSrc) {
+                // 强制刷新，避免缓存问题
+                frontImg.src = newSrc + '?t=' + Date.now();
+                console.log(`单张卡牌已切换到: ${newCard.name}`);
+            }
+        }
+    } catch (error) {
+        console.error('更新单张卡牌失败:', error);
+    }
+}
+
+// 降级方案：使用定时器切换
+function fallbackCardSwitch() {
+    console.log('使用降级方案进行卡牌切换...');
+    const cards = document.querySelectorAll('.card');
+    const newCards = AppState.cardSets[AppState.currentSetIndex];
+
+    cards.forEach((card, index) => {
+        if (newCards && newCards[index]) {
+            // 延迟不同时间，避免同时切换
+            setTimeout(() => {
+                updateSingleCard(card, newCards[index]);
+            }, index * 100);
+        }
+    });
 }
 
 // 更新卡牌图片（纯展示模式）
