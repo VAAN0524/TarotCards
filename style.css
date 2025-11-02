@@ -985,11 +985,11 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: clamp(15px, 3vw, 25px);
-    margin: 30px 0;
+    gap: clamp(8px, 2vw, 15px);
+    margin: 25px 0;
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding: clamp(10px, 2vw, 20px) clamp(8px, 1.5vw, 15px);
+    padding: clamp(8px, 1.5vw, 15px) clamp(5px, 1vw, 10px);
     max-width: 100%;
     width: fit-content;
     margin-left: auto;
@@ -1057,9 +1057,9 @@ h1 {
 
     /* 结果解读界面 - 电脑端优化 */
     .result-cards {
-        gap: clamp(20px, 4vw, 35px);
-        margin: 35px 0;
-        padding: clamp(15px, 2vw, 25px) clamp(15px, 2vw, 25px);
+        gap: clamp(12px, 2.5vw, 20px);
+        margin: 25px 0;
+        padding: clamp(10px, 1.5vw, 20px) clamp(8px, 1.5vw, 15px);
         max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
@@ -1099,7 +1099,7 @@ h1 {
     background: transparent;
     border: none;
     border-radius: 0;
-    padding: 10px 8px;
+    padding: 6px 4px;
     width: clamp(200px, 25vw, 320px);
     min-width: clamp(180px, 22vw, 280px);
     max-width: 320px;
@@ -1378,9 +1378,9 @@ h1 {
 
     /* 移动端结果卡牌优化 - 防止边框遮挡 */
     .result-cards {
-        gap: clamp(8px, 2.5vw, 15px);
-        padding: clamp(8px, 2vw, 15px) clamp(12px, 3vw, 20px);
-        margin: 15px 0;
+        gap: clamp(4px, 1.5vw, 8px);
+        padding: clamp(5px, 1.5vw, 10px) clamp(8px, 2vw, 12px);
+        margin: 10px 0;
         overflow-x: auto;
         justify-content: flex-start;
         scrollbar-width: thin;
@@ -1404,7 +1404,7 @@ h1 {
     .result-card {
         width: clamp(140px, 35vw, 180px);
         min-width: clamp(130px, 32vw, 160px);
-        padding: clamp(4px, 1vw, 8px);
+        padding: clamp(2px, 0.8vw, 4px);
         margin: 0;
         border: none;
         border-radius: 0;
@@ -1470,14 +1470,14 @@ h1 {
     }
 
     .result-cards {
-        gap: 15px;
-        padding: 10px 0;
+        gap: 10px;
+        padding: 6px 0;
     }
 
     .result-card {
         width: 200px;
         min-width: 200px;
-        padding: 8px;
+        padding: 4px;
         border: none;
         background: transparent;
     }
@@ -1636,15 +1636,15 @@ footer {
     }
 
     .result-cards {
-        gap: clamp(6px, 1.5vw, 10px);
-        padding: 3px 0;
-        margin: 15px 0;
+        gap: clamp(3px, 1vw, 6px);
+        padding: 2px 0;
+        margin: 8px 0;
     }
 
     .result-card {
         width: clamp(110px, 30vw, 140px);
         min-width: 110px;
-        padding: clamp(3px, 1vw, 6px);
+        padding: clamp(1px, 0.5vw, 3px);
         border: none;
         border-radius: 0;
         background: transparent;
@@ -1703,9 +1703,9 @@ footer {
 
     /* 结果卡牌移动端优化 */
     .result-cards {
-        gap: clamp(12px, 2.5vw, 20px);
-        padding: clamp(10px, 2vw, 18px) clamp(15px, 3vw, 25px);
-        margin: 20px 0;
+        gap: clamp(6px, 1.8vw, 12px);
+        padding: clamp(6px, 1.5vw, 12px) clamp(10px, 2vw, 15px);
+        margin: 12px 0;
         justify-content: flex-start;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -1715,7 +1715,7 @@ footer {
     .result-card {
         width: clamp(150px, 38vw, 180px);
         min-width: clamp(140px, 35vw, 170px);
-        padding: clamp(5px, 1.5vw, 8px);
+        padding: clamp(3px, 1vw, 5px);
         border: none;
         border-radius: 0;
         background: transparent;
