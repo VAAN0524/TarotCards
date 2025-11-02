@@ -605,20 +605,40 @@ function switchToNextCardSet() {
         const totalCards = cards.length;
 
         cards.forEach((card, index) => {
+            // 添加标志防止同一周期内多次切换
+            if (!card.switchData) {
+                card.switchData = {
+                    lastSwitchTime: 0,
+                    switchedInCurrentCycle: false
+                };
+            }
+
             // 为每个卡牌添加动画事件监听器
             const handleAnimationIteration = (event) => {
                 console.log(`卡牌 ${index} 动画事件触发: elapsedTime=${event.elapsedTime}s`);
 
-                // 检查是否是旋转到一半的时刻（约2秒位置）
+                // 检查是否是侧面位置（用户看不到内容的时候）
                 // elapsedTime是动画开始后的总时间，8秒一个周期
                 const currentCycleTime = event.elapsedTime % 8;
-                if (currentCycleTime >= 3.8 && currentCycleTime <= 4.2) { // 在4秒左右（背面位置）
-                    console.log(`✓ 卡牌 ${index} 到达背面位置（${currentCycleTime.toFixed(2)}s），进行切换`);
+                // 在2秒（90度）或6秒（270度）左右切换，这些时候用户看不到任何面
+                if ((currentCycleTime >= 1.8 && currentCycleTime <= 2.2) ||
+                    (currentCycleTime >= 5.8 && currentCycleTime <= 6.2)) {
+
+                    // 检查是否已经在当前周期切换过了
+                    const currentCycle = Math.floor(event.elapsedTime / 8);
+                    if (card.switchData.lastSwitchCycle === currentCycle) {
+                        console.log(`⚠️ 卡牌 ${index} 在当前周期已切换过，跳过`);
+                        return;
+                    }
+
+                    console.log(`✓ 卡牌 ${index} 到达侧面位置（${currentCycleTime.toFixed(2)}s），进行切换`);
 
                     // 立即切换这张卡牌的图片
                     const newCards = AppState.cardSets[AppState.currentSetIndex];
                     if (newCards && newCards[index]) {
                         updateSingleCard(card, newCards[index]);
+                        // 记录切换的周期
+                        card.switchData.lastSwitchCycle = currentCycle;
                     }
 
                     switchedCount++;
@@ -682,14 +702,22 @@ function fallbackCardSwitch() {
 
     cards.forEach((card, index) => {
         if (newCards[index]) {
-            // 计算延迟时间，模拟自然的背面位置
-            const baseDelay = 4000; // 4秒到背面
+            // 计算延迟时间，在侧面位置切换（2秒或6秒位置）
+            const baseDelay1 = 2000; // 2秒到90度位置
+            const baseDelay2 = 6000; // 6秒到270度位置
             const cardStagger = index * 400; // 每张卡牌延迟400ms
-            const totalDelay = baseDelay + cardStagger;
+
+            // 选择第一个可用的时间点
+            const totalDelay = baseDelay1 + cardStagger;
 
             setTimeout(() => {
-                console.log(`⚠️ 降级方案切换卡牌 ${index}`);
+                console.log(`⚠️ 降级方案切换卡牌 ${index}（90度位置）`);
                 updateSingleCard(card, newCards[index]);
+
+                // 为下一次切换准备
+                if (card.switchData) {
+                    card.switchData.lastSwitchCycle = 1;
+                }
             }, totalDelay);
         } else {
             console.warn(`⚠️ 卡牌 ${index} 没有对应的新数据`);
