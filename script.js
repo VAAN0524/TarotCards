@@ -205,6 +205,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 初始化智能卡牌尺寸系统
         window.smartCardSizer = new SmartCardSizer();
+
+        // 检查动画系统初始化状态
+        setTimeout(() => {
+            console.log('🎯 检查动画系统初始化状态...');
+            const cards = document.querySelectorAll('.card');
+            console.log(`✓ 找到 ${cards.length} 张卡牌`);
+
+            cards.forEach((card, index) => {
+                const style = window.getComputedStyle(card);
+                const animationName = style.animationName;
+                const animationDuration = style.animationDuration;
+                console.log(`✓ 卡牌 ${index}: ${animationName} (${animationDuration})`);
+            });
+
+            console.log('✨ 动画系统初始化完成，卡牌应该开始旋转');
+        }, 1000);
     }, 200);
 
     // 添加全局测试函数
@@ -221,6 +237,38 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('测试占卜系统失败:', error);
         }
+    };
+
+    // 添加卡牌动画状态监控函数
+    window.monitorCardAnimation = function() {
+        console.log('🔍 开始监控卡牌动画状态...');
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            // 获取计算样式
+            const computedStyle = window.getComputedStyle(card);
+            const transform = computedStyle.transform;
+            const animation = computedStyle.animation;
+
+            console.log(`🔍 卡牌 ${index} 状态:`);
+            console.log(`  - 动画: ${animation}`);
+            console.log(`  - 变换: ${transform}`);
+
+            // 检查动画事件监听器
+            const hasListener = card.onanimationiteration !== null;
+            console.log(`  - 有动画迭代监听器: ${hasListener}`);
+        });
+
+        console.log('🔍 AppState状态:');
+        console.log(`  - 当前卡牌组索引: ${AppState.currentSetIndex}`);
+        console.log(`  - 卡牌组总数: ${AppState.cardSets.length}`);
+        console.log(`  - 显示的卡牌: ${AppState.displayedCards.map(c => c.name).join(', ')}`);
+    };
+
+    // 手动触发卡牌切换测试
+    window.testCardSwitch = function() {
+        console.log('🧪 手动测试卡牌切换...');
+        switchToNextCardSet();
     };
 
     console.log('基础初始化完成，占卜系统将在200ms后初始化');
@@ -559,9 +607,13 @@ function switchToNextCardSet() {
         cards.forEach((card, index) => {
             // 为每个卡牌添加动画事件监听器
             const handleAnimationIteration = (event) => {
-                // 检查是否是旋转到一半的时刻（约50%进度）
-                if (event.elapsedTime % 4 >= 1.9 && event.elapsedTime % 4 <= 2.1) { // 在2秒左右
-                    console.log(`卡牌 ${index} 到达背面位置，进行切换`);
+                console.log(`卡牌 ${index} 动画事件触发: elapsedTime=${event.elapsedTime}s`);
+
+                // 检查是否是旋转到一半的时刻（约2秒位置）
+                // elapsedTime是动画开始后的总时间，8秒一个周期
+                const currentCycleTime = event.elapsedTime % 8;
+                if (currentCycleTime >= 3.8 && currentCycleTime <= 4.2) { // 在4秒左右（背面位置）
+                    console.log(`✓ 卡牌 ${index} 到达背面位置（${currentCycleTime.toFixed(2)}s），进行切换`);
 
                     // 立即切换这张卡牌的图片
                     const newCards = AppState.cardSets[AppState.currentSetIndex];
@@ -576,11 +628,11 @@ function switchToNextCardSet() {
 
                     // 所有卡牌切换完成
                     if (switchedCount === totalCards) {
-                        console.log('所有卡牌已完成同步切换');
+                        console.log('✓ 所有卡牌已完成同步切换');
                         // 预生成更多卡牌组
                         if (AppState.cardSets.length < 10) {
                             AppState.cardSets.push(getRandomCardsForRound());
-                            console.log(`生成新的随机组合，当前共${AppState.cardSets.length}组`);
+                            console.log(`✓ 生成新的随机组合，当前共${AppState.cardSets.length}组`);
                         }
                     }
                 }
@@ -588,6 +640,7 @@ function switchToNextCardSet() {
 
             // 添加动画迭代事件监听器
             card.addEventListener('animationiteration', handleAnimationIteration);
+            console.log(`✓ 已为卡牌 ${index} 添加动画事件监听器`);
         });
 
         console.log(`等待动画事件触发切换到第${AppState.currentSetIndex + 1}组卡牌`);
@@ -618,18 +671,40 @@ function updateSingleCard(cardElement, newCard) {
 
 // 降级方案：使用定时器切换
 function fallbackCardSwitch() {
-    console.log('使用降级方案进行卡牌切换...');
+    console.log('⚠️ 使用降级方案进行卡牌切换...');
     const cards = document.querySelectorAll('.card');
     const newCards = AppState.cardSets[AppState.currentSetIndex];
 
+    if (!newCards || newCards.length === 0) {
+        console.error('⚠️ 降级方案失败：没有可用的卡牌组');
+        return;
+    }
+
     cards.forEach((card, index) => {
-        if (newCards && newCards[index]) {
-            // 延迟不同时间，避免同时切换
+        if (newCards[index]) {
+            // 计算延迟时间，模拟自然的背面位置
+            const baseDelay = 4000; // 4秒到背面
+            const cardStagger = index * 400; // 每张卡牌延迟400ms
+            const totalDelay = baseDelay + cardStagger;
+
             setTimeout(() => {
+                console.log(`⚠️ 降级方案切换卡牌 ${index}`);
                 updateSingleCard(card, newCards[index]);
-            }, index * 100);
+            }, totalDelay);
+        } else {
+            console.warn(`⚠️ 卡牌 ${index} 没有对应的新数据`);
         }
     });
+
+    // 5秒后检查是否需要重试
+    setTimeout(() => {
+        console.log('⚠️ 降级方案切换完成');
+        // 预生成更多卡牌组
+        if (AppState.cardSets.length < 10) {
+            AppState.cardSets.push(getRandomCardsForRound());
+            console.log(`⚠️ 降级方案：生成新的随机组合，当前共${AppState.cardSets.length}组`);
+        }
+    }, 6000);
 }
 
 // 更新卡牌图片（纯展示模式）
