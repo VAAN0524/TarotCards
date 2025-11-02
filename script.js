@@ -577,98 +577,77 @@ function getRandomCardsForRound() {
 }
 
 
-// 添加自动旋转效果
+// 添加自动旋转效果（完全同步CSS动画）
 function addAutoRotate() {
-    // 4秒后（第一次到背面位置）开始更换，然后每8秒更换一次
-    // 增加小延时确保动画完全到达背面位置
+    // 关键：CSS动画在页面加载时立即开始（0秒）
+    // 我们需要在第一个2秒位置（侧面）进行第一次切换
+
+    // 计算到下一个2秒位置的时间
+    const now = Date.now();
+    const pageLoadTime = window.performance.timing.domContentLoadedEventEnd;
+    const elapsedSinceLoad = now - pageLoadTime;
+    const timeToNextSidePosition = 2000 - (elapsedSinceLoad % 2000);
+
+    console.log(`🕐 页面加载时间: ${pageLoadTime}ms, 已过时间: ${elapsedSinceLoad}ms`);
+    console.log(`🕐 到下一个侧面位置: ${timeToNextSidePosition}ms`);
+
+    // 第一次切换：等待到下一个侧面位置
     setTimeout(() => {
+        console.log('🎯 第一次切换开始（侧面位置）');
         switchToNextCardSet();
-        // 使用8秒间隔，与CSS动画周期完全同步
+
+        // 后续切换：每8秒一次，与CSS动画完全同步
         setInterval(() => {
-            // 在动画运行到一半时（4秒）开始切换，确保卡牌在背面位置
-            setTimeout(switchToNextCardSet, 4000);
-        }, 8000);
-    }, 4100); // 稍微延迟确保第一次也在背面位置
+            console.log('🎯 循环切换开始');
+            switchToNextCardSet();
+        }, 8000); // 完全匹配CSS动画周期
+    }, timeToNextSidePosition);
 }
 
-// 切换到下一套卡牌（使用CSS动画事件驱动）
+// 切换到下一套卡牌（使用精确定时器，完全同步CSS动画）
 function switchToNextCardSet() {
     try {
-        console.log('准备切换卡牌组，等待CSS动画事件...');
+        console.log('🎯 开始精确同步切换卡牌...');
 
         // 切换到下一套卡牌 - 使用AppState管理
         AppState.currentSetIndex = (AppState.currentSetIndex + 1) % AppState.cardSets.length;
 
-        // 使用CSS动画事件监听器来确保精确同步
         const cards = document.querySelectorAll('.card');
-        let switchedCount = 0;
-        const totalCards = cards.length;
+        const newCards = AppState.cardSets[AppState.currentSetIndex];
 
+        if (!newCards || newCards.length === 0) {
+            console.error('❌ 没有可用的卡牌组');
+            return;
+        }
+
+        console.log(`🔄 准备切换到第${AppState.currentSetIndex + 1}组卡牌: ${newCards.map(c => c.name).join(', ')}`);
+
+        // 关键：使用精确的侧面位置时机
+        // CSS动画从0开始：0s正面→2s侧面→4s背面→6s侧面→8s正面
+        // 我们在2秒位置（90度）切换，用户看不到
         cards.forEach((card, index) => {
-            // 添加标志防止同一周期内多次切换
-            if (!card.switchData) {
-                card.switchData = {
-                    lastSwitchTime: 0,
-                    switchedInCurrentCycle: false
-                };
+            if (newCards[index]) {
+                // 为每张卡牌添加微小延迟，模拟自然的视觉流
+                const delay = index * 50; // 每张卡牌延迟50ms
+                const switchTime = 2000 + delay; // 2秒到达侧面位置 + 延迟
+
+                setTimeout(() => {
+                    updateSingleCard(card, newCards[index]);
+                    console.log(`✓ 卡牌 ${index} 在侧面位置切换完成: ${newCards[index].name}`);
+                }, switchTime);
             }
-
-            // 为每个卡牌添加动画事件监听器
-            const handleAnimationIteration = (event) => {
-                console.log(`卡牌 ${index} 动画事件触发: elapsedTime=${event.elapsedTime}s`);
-
-                // 检查是否是侧面位置（用户看不到内容的时候）
-                // elapsedTime是动画开始后的总时间，8秒一个周期
-                const currentCycleTime = event.elapsedTime % 8;
-                // 在2秒（90度）或6秒（270度）左右切换，这些时候用户看不到任何面
-                if ((currentCycleTime >= 1.8 && currentCycleTime <= 2.2) ||
-                    (currentCycleTime >= 5.8 && currentCycleTime <= 6.2)) {
-
-                    // 检查是否已经在当前周期切换过了
-                    const currentCycle = Math.floor(event.elapsedTime / 8);
-                    if (card.switchData.lastSwitchCycle === currentCycle) {
-                        console.log(`⚠️ 卡牌 ${index} 在当前周期已切换过，跳过`);
-                        return;
-                    }
-
-                    console.log(`✓ 卡牌 ${index} 到达侧面位置（${currentCycleTime.toFixed(2)}s），进行切换`);
-
-                    // 立即切换这张卡牌的图片
-                    const newCards = AppState.cardSets[AppState.currentSetIndex];
-                    if (newCards && newCards[index]) {
-                        updateSingleCard(card, newCards[index]);
-                        // 记录切换的周期
-                        card.switchData.lastSwitchCycle = currentCycle;
-                    }
-
-                    switchedCount++;
-
-                    // 移除事件监听器，避免重复触发
-                    card.removeEventListener('animationiteration', handleAnimationIteration);
-
-                    // 所有卡牌切换完成
-                    if (switchedCount === totalCards) {
-                        console.log('✓ 所有卡牌已完成同步切换');
-                        // 预生成更多卡牌组
-                        if (AppState.cardSets.length < 10) {
-                            AppState.cardSets.push(getRandomCardsForRound());
-                            console.log(`✓ 生成新的随机组合，当前共${AppState.cardSets.length}组`);
-                        }
-                    }
-                }
-            };
-
-            // 添加动画迭代事件监听器
-            card.addEventListener('animationiteration', handleAnimationIteration);
-            console.log(`✓ 已为卡牌 ${index} 添加动画事件监听器`);
         });
 
-        console.log(`等待动画事件触发切换到第${AppState.currentSetIndex + 1}组卡牌`);
+        // 预生成更多卡牌组
+        if (AppState.cardSets.length < 10) {
+            AppState.cardSets.push(getRandomCardsForRound());
+            console.log(`✓ 生成新的随机组合，当前共${AppState.cardSets.length}组`);
+        }
+
+        console.log('✨ 所有卡牌切换任务已安排，将在侧面位置完成切换');
 
     } catch (error) {
-        console.error('切换卡牌集失败:', error);
-        // 降级方案：使用定时器
-        fallbackCardSwitch();
+        console.error('❌ 切换卡牌集失败:', error);
     }
 }
 
@@ -689,51 +668,6 @@ function updateSingleCard(cardElement, newCard) {
     }
 }
 
-// 降级方案：使用定时器切换
-function fallbackCardSwitch() {
-    console.log('⚠️ 使用降级方案进行卡牌切换...');
-    const cards = document.querySelectorAll('.card');
-    const newCards = AppState.cardSets[AppState.currentSetIndex];
-
-    if (!newCards || newCards.length === 0) {
-        console.error('⚠️ 降级方案失败：没有可用的卡牌组');
-        return;
-    }
-
-    cards.forEach((card, index) => {
-        if (newCards[index]) {
-            // 计算延迟时间，在侧面位置切换（2秒或6秒位置）
-            const baseDelay1 = 2000; // 2秒到90度位置
-            const baseDelay2 = 6000; // 6秒到270度位置
-            const cardStagger = index * 400; // 每张卡牌延迟400ms
-
-            // 选择第一个可用的时间点
-            const totalDelay = baseDelay1 + cardStagger;
-
-            setTimeout(() => {
-                console.log(`⚠️ 降级方案切换卡牌 ${index}（90度位置）`);
-                updateSingleCard(card, newCards[index]);
-
-                // 为下一次切换准备
-                if (card.switchData) {
-                    card.switchData.lastSwitchCycle = 1;
-                }
-            }, totalDelay);
-        } else {
-            console.warn(`⚠️ 卡牌 ${index} 没有对应的新数据`);
-        }
-    });
-
-    // 5秒后检查是否需要重试
-    setTimeout(() => {
-        console.log('⚠️ 降级方案切换完成');
-        // 预生成更多卡牌组
-        if (AppState.cardSets.length < 10) {
-            AppState.cardSets.push(getRandomCardsForRound());
-            console.log(`⚠️ 降级方案：生成新的随机组合，当前共${AppState.cardSets.length}组`);
-        }
-    }, 6000);
-}
 
 // 更新卡牌图片（纯展示模式）
 function updateCardImages(newCards) {
