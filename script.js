@@ -703,32 +703,9 @@ function initializeDivination() {
                 };
             }
 
-            // 开始新的占卜按钮绑定
-            const newReadingBtn = document.getElementById('newReading');
-            if (newReadingBtn) {
-                newReadingBtn.onclick = function() {
-                    console.log('开始新的占卜');
-                    newReading();
-                };
-            }
+            // 按钮现在直接使用onclick="location.reload()"，不需要事件绑定
 
-            // 返回主页按钮绑定
-            const backHomeBtn = document.getElementById('backHome');
-            if (backHomeBtn) {
-                backHomeBtn.onclick = function() {
-                    console.log('返回主页');
-                    backHome();
-                };
-            }
-
-            // 返回问题类型选择按钮绑定
-            const backToQuestionTypeBtn = document.getElementById('backToQuestionType');
-            if (backToQuestionTypeBtn) {
-                backToQuestionTypeBtn.onclick = function() {
-                    console.log('返回问题类型选择');
-                    backToQuestionType();
-                };
-            }
+            // 返回问题类型选择按钮已删除
 
             console.log('极简占卜系统初始化完成');
         } catch (error) {
@@ -3288,21 +3265,7 @@ function showResultScreen(interpretation) {
 
     // 重新绑定按钮事件并应用智能尺寸
     setTimeout(() => {
-        const newReadingBtn = document.getElementById('newReading');
-        if (newReadingBtn) {
-            newReadingBtn.onclick = function() {
-                console.log('开始新的占卜');
-                newReading();
-            };
-        }
-
-        const backHomeBtn = document.getElementById('backHome');
-        if (backHomeBtn) {
-            backHomeBtn.onclick = function() {
-                console.log('返回主页');
-                backHome();
-            };
-        }
+        // 按钮现在直接使用onclick="location.reload()"，不需要事件绑定
 
         // 应用智能卡牌尺寸到新创建的结果卡牌
         if (window.smartCardSizer) {
