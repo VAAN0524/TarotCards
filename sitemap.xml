@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 🎯 塔罗牌占卜应用 - 网站地图 -->
+<!-- 🌐 Tarot Cards Application - Sitemap -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <!-- 🌟 Cloudflare Pages 主站 -->
+    <url>
+        <loc>https://tarotcards-365.pages.dev/</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <url>
+        <loc>https://tarotcards-365.pages.dev/index.html</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <!-- 🔗 GitHub Pages 镜像站点 -->
+    <url>
+        <loc>https://VAAN0524.github.io/TarotCards/</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://VAAN0524.github.io/TarotCards/index.html</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- 📋 重要资源文件 -->
+    <url>
+        <loc>https://tarotcards-365.pages.dev/style.css</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://tarotcards-365.pages.dev/script.js</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://tarotcards-365.pages.dev/robots.txt</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://tarotcards-365.pages.dev/sitemap.xml</loc>
+        <lastmod>2025-01-02</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+</urlset>

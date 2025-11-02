@@ -1,0 +1,47 @@
+# 🎯 塔罗牌占卜应用 - 搜索引擎优化配置
+# 🌐 Tarot Cards Application - Search Engine Optimization Configuration
+
+User-agent: *
+Allow: /
+Allow: /images/
+Allow: /index.html
+Allow: /style.css
+Allow: /script.js
+Allow: /robots.txt
+Allow: /sitemap.xml
+
+# 🇨🇳 百度搜索引擎优化
+User-agent: Baiduspider
+Allow: /
+Allow: /images/
+Allow: /index.html
+Allow: /style.css
+Allow: /script.js
+Crawl-delay: 1
+
+# 🌍 谷歌搜索引擎优化
+User-agent: Googlebot
+Allow: /
+Allow: /images/
+
+# 🐌 搜狗搜索引擎优化
+User-agent: Sogou web spider
+Allow: /
+Crawl-delay: 1
+
+# 🔍 360搜索引擎优化
+User-agent: 360Spider
+Allow: /
+Crawl-delay: 1
+
+# 🦊 神马搜索引擎优化
+User-agent: Yisouspider
+Allow: /
+Crawl-delay: 1
+
+# 🤖 通用爬虫限制
+Crawl-delay: 1
+
+# 📍 Sitemap位置 - 双站点支持
+Sitemap: https://tarotcards-365.pages.dev/sitemap.xml
+Sitemap: https://VAAN0524.github.io/TarotCards/sitemap.xml
