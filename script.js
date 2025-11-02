@@ -423,21 +423,20 @@ function initializeTarotCards() {
     }
 }
 
-// 安全地初始化卡牌状态，防止动画冲突
+// 安全地初始化卡牌状态，与CSS动画兼容
 function initializeCardState(cardElement) {
-    // 清除所有可能的动画相关属性
-    cardElement.style.animation = 'none';
-    cardElement.style.webkitAnimation = 'none';
-    cardElement.style.mozAnimation = 'none';
-    cardElement.style.animationPlayState = 'paused';
-
-    // 设置初始transform状态
-    cardElement.style.transform = 'rotateY(0deg)';
-
-    // 确保backface-visibility正确设置
+    // 保持CSS动画运行，不强制停止
+    // 只确保基本的3D属性正确设置
     cardElement.style.webkitBackfaceVisibility = 'hidden';
     cardElement.style.backfaceVisibility = 'hidden';
     cardElement.style.mozBackfaceVisibility = 'hidden';
+
+    // 确保transform-style正确
+    cardElement.style.webkitTransformStyle = 'preserve-3d';
+    cardElement.style.transformStyle = 'preserve-3d';
+    cardElement.style.mozTransformStyle = 'preserve-3d';
+
+    // 不干预动画，让CSS自动旋转持续运行
 }
 
 // 显示指定的卡牌集合
@@ -449,6 +448,8 @@ function displayCardSet(cardSet) {
         const cardElement = document.createElement('div');
         cardElement.className = 'card';
         cardElement.setAttribute('data-card-id', card.id);
+        // 设置不同的动画延迟，让卡牌错开旋转
+        cardElement.style.animationDelay = `${index * 0.4}s`;
 
         // 安全初始化卡牌状态
         initializeCardState(cardElement);
@@ -549,14 +550,28 @@ function switchToNextCardSet() {
         // 获取所有卡牌元素
         const cards = document.querySelectorAll('.card');
 
-        // 由于CSS动画已被禁用，直接设置所有卡牌显示背面
-        cards.forEach(card => {
-            // 移除动画状态控制，直接设置transform
+        // 智能切换策略：安全地暂停动画并平滑过渡
+        cards.forEach((card, index) => {
+            // 强制停止动画，避免冲突
+            card.style.animation = 'none !important';
+            card.style.webkitAnimation = 'none !important';
+            card.style.mozAnimation = 'none !important';
+
+            // 获取当前计算样式
+            const computedStyle = window.getComputedStyle(card);
+
+            // 使用CSS transition平滑过渡到背面位置
+            card.style.transition = 'transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1)';
+            card.style.webkitTransition = '-webkit-transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1)';
+            card.style.mozTransition = 'transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1)';
+
+            // 强制设置到背面位置
             card.style.transform = 'rotateY(180deg)';
-            // 清除任何可能的动画相关属性
-            card.style.animation = 'none';
-            card.style.webkitAnimation = 'none';
-            card.style.mozAnimation = 'none';
+            card.style.webkitTransform = 'rotateY(180deg)';
+            card.style.mozTransform = 'rotateY(180deg)';
+
+            // 确保transform样式优先级最高
+            card.style.setProperty('transform', 'rotateY(180deg)', 'important');
         });
 
         // 切换到下一套卡牌 - 使用AppState管理
@@ -566,9 +581,43 @@ function switchToNextCardSet() {
         updateCardImages(AppState.cardSets[AppState.currentSetIndex]);
         console.log(`在背面位置切换为正面随机${AppState.currentSetIndex + 1}: 已切换到新卡牌组`);
 
-        // 由于已禁用CSS动画，无需恢复动画状态
-        // 卡牌将保持当前的transform状态，直到用户交互或页面刷新
-        console.log('卡牌切换完成，保持当前显示状态');
+        // 短暂延迟后，从背面位置平滑过渡到正面并重新开始动画
+        setTimeout(() => {
+            cards.forEach((card, index) => {
+                // 清除之前的强制transform
+                card.style.removeProperty('transform');
+
+                // 先从背面平滑过渡到正面
+                card.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                card.style.webkitTransition = '-webkit-transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                card.style.mozTransition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                card.style.transform = 'rotateY(0deg)';
+
+                // 延迟后重新开始动画
+                setTimeout(() => {
+                    // 清除transition
+                    card.style.transition = '';
+                    card.style.webkitTransition = '';
+                    card.style.mozTransition = '';
+
+                    // 重新设置动画
+                    card.style.animation = '';
+                    card.style.webkitAnimation = '';
+                    card.style.mozAnimation = '';
+
+                    // 强制重新开始动画
+                    requestAnimationFrame(() => {
+                        card.style.animation = 'autoSpin 12s linear infinite';
+                        card.style.webkitAnimation = 'autoSpin 12s linear infinite';
+                        card.style.mozAnimation = 'autoSpin 12s linear infinite';
+                        card.style.animationDelay = `${index * 0.4}s`;
+                        card.style.webkitAnimationDelay = `${index * 0.4}s`;
+                        card.style.mozAnimationDelay = `${index * 0.4}s`;
+                    });
+                }, 600);
+            });
+            console.log('卡牌重新开始自动旋转，动画延迟已重新设置');
+        }, 200);
 
         // 预生成更多卡牌组，确保有足够的随机组合
         if (AppState.cardSets.length < 10) { // 保持至少10组，避免重复
