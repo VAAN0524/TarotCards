@@ -194,6 +194,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTarotCards();
     addAutoRotate();
 
+    // 立即开始图片预加载优化
+    initializeImageOptimization();
+
     // 延迟初始化占卜系统，确保所有元素都准备好
     setTimeout(() => {
         console.log('延迟初始化占卜系统...');
@@ -3739,4 +3742,121 @@ function shuffleArray(array) {
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
+}
+
+// 图片预加载和优化系统
+function initializeImageOptimization() {
+    console.log('🖼️ 开始图片优化系统初始化...');
+
+    // 创建图片预加载管理器
+    window.imagePreloader = {
+        cache: new Map(),
+        loadingPromises: new Map(),
+        criticalImages: ['塔罗牌背面.png'], // 关键图片列表
+
+        // 预加载关键图片
+        preloadCriticalImages: function() {
+            const promises = this.criticalImages.map(imageSrc => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.cache.set(imageSrc, img);
+                        console.log(`✅ 关键图片预加载完成: ${imageSrc}`);
+                        resolve(img);
+                    };
+                    img.onerror = () => {
+                        console.warn(`⚠️ 关键图片预加载失败: ${imageSrc}`);
+                        resolve(null);
+                    };
+                    img.src = `images/${imageSrc}`;
+                });
+            });
+
+            return Promise.all(promises);
+        },
+
+        // 智能卡牌图片加载
+        loadCardImage: function(cardFile, priority = 'normal') {
+            if (this.cache.has(cardFile)) {
+                return Promise.resolve(this.cache.get(cardFile));
+            }
+
+            if (this.loadingPromises.has(cardFile)) {
+                return this.loadingPromises.get(cardFile);
+            }
+
+            const promise = new Promise((resolve) => {
+                const img = new Image();
+
+                img.onload = () => {
+                    this.cache.set(cardFile, img);
+                    this.loadingPromises.delete(cardFile);
+                    console.log(`✅ 卡牌图片加载完成: ${cardFile}`);
+                    resolve(img);
+                };
+
+                img.onerror = () => {
+                    this.loadingPromises.delete(cardFile);
+                    console.warn(`⚠️ 卡牌图片加载失败: ${cardFile}`);
+                    resolve(null);
+                };
+
+                // 根据优先级设置加载策略
+                if (priority === 'high') {
+                    img.src = `images/${cardFile}`;
+                } else {
+                    // 延迟加载低优先级图片
+                    setTimeout(() => {
+                        img.src = `images/${cardFile}`;
+                    }, Math.random() * 1000); // 随机延迟避免同时加载
+                }
+            });
+
+            this.loadingPromises.set(cardFile, promise);
+            return promise;
+        },
+
+        // 批量预加载常用卡牌
+        preloadCommonCards: function() {
+            const commonCards = [
+                '0. 愚人 (The Fool).png',
+                '1. 魔术师 (The Magician) .png',
+                '21. 世界 (The World).png'
+            ];
+
+            commonCards.forEach(card => {
+                this.loadCardImage(card, 'normal');
+            });
+
+            console.log('🔄 开始预加载常用卡牌...');
+        },
+
+        // 获取图片加载统计
+        getStats: function() {
+            return {
+                cached: this.cache.size,
+                loading: this.loadingPromises.size,
+                memoryUsage: Array.from(this.cache.values()).length * 2.5 // 估算内存使用(MB)
+            };
+        }
+    };
+
+    // 立即预加载关键图片
+    window.imagePreloader.preloadCriticalImages().then(() => {
+        console.log('✅ 关键图片预加载完成');
+    });
+
+    // 延迟预加载常用卡牌
+    setTimeout(() => {
+        window.imagePreloader.preloadCommonCards();
+    }, 2000);
+
+    // 定期清理未使用的图片缓存
+    setInterval(() => {
+        if (window.imagePreloader.cache.size > 30) {
+            const oldestKey = window.imagePreloader.cache.keys().next().value;
+            window.imagePreloader.cache.delete(oldestKey);
+            console.log('🧹 清理图片缓存:', oldestKey);
+        }
+    }, 30000); // 30秒清理一次
 }
